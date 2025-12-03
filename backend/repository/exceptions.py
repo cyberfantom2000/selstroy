@@ -1,0 +1,12 @@
+from ..exceptions import BackendException
+
+
+class DatabaseException(BackendException):
+    """ Based database exception """
+    pass
+
+
+class EntityNotFound(DatabaseException):
+    """ Entity not found exception. Thrown when entity not found during CRUD operations """
+    def __init__(self, entity):
+        DatabaseException.__init__(self, f'{entity} not found!')
