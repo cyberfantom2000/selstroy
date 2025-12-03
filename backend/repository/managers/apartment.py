@@ -6,7 +6,7 @@ from ..models.apartment import ApartmentUpdate, ApartmentCreate
 from ..models.common import File
 
 
-class ApartImageManager(ModelManager):
+class ApartmentManager(ModelManager):
     """ Apartment model manager. Override create and update methods for creating links
     to File models from an id
     """

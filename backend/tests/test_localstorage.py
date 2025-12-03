@@ -9,21 +9,17 @@ from backend.repository.localstorage import LocalStorage, EntityNotFound
 
 class MockStream:
     """ Mock for async stream imitating """
-    def __init__(self, data: bytes, chunk_size: int = 4):
+    def __init__(self, data: bytes):
         self.data = data
-        self.chunk_size = chunk_size
         self.pos = 0
 
-    def __aiter__(self):
-        return self
-
-    async def __anext__(self):
+    async def read(self, size: int) -> bytes:
         if self.pos >= len(self.data):
-            raise StopAsyncIteration
-
-        chunk = self.data[self.pos:self.pos + self.chunk_size]
-        self.pos += self.chunk_size
-        return chunk
+            return b''
+        chunk = min(len(self.data) - self.pos, size)
+        result = self.data[self.pos: self.pos + chunk]
+        self.pos += chunk
+        return result
 
 
 @pytest.fixture
@@ -54,9 +50,10 @@ async def test_write_file(storage: LocalStorage, stream_mock: MockStream):
     :param storage: fixture of a LocalStorage
     :param stream_mock: fixture of a MockStream object
     """
-    path = await storage.write(stream_mock, ext='txt', folder='test')
+    path, size = await storage.write(stream_mock, ext='txt', folder='test')
     assert Path(storage.base_path, path).exists()
     assert Path(storage.base_path, path).is_file()
+    assert size == len(stream_mock.data)
 
 
 @pytest.mark.asyncio

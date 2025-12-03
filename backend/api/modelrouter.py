@@ -33,7 +33,7 @@ def create_model_router(manager, model_collections: ModelCollection, *args, **kw
                                       response_model=Union[list[model_collections.public], list[dict[str, Any]]])
             self.router.add_api_route('', self.create, methods=['POST'], response_model=model_collections.public)
             self.router.add_api_route('', self.update, methods=['PATCH'], response_model=model_collections.public)
-            self.router.add_api_route('/{_id}', self.delete, methods=['DELETE'], response_class=JSONResponse)
+            self.router.add_api_route('/{uid}', self.delete, methods=['DELETE'], response_class=JSONResponse)
 
         async def list(self, limit: int = 100, offset: int = 0,
                        fields: str = Query(default=None, description='Comma separated fields')):
@@ -50,8 +50,8 @@ def create_model_router(manager, model_collections: ModelCollection, *args, **kw
         async def update(self, update: model_collections.update):
             return self.manager.update(update)
 
-        async def delete(self, _id: model_collections.id_type):
-            self.manager.delete(_id)
+        async def delete(self, uid: model_collections.id_type):
+            self.manager.delete(uid)
             return JSONResponse(status_code=200, content='Success deleted')
 
     return ModelRouter(manager, *args, **kwargs)
