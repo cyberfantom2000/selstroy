@@ -9,3 +9,4 @@ class Settings(BaseSettings):
     port: int
     host: str
     version: str
+    upload_dir: str

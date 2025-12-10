@@ -8,7 +8,7 @@ from ..repository.managers import ModelManager
 from ..repository.models.common import FileCreate, FilePublic
 
 class FileRouter:
-    """"""
+    """ File operations router """
     def __init__(self, storage: LocalStorage, manager: ModelManager, *args, **kwargs):
         """ Initializer
         :param storage: storage for saving file binary data
@@ -18,8 +18,8 @@ class FileRouter:
         self.storage = storage
         self.manager = manager
 
-        self.router.add_api_route('/file', self.upload, methods=['POST'], response_model=FilePublic)
-        self.router.add_api_route('/file/{uid}', self.download, methods=['GET'], response_model=FileResponse)
+        self.router.add_api_route('', self.upload, methods=['POST'], response_model=FilePublic)
+        self.router.add_api_route('/{uid}', self.download, methods=['GET'], response_model=FileResponse)
 
     async def upload(self, file: UploadFile):
         filename = Path(file.filename)

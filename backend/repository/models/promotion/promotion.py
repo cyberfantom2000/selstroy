@@ -7,8 +7,8 @@ from ..common import File, FilePublic
 
 
 class PromotionImageLink(SQLModel, table=True):
-    promotion_id: UUID | None = Field(default=None, foreign_key='promotion.id', primary_key=True)
-    image_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True)
+    promotion_id: UUID | None = Field(default=None, foreign_key='promotion.id', primary_key=True, ondelete='CASCADE')
+    image_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True, ondelete='CASCADE')
 
 
 class PromotionBase(SQLModel):

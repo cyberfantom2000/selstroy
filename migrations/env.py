@@ -12,8 +12,9 @@ from sqlmodel import SQLModel
 from common import settings, get_logger
 from backend.repository.models.common import *
 from backend.repository.models.promotion import *
-from backend.repository.models.apartment import *
+from backend.repository.models.apartment import Apartment, ApartElement, ApartImage
 from backend.repository.models.project import *
+
 
 log = get_logger(settings, 'migrations', store=False)
 

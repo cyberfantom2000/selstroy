@@ -12,7 +12,7 @@ class ApartElementBase(SQLModel):
 
 
 class ApartElement(ApartElementBase, table=True):
-    apartment_id: UUID | None = Field(default_factory=None, foreign_key='apartment.id', ondelete='CASCADE')
+    apartment_id: UUID | None = Field(default=None, foreign_key='apartment.id', ondelete='CASCADE')
 
 
 class ApartElementPublic(ApartElementBase):

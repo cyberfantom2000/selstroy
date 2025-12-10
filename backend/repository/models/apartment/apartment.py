@@ -9,8 +9,8 @@ from ..common import File, FilePublic
 
 
 class ApartmentPdfLink(SQLModel, table=True):
-    apartment_id: UUID | None = Field(default=None, foreign_key='apartment.id', primary_key=True)
-    pdf_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True)
+    apartment_id: UUID | None = Field(default=None, foreign_key='apartment.id', primary_key=True, ondelete='CASCADE')
+    pdf_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True, ondelete='CASCADE')
 
 
 class ApartmentBase(SQLModel):
@@ -24,7 +24,7 @@ class Apartment(ApartmentBase, table=True):
     images: list[ApartImage] = Relationship(back_populates=None, cascade_delete=True)
     items: list[ApartElement] = Relationship(back_populates=None, cascade_delete=True)
     pdf: File | None = Relationship(back_populates=None, link_model=ApartmentPdfLink)
-    project_id: UUID | None = Field(default=None, foreign_key='project.id', primary_key=True, ondelete='CASCADE')
+    project_id: UUID | None = Field(default=None, foreign_key='project.id', ondelete='CASCADE')
 
 
 class ApartmentPublic(ApartmentBase):

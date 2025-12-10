@@ -7,8 +7,8 @@ from ..common import File, FilePublic
 
 
 class ProjectShortDescriptionFileLink(SQLModel, table=True):
-    project_short_description_id: UUID | None = Field(default=None, foreign_key='projectshortdescription.id', primary_key=True)
-    file_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True)
+    project_short_description_id: UUID | None = Field(default=None, foreign_key='projectshortdescription.id', primary_key=True, ondelete='CASCADE')
+    file_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True, ondelete='CASCADE')
 
 
 class ProjectShortDescriptionBase(SQLModel):
@@ -19,7 +19,7 @@ class ProjectShortDescriptionBase(SQLModel):
 
 class ProjectShortDescription(ProjectShortDescriptionBase, table=True):
     image: File | None = Relationship(back_populates=None, link_model=ProjectShortDescriptionFileLink)
-    project_id: UUID | None = Field(default=None, foreign_key='project.id', primary_key=True, ondelete='CASCADE')
+    project_id: UUID | None = Field(default=None, foreign_key='project.id', ondelete='CASCADE')
 
 class ProjectShortDescriptionPublic(ProjectShortDescriptionBase):
     id: UUID

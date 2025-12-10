@@ -10,13 +10,13 @@ from ..common import File, FilePublic
 
 
 class ProjectImageLink(SQLModel, table=True):
-    project_id: UUID | None = Field(default=None, foreign_key='project.id', primary_key=True)
-    image_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True)
+    project_id: UUID | None = Field(default=None, foreign_key='project.id', primary_key=True, ondelete='CASCADE')
+    image_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True, ondelete='CASCADE')
 
 
 class ProjectMasterPlanLink(SQLModel, table=True):
-    project_id: UUID | None = Field(default=None, foreign_key='project.id', primary_key=True)
-    master_plan_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True)
+    project_id: UUID | None = Field(default=None, foreign_key='project.id', primary_key=True, ondelete='CASCADE')
+    master_plan_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True, ondelete='CASCADE')
 
 
 class ProjectBase(SQLModel):

@@ -7,13 +7,13 @@ from ..common import File, FilePublic
 
 
 class ApartImageIconLink(SQLModel, table=True):
-    apart_image_id: UUID | None = Field(default=None, foreign_key='apartimage.id', primary_key=True)
-    icon_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True)
+    apart_image_id: UUID | None = Field(default=None, foreign_key='apartimage.id', primary_key=True, ondelete='CASCADE')
+    icon_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True, ondelete='CASCADE')
 
 
 class ApartImageImageLink(SQLModel, table=True):
-    apart_image_id: UUID | None = Field(default=None, foreign_key='apartimage.id', primary_key=True)
-    image_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True)
+    apart_image_id: UUID | None = Field(default=None, foreign_key='apartimage.id', primary_key=True, ondelete='CASCADE')
+    image_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True, ondelete='CASCADE')
 
 
 class ApartImageBase(SQLModel):

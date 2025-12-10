@@ -2,12 +2,14 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from common import settings, get_logger
 
-from .api import create_model_router, ModelCollection, HttpExceptionMapper
+from .api import create_model_router, ModelCollection, HttpExceptionMapper, FileRouter
 from .repository.models.project import *
 from .repository.models.apartment import *
-from .repository.managers import ModelManager
-from .repository.models.project.project import ProjectUpdate
+from .repository.managers import *
+from .repository.models.promotion import *
+from .repository.models.common import *
 from .repository.repository import AsyncRepository
+from .repository.localstorage import LocalStorage
 
 log = get_logger(settings.logger_name, 'backend')
 
@@ -23,28 +25,34 @@ def register(app) -> None:
     log.info(f'Creating async repository')
     repo = AsyncRepository(engine)
 
-    elements = [(ModelManager(repo, ApartImage),
+    elements = [(ApartImageManager(repo, ApartImage),
                  ModelCollection(public=ApartImagePublic, create=ApartImageCreate, update=ApartImageUpdate),
                  {'prefix': '/api/apartment/image', 'tags': ['Apartment Image']}),
                 (ModelManager(repo, ApartElement),
                  ModelCollection(public=ApartElementPublic, create=ApartElementCreate, update=ApartElementUpdate),
                  {'prefix': '/api/apartment/element', 'tags': ['Apartment Element']}),
-                (ModelManager(repo, Apartment),
+                (ApartmentManager(repo, Apartment),
                  ModelCollection(public=ApartmentPublic, create=ApartmentCreate, update=ApartmentUpdate),
                  {'prefix': '/api/apartment', 'tags': ['Apartment']}),
-
-                (ModelManager(repo, ShortDescription),
-                 ModelCollection(public=ShortDescriptionPublic, create=ShortDescriptionCreate, update=ShortDescriptionUpdate),
+                (ProjectShortDescriptionManager(repo, ProjectShortDescription),
+                 ModelCollection(public=ProjectShortDescriptionPublic, create=ProjectShortDescriptionCreate, update=ProjectShortDescriptionUpdate),
                  {'prefix': '/api/project/shortdescr', 'tags': ['Project Short Description']}),
-                (ModelManager(repo, Description),
-                 ModelCollection(public=DescriptionPublic, create=DescriptionCreate, update=DescriptionUpdate),
-                 {'prefix': '/api/project/descr', 'tags': ['Project Description']}),
-                (ModelManager(repo, Project),
+                (ProjectDetailsManager(repo, ProjectDetails),
+                 ModelCollection(public=ProjectDetailsPublic, create=ProjectDetailsCreate, update=ProjectDetailsUpdate),
+                 {'prefix': '/api/project/details', 'tags': ['Project Details']}),
+                (ProjectManager(repo, Project),
                  ModelCollection(public=ProjectPublic, create=ProjectCreate, update=ProjectUpdate),
                  {'prefix': '/api/project', 'tags': ['Project']}),
+                (PromotionManager(repo, Promotion),
+                 ModelCollection(public=PromotionPublic, create=PromotionCreate, update=PromotionUpdate),
+                 {'prefix': '/api/promotion', 'tags': ['Promotion']}),
                 ]
 
     routers = [create_model_router(manager, collection, **kwargs) for manager, collection, kwargs in elements]
+
+    local_storage = LocalStorage(settings.upload_dir)
+    file_manager = ModelManager(repo, File)
+    routers.append(FileRouter(local_storage, file_manager, prefix='/api/file', tags=['File']))
 
     _ = HttpExceptionMapper(app)
 
