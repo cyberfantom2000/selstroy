@@ -38,20 +38,24 @@ def create_model_router(manager, model_collections: ModelCollection, *args, **kw
         async def list(self, limit: int = 100, offset: int = 0,
                        fields: str = Query(default=None, description='Comma separated fields')):
             requested_fields = fields.split(',') if fields else None
-            return self.manager.get(limit=limit, offset=offset, fields=requested_fields)
+            return await self.manager.get(limit=limit, offset=offset, fields=requested_fields)
 
         async def query(self, filters: dict, fields: str = Query(default=None, description='Comma separated fields')):
             requested_fields = fields.split(',') if fields else None
-            return self.manager.get(fields=requested_fields, filters=filters)
+            return await self.manager.get(fields=requested_fields, filters=filters)
 
         async def create(self, new_el: model_collections.create):
-            return self.manager.create(new_el)
+            return await self.manager.create(new_el)
 
         async def update(self, update: model_collections.update):
-            return self.manager.update(update)
+            return await self.manager.update(update)
 
         async def delete(self, uid: model_collections.id_type):
             self.manager.delete(uid)
             return JSONResponse(status_code=200, content='Success deleted')
+
+        def __str__(self):
+            """ To debug output """
+            return f'Name: {self.__class__.__name__}, Manager: {self.manager.__class__.__name__}, Model: {self.manager.model.__name__}'
 
     return ModelRouter(manager, *args, **kwargs)

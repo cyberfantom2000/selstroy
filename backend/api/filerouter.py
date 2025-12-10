@@ -19,7 +19,7 @@ class FileRouter:
         self.manager = manager
 
         self.router.add_api_route('', self.upload, methods=['POST'], response_model=FilePublic)
-        self.router.add_api_route('/{uid}', self.download, methods=['GET'], response_model=FileResponse)
+        self.router.add_api_route('/{uid}', self.download, methods=['GET'], response_class=FileResponse)
 
     async def upload(self, file: UploadFile):
         filename = Path(file.filename)
@@ -31,3 +31,7 @@ class FileRouter:
     async def download(self, uid: UUID):
         record = await self.manager.get(filters={'id': uid})
         return FileResponse(self.storage.file_path(record[0].path))
+
+    def __str__(self):
+        """ To debug output """
+        return f'Name: {self.__class__.__name__}, Manager: {self.manager.__class__.__name__}, Storage: {self.storage.__class__.__name__}'

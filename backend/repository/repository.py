@@ -1,7 +1,6 @@
 import asyncio
 
 from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel, select, and_, or_
 from typing import Iterable
@@ -15,6 +14,7 @@ class AsyncRepository:
     """ Class for async CRUD operations with database """
     def __init__(self, async_engine):
         self.async_engine = async_engine
+        self.async_session = sessionmaker(bind=self.async_engine, class_=AsyncSession, expire_on_commit=False)
 
     async def get_items(self, model_type, *, filters=None, limit=None, offset=None) -> list[SQLModel]:
         """
@@ -26,8 +26,8 @@ class AsyncRepository:
         :return: collection of model items less than or equal to the limit
         """
         conditions = self._to_model_conditions(model_type, filters)
-        session = await self._make_session()
-        return await self._get(model_type, conditions=conditions, session=session, limit=limit, offset=offset)
+        async with self.async_session() as session:
+            return await self._get(model_type, conditions=conditions, session=session, limit=limit, offset=offset)
 
     async def get_fields(self, model_type, *fields, filters=None, limit=None, offset=None):
         """
@@ -40,8 +40,8 @@ class AsyncRepository:
         :return: collection of dict with model fields. Result size less than or equal to the limit
         """
         conditions = self._to_model_conditions(model_type, filters)
-        session = await self._make_session()
-        return await self._get(*fields, conditions=conditions, session=session, limit=limit, offset=offset)
+        async with self.async_session() as session:
+            return await self._get(*fields, conditions=conditions, session=session, limit=limit, offset=offset)
 
     async def create(self, model_type, model=None, **kwargs) -> SQLModel:
         """
@@ -64,10 +64,10 @@ class AsyncRepository:
         :return: collection of created model items
         """
         new_items = [model_type.model_validate(el) for el in elements]
-        session = await self._make_session()
-        await self._add_and_commit(new_items, session)
+        async with self.async_session() as session:
+            await self._add_and_commit(new_items, session)
 
-        await asyncio.gather(*[session.refresh(el) for el in new_items])
+            await asyncio.gather(*[session.refresh(el) for el in new_items])
 
         return new_items
 
@@ -100,10 +100,10 @@ class AsyncRepository:
             for key, val in data.items():
                 setattr(item, key, val)
 
-        session = await self._make_session()
-        await self._add_and_commit(updatable_items, session)
+        async with self.async_session() as session:
+            await self._add_and_commit(updatable_items, session)
 
-        await asyncio.gather(*[session.refresh(el) for el in updatable_items])
+            await asyncio.gather(*[session.refresh(el) for el in updatable_items])
 
         return updatable_items
 
@@ -113,14 +113,8 @@ class AsyncRepository:
         :param to_delete: item to delete. Must be inherited from SQLModel
         :return: None
         """
-        session = await self._make_session()
-        await self._delete(to_delete if _is_collection(to_delete) else [to_delete], session)
-
-    async def _make_session(self) -> AsyncSession:
-        """ Generator for create async session """
-        async_session = sessionmaker(self.async_engine, class_=AsyncEngine, expire_on_commit=False)
-        async with async_session() as session:
-            yield session
+        async with self.async_session() as session:
+            await self._delete(to_delete if _is_collection(to_delete) else [to_delete], session)
 
     @staticmethod
     async def _get(*args, conditions: list, session, limit: int, offset: int) -> list[SQLModel]:
@@ -143,7 +137,7 @@ class AsyncRepository:
             if conditions:
                 statement = statement.where(and_(*conditions))
 
-            res = await session.exec(statement).all()
+            res = await session.exec(statement)
             return list(res)
         except Exception as e:
             await session.rollback()
