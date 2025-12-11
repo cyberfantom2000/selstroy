@@ -1,6 +1,6 @@
 from uuid import UUID
 from pathlib import Path
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter, UploadFile, Request
 from fastapi.responses import FileResponse
 
 from ..repository.localstorage import LocalStorage
@@ -21,15 +21,15 @@ class FileRouter:
         self.router.add_api_route('', self.upload, methods=['POST'], response_model=FilePublic)
         self.router.add_api_route('/{uid}', self.download, methods=['GET'], response_class=FileResponse)
 
-    async def upload(self, file: UploadFile):
+    async def upload(self, request: Request, file: UploadFile):
         filename = Path(file.filename)
         rel_path, size = await self.storage.write(file, filename.suffix)
 
-        record = FileCreate(path=rel_path, size=size, extension=filename.suffix, filename=filename.stem)
-        return await self.manager.create(record)
+        record = FileCreate(path=str(rel_path), size=size, ext=filename.suffix, name=filename.stem)
+        return await self.manager.create(session=request.state.db_session, new_model=record)
 
-    async def download(self, uid: UUID):
-        record = await self.manager.get(filters={'id': uid})
+    async def download(self, request: Request, uid: UUID):
+        record = await self.manager.get(session=request.state.db_session, filters={'id': uid})
         return FileResponse(self.storage.file_path(record[0].path))
 
     def __str__(self):

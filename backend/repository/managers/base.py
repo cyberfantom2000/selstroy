@@ -17,42 +17,46 @@ class ModelManager:
         self.repo = repo
         self.model = model_type
 
-    async def create(self, new_model: SQLModel) -> SQLModel:
+    async def create(self, session, new_model: SQLModel) -> SQLModel:
         """
         Create new item and return it
+        :param session: opened database session
         :param new_model: item prototype to create
         :return: created item
         """
-        return await self.repo.create(self.model, model_data=new_model)
+        return await self.repo.create(session, self.model, model=new_model)
 
-    async def update(self, update_model: SQLModel) -> SQLModel:
+    async def update(self, session, update_model: SQLModel) -> SQLModel:
         """
         Update existing item.
+        :param session: opened database session
         :param update_model: item prototype to update. Field id is required, another fields used to update
         :return: updated item
 
         :raise EntityNotFound: if update_model.id not exists
         """
-        updatable = await self._get_item_by_id(update_model.id)
+        updatable = await self._get_item_by_id(session, update_model.id)
         if updatable is None:
             raise EntityNotFound(self.model)
-        return await self.repo.update(updatable, obj=update_model)
+        return await self.repo.update(session, updatable, model=update_model)
 
-    async def delete(self, model_id: uuid.UUID) -> SQLModel:
+    async def delete(self, session, model_id: uuid.UUID) -> SQLModel:
         """
         Delete existing item.
+        :param session: opened database session
         :param model_id: Existing model id
         :return: deleted item. This item no longer exists in the repository.
 
         :raise EntityNotFound: if model_id not exists
         """
-        item = await self._get_item_by_id(model_id)
+        item = await self._get_item_by_id(session, model_id)
         if item is None:
             raise EntityNotFound(self.model)
-        await self.repo.delete(item)
+        await self.repo.delete(session, item)
         return item
 
     async def get(self, *args,
+                  session,
                   filters: dict | None = None,
                   limit: int = None,
                   offset: int = None,
@@ -60,6 +64,7 @@ class ModelManager:
         """
         Get item or fields
         :param args: positional arguments are not available
+        :param session: opened database session
         :param filters: dict with filters. key - is a model attribute as string, value - item or collection for compare
         :param limit: count of request items
         :param offset: offset relative to the first element in the query
@@ -70,18 +75,19 @@ class ModelManager:
 
         if fields:
             attrs = [getattr(self.model, field) for field in fields]
-            result = await self.repo.get_fields(self.model, *attrs, filters=filters, offset=offset, limit=limit)
+            result = await self.repo.get_fields(session, self.model, *attrs, filters=filters, offset=offset, limit=limit)
             return self._zip_query_result(fields, result)
         else:
-            return await self.repo.get_items(self.model, filters=filters, offset=offset, limit=limit)
+            return await self.repo.get_items(session, self.model, filters=filters, offset=offset, limit=limit)
 
-    async def _get_item_by_id(self, uid: uuid.UUID) -> SQLModel:
+    async def _get_item_by_id(self, session, uid: uuid.UUID) -> SQLModel:
         """
         Get item by id
+        :param session: opened database session
         :param uid: item uid
         :return: item from repository
         """
-        items = await self.repo.get_items(self.model, filters={'id': uid})
+        items = await self.repo.get_items(session, self.model, filters={'id': uid})
         return None if not items else items[0]
 
     @staticmethod

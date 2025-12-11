@@ -1,11 +1,13 @@
 from sqlalchemy.ext.asyncio import create_async_engine
 from pathlib import Path
 
-from sqlalchemy.sql.base import elements
+from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm import sessionmaker
 
 from common import settings, get_logger
 
-from .api import create_model_router, ModelCollection, HttpExceptionMapper, FileRouter
+from .api import create_model_router, ModelCollection, FileRouter
+from .api.middlewares import HttpExceptionMapper, DatabaseSessionMiddleware
 from .repository.models.project import *
 from .repository.models.apartment import *
 from .repository.managers import *
@@ -22,11 +24,8 @@ def register(app) -> None:
     """
     log.info(f'Registering backend')
 
-    log.debug(f'Creating async engine. url: {settings.db_url}, echo: {settings.debug}')
-    engine = create_async_engine(settings.db_url, echo=settings.debug, future=True)
-
     log.info(f'Creating async repository')
-    repo = AsyncRepository(engine)
+    repo = AsyncRepository()
 
     elements = [(ApartImageManager(ApartImage, repo),
                  ModelCollection(public=ApartImagePublic, create=ApartImageCreate, update=ApartImageUpdate),
@@ -54,11 +53,21 @@ def register(app) -> None:
     routers = [create_model_router(manager, collection, **kwargs) for manager, collection, kwargs in elements]
 
     local_storage = LocalStorage(Path(settings.upload_dir))
-    file_manager = ModelManager(repo, File)
+    file_manager = ModelManager(File, repo)
     routers.append(FileRouter(local_storage, file_manager, prefix='/api/file', tags=['File']))
+
+    for r in routers:
+        log.debug(f"""Router registration: {r}""")
+        app.include_router(r.router)
+
+    log.debug(f'Creating async engine. url: {settings.db_url}, echo: {settings.debug}')
+    async_engine = create_async_engine(settings.db_url, echo=settings.debug, future=True)
+    async_session = sessionmaker(bind=async_engine, class_=AsyncSession, expire_on_commit=False)
+
+    db_allowed_routes = [router.router.prefix for router in routers]
+    app.add_middleware(DatabaseSessionMiddleware, session=async_session, allowed_routes=db_allowed_routes)
 
     _ = HttpExceptionMapper(app)
 
-    for r in routers:
-        log.debug(f"""Router registration. {r}""")
-        app.include_router(r.router)
+
+

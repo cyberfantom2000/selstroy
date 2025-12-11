@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 
 from common import get_logger, settings
 
-from ..repository.exceptions import EntityNotFound
+from backend.repository.exceptions import EntityNotFound
 
 log = get_logger(settings, 'backend')
 

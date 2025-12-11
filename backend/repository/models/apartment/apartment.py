@@ -21,9 +21,9 @@ class ApartmentBase(SQLModel):
 
 
 class Apartment(ApartmentBase, table=True):
-    images: list[ApartImage] = Relationship(back_populates=None, cascade_delete=True)
-    items: list[ApartElement] = Relationship(back_populates=None, cascade_delete=True)
-    pdf: File | None = Relationship(back_populates=None, link_model=ApartmentPdfLink)
+    images: list[ApartImage] = Relationship(back_populates=None, cascade_delete=True, sa_relationship_kwargs={"lazy": "selectin"})
+    items: list[ApartElement] = Relationship(back_populates=None, cascade_delete=True, sa_relationship_kwargs={"lazy": "selectin"})
+    pdf: File | None = Relationship(back_populates=None, link_model=ApartmentPdfLink, sa_relationship_kwargs={"lazy": "selectin"})
     project_id: UUID | None = Field(default=None, foreign_key='project.id', ondelete='CASCADE')
 
 

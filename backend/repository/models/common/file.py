@@ -6,13 +6,13 @@ from sqlmodel import SQLModel, Field
 
 class FileBase(SQLModel):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
-
-
-class File(FileBase, table=True):
     path: str
     name: str
     ext: str
     size: int
+
+class File(FileBase, table=True):
+    pass
 
 
 class FilePublic(FileBase):

@@ -1,7 +1,5 @@
 import asyncio
 
-from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel, select, and_, or_
 from typing import Iterable
 
@@ -12,13 +10,10 @@ def _is_collection(obj):
 
 class AsyncRepository:
     """ Class for async CRUD operations with database """
-    def __init__(self, async_engine):
-        self.async_engine = async_engine
-        self.async_session = sessionmaker(bind=self.async_engine, class_=AsyncSession, expire_on_commit=False)
-
-    async def get_items(self, model_type, *, filters=None, limit=None, offset=None) -> list[SQLModel]:
+    async def get_items(self, session, model_type, *, filters=None, limit=None, offset=None) -> list[SQLModel]:
         """
         Get item collection
+        :param session: Opened session for database interaction
         :param model_type: model type for get. Must be inherited from SQLModel
         :param filters: dict with filters. key - is a model attribute as string, value - item or collection for compare
         :param limit: count of request item from DB
@@ -26,12 +21,12 @@ class AsyncRepository:
         :return: collection of model items less than or equal to the limit
         """
         conditions = self._to_model_conditions(model_type, filters)
-        async with self.async_session() as session:
-            return await self._get(model_type, conditions=conditions, session=session, limit=limit, offset=offset)
+        return await self._get(model_type, conditions=conditions, limit=limit, offset=offset, session=session)
 
-    async def get_fields(self, model_type, *fields, filters=None, limit=None, offset=None):
+    async def get_fields(self, session, model_type, *fields, filters=None, limit=None, offset=None):
         """
         Get model fields collection
+        :param session: Opened session for database interaction
         :param model_type: model type for get. Must be inherited from SQLModel
         :param fields: fields for get of mode_type
         :param filters: dict with filters. key - is a model attribute as string, value - item or collection for compare
@@ -40,41 +35,40 @@ class AsyncRepository:
         :return: collection of dict with model fields. Result size less than or equal to the limit
         """
         conditions = self._to_model_conditions(model_type, filters)
-        async with self.async_session() as session:
-            return await self._get(*fields, conditions=conditions, session=session, limit=limit, offset=offset)
+        return await self._get(*fields, conditions=conditions, limit=limit, offset=offset, session=session)
 
-    async def create(self, model_type, model=None, **kwargs) -> SQLModel:
+    async def create(self, session, model_type, model=None, **kwargs) -> SQLModel:
         """
         Create item. Use 'model' arg to create new item from prototype. Use kwargs if you want to create
         item from key-value arguments. The model arg has a higher priority.
+        :param session: Opened session for database interaction
         :param model_type: model type for create. Must be inherited from SQLModel
         :param model: model prototype. Fields this model used for create item
         :param kwargs: key-value model params used for create item
         :return: new created item
         """
         new = model_type.model_validate(model) if model else model_type(**kwargs)
-        await self.create_all(model_type, [new])
+        await self.create_all(session, model_type, [new])
         return new
 
-    async def create_all(self, model_type, elements) -> list[SQLModel]:
+    async def create_all(self, session, model_type, elements) -> list[SQLModel]:
         """
         Create item collection.
+        :param session: Opened session for database interaction
         :param model_type: model type for create. Must be inherited from SQLModel
         :param elements: collection of a model prototype. Fields of elements used for create items
         :return: collection of created model items
         """
         new_items = [model_type.model_validate(el) for el in elements]
-        async with self.async_session() as session:
-            await self._add_and_commit(new_items, session)
-
-            await asyncio.gather(*[session.refresh(el) for el in new_items])
-
+        await self._add_and_commit(new_items, session)
+        await asyncio.gather(*[session.refresh(el) for el in new_items])
         return new_items
 
-    async def update(self, updatable, model=None, **kwargs) -> SQLModel:
+    async def update(self, session, updatable, model=None, **kwargs) -> SQLModel:
         """
         Update existing item. Use model arg if you want to update new item from prototype. Use kwargs if you want
         to update item from key-value arguments. The model arg has a higher priority.
+        :param session: Opened session for database interaction
         :param updatable: Updatable item. Must be inherited from SQLModel and exist in database
         :param model: model prototype. Fields this model used for update item
         :param kwargs: key-value model params used for update item
@@ -83,12 +77,13 @@ class AsyncRepository:
         if model is None:
             model = updatable.__class__(**kwargs)
 
-        await self.update_all([updatable], [model])
+        await self.update_all(session, [updatable], [model])
         return updatable
 
-    async def update_all(self, updatable_items, updates) -> list[SQLModel]:
+    async def update_all(self, session, updatable_items, updates) -> list[SQLModel]:
         """
         Update item collection. Collection 'updatable_items' will be matched to collection 'updates' to apply updates
+        :param session: Opened session for database interaction
         :param updatable_items: Collection of items for update.
         :param updates: collection of prototypes for updating.
         :return: collection of updated items
@@ -100,31 +95,29 @@ class AsyncRepository:
             for key, val in data.items():
                 setattr(item, key, val)
 
-        async with self.async_session() as session:
-            await self._add_and_commit(updatable_items, session)
-
-            await asyncio.gather(*[session.refresh(el) for el in updatable_items])
-
+        await self._add_and_commit(updatable_items, session)
+        await asyncio.gather(*[session.refresh(el) for el in updatable_items])
         return updatable_items
 
-    async def delete(self, to_delete) -> None:
+    async def delete(self, session, to_delete) -> None:
         """
         Delete existing item from database.
+        :param session: Opened session for database interaction
         :param to_delete: item to delete. Must be inherited from SQLModel
         :return: None
         """
-        async with self.async_session() as session:
-            await self._delete(to_delete if _is_collection(to_delete) else [to_delete], session)
+        deleting = to_delete if _is_collection(to_delete) else [to_delete]
+        await self._delete(deleting, session)
 
     @staticmethod
-    async def _get(*args, conditions: list, session, limit: int, offset: int) -> list[SQLModel]:
+    async def _get(*args, conditions: list, limit: int, offset: int, session) -> list[SQLModel]:
         """
         Facade for get item/items from database.
         :param args: parameters for pass to select() instruction
         :param conditions: collection of conditions used in 'where' instruction. All conditions concat from and_()
-        :param session: Opened session for database interaction
         :param limit: count of request item from database
         :param offset: offset relative to the first element in the query
+        :param session: Opened session for database interaction
         :return: collection of items
         """
         try:
@@ -179,9 +172,9 @@ class AsyncRepository:
         """
         try:
             if _is_collection(data):
-                await session.add_all(data)
+                session.add_all(data)
             else:
-                await session.add(data)
+                session.add(data)
         except Exception as e:
             await session.rollback()
             raise e

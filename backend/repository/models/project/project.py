@@ -32,11 +32,11 @@ class ProjectBase(SQLModel):
 class Project(ProjectBase, table=True):
     slug: str | None = Field(default=None)
     active: bool = Field(default=False)
-    images: list[File] = Relationship(back_populates=None, link_model=ProjectImageLink)
-    master_plan: File | None = Relationship(back_populates=None, link_model=ProjectMasterPlanLink)
-    short_description: ProjectShortDescription | None = Relationship(back_populates=None, cascade_delete=True)
-    details: list[ProjectDetails] = Relationship(back_populates=None, cascade_delete=True)
-    apartments: list[Apartment] = Relationship(back_populates=None, cascade_delete=True)
+    images: list[File] = Relationship(back_populates=None, link_model=ProjectImageLink, sa_relationship_kwargs={"lazy": "selectin"})
+    master_plan: File | None = Relationship(back_populates=None, link_model=ProjectMasterPlanLink, sa_relationship_kwargs={"lazy": "selectin"})
+    short_description: ProjectShortDescription | None = Relationship(back_populates=None, cascade_delete=True, sa_relationship_kwargs={"lazy": "selectin"})
+    details: list[ProjectDetails] = Relationship(back_populates=None, cascade_delete=True, sa_relationship_kwargs={"lazy": "selectin"})
+    apartments: list[Apartment] = Relationship(back_populates=None, cascade_delete=True, sa_relationship_kwargs={"lazy": "selectin"})
 
 
 class ProjectPublic(ProjectBase):

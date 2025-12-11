@@ -17,7 +17,7 @@ class PromotionBase(SQLModel):
 
 
 class Promotion(PromotionBase, table=True):
-    image: File | None = Relationship(back_populates=None, link_model=PromotionImageLink)
+    image: File | None = Relationship(back_populates=None, link_model=PromotionImageLink, sa_relationship_kwargs={"lazy": "selectin"})
 
 
 class PromotionPublic(PromotionBase):

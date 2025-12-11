@@ -18,7 +18,7 @@ class ProjectShortDescriptionBase(SQLModel):
 
 
 class ProjectShortDescription(ProjectShortDescriptionBase, table=True):
-    image: File | None = Relationship(back_populates=None, link_model=ProjectShortDescriptionFileLink)
+    image: File | None = Relationship(back_populates=None, link_model=ProjectShortDescriptionFileLink, sa_relationship_kwargs={"lazy": "selectin"})
     project_id: UUID | None = Field(default=None, foreign_key='project.id', ondelete='CASCADE')
 
 class ProjectShortDescriptionPublic(ProjectShortDescriptionBase):

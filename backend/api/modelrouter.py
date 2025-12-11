@@ -1,6 +1,6 @@
 import uuid
 from typing import Union, Any
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 from dataclasses import dataclass
 
@@ -35,23 +35,24 @@ def create_model_router(manager, model_collections: ModelCollection, *args, **kw
             self.router.add_api_route('', self.update, methods=['PATCH'], response_model=model_collections.public)
             self.router.add_api_route('/{uid}', self.delete, methods=['DELETE'], response_class=JSONResponse)
 
-        async def list(self, limit: int = 100, offset: int = 0,
+        async def list(self, request: Request, limit: int = 100, offset: int = 0,
                        fields: str = Query(default=None, description='Comma separated fields')):
             requested_fields = fields.split(',') if fields else None
-            return await self.manager.get(limit=limit, offset=offset, fields=requested_fields)
+            result = await self.manager.get(session=request.state.db_session, limit=limit, offset=offset, fields=requested_fields)
+            return [model_collections.public.model_validate(el) for el in result]
 
-        async def query(self, filters: dict, fields: str = Query(default=None, description='Comma separated fields')):
+        async def query(self, request: Request, filters: dict, fields: str = Query(default=None, description='Comma separated fields')):
             requested_fields = fields.split(',') if fields else None
-            return await self.manager.get(fields=requested_fields, filters=filters)
+            return await self.manager.get(session=request.state.db_session, fields=requested_fields, filters=filters)
 
-        async def create(self, new_el: model_collections.create):
-            return await self.manager.create(new_el)
+        async def create(self, request: Request, new_el: model_collections.create):
+            return await self.manager.create(session=request.state.db_session, new_model=new_el)
 
-        async def update(self, update: model_collections.update):
-            return await self.manager.update(update)
+        async def update(self, request: Request, update: model_collections.update):
+            return await self.manager.update(session=request.state.db_session, update_model=update)
 
-        async def delete(self, uid: model_collections.id_type):
-            self.manager.delete(uid)
+        async def delete(self, request: Request, uid: model_collections.id_type):
+            await self.manager.delete(session=request.state.db_session, model_id=uid)
             return JSONResponse(status_code=200, content='Success deleted')
 
         def __str__(self):

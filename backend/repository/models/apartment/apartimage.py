@@ -22,8 +22,8 @@ class ApartImageBase(SQLModel):
 
 
 class ApartImage(ApartImageBase, table=True):
-    category_icon: File | None = Relationship(back_populates=None, link_model=ApartImageIconLink)
-    image: File | None = Relationship(back_populates=None, link_model=ApartImageImageLink)
+    category_icon: File | None = Relationship(back_populates=None, link_model=ApartImageIconLink, sa_relationship_kwargs={"lazy": "selectin"})
+    image: File | None = Relationship(back_populates=None, link_model=ApartImageImageLink, sa_relationship_kwargs={"lazy": "selectin"})
     apartment_id: UUID | None = Field(default=None, foreign_key='apartment.id', ondelete='CASCADE')
 
 

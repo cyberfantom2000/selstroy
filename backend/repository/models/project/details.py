@@ -18,7 +18,7 @@ class ProjectDetailsBase(SQLModel):
 
 
 class ProjectDetails(ProjectDetailsBase, table=True):
-    images: list[File] = Relationship(back_populates=None, link_model=ProjectDetailsFileLink)
+    images: list[File] = Relationship(back_populates=None, link_model=ProjectDetailsFileLink, sa_relationship_kwargs={"lazy": "selectin"})
     project_id: UUID | None = Field(default=None, foreign_key='project.id', ondelete='CASCADE')
 
 
