@@ -24,7 +24,7 @@ class LocalStorage:
         path = self.base_path / folder
         path.mkdir(parents=True, exist_ok=True)
 
-        name = f'{uuid.uuid4().hex}.{ext}'
+        name = f'{uuid.uuid4().hex}{ext}'
         dst = path / name
 
         size = 0

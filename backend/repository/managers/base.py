@@ -55,6 +55,19 @@ class ModelManager:
         await self.repo.delete(session, item)
         return item
 
+    async def get_by_id(self, session, uid: uuid.UUID) -> SQLModel:
+        """ Get item by id
+        :param session: opened database session
+        :param uid: item id
+        :return: item from repository
+
+        :raise EntityNotFound: if item with uid does not exist
+        """
+        items = await self.get(session=session, filters={'id': uid})
+        if not items:
+            raise EntityNotFound(self.model)
+        return items[0]
+
     async def get(self, *args,
                   session,
                   filters: dict | None = None,

@@ -38,8 +38,7 @@ def create_model_router(manager, model_collections: ModelCollection, *args, **kw
         async def list(self, request: Request, limit: int = 100, offset: int = 0,
                        fields: str = Query(default=None, description='Comma separated fields')):
             requested_fields = fields.split(',') if fields else None
-            result = await self.manager.get(session=request.state.db_session, limit=limit, offset=offset, fields=requested_fields)
-            return [model_collections.public.model_validate(el) for el in result]
+            return await self.manager.get(session=request.state.db_session, limit=limit, offset=offset, fields=requested_fields)
 
         async def query(self, request: Request, filters: dict, fields: str = Query(default=None, description='Comma separated fields')):
             requested_fields = fields.split(',') if fields else None

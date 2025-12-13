@@ -5,7 +5,7 @@ from typing import Iterable
 
 
 def _is_collection(obj):
-    return isinstance(obj, Iterable) and not isinstance(obj, str)
+    return isinstance(obj, Iterable) and not isinstance(obj, str) and not isinstance(obj, SQLModel)
 
 
 class AsyncRepository:
@@ -156,7 +156,7 @@ class AsyncRepository:
         :return: None
         """
         try:
-            await asyncio.gather(*[session.delte(el) for el in models])
+            await asyncio.gather(*[session.delete(el) for el in models])
             await session.commit()
         except Exception as e:
             await session.rollback()
