@@ -12,5 +12,5 @@ class HttpExceptionMapper:
         @app.exception_handler(EntityNotFound)
         async def not_found(request, exc):
             """ Handle database EntityNotFound exception"""
-            log.info(f'Map http exception {exc.__name__} to 404 Not Found')
+            log.info(f'Map http exception {exc.__class__.__name__} to 404 Not Found')
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
