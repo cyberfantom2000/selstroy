@@ -21,7 +21,7 @@ class ApartmentManager(ModelManager):
     async def update(self, session, update_model: ApartmentUpdate):
         updated_item = await super().update(session, update_model)
 
-        if updated_item.pdf_id:
+        if update_model.pdf_id:
             updated_item = await self._update_pdf_field(session, updated_item, update_model.pdf_id)
 
         return updated_item

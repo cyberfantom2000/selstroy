@@ -35,9 +35,7 @@ class ModelManager:
 
         :raise EntityNotFound: if update_model.id not exists
         """
-        updatable = await self._get_item_by_id(session, update_model.id)
-        if updatable is None:
-            raise EntityNotFound(self.model)
+        updatable = await self.get_by_id(session, update_model.id)
         return await self.repo.update(session, updatable, model=update_model)
 
     async def delete(self, session, model_id: uuid.UUID) -> SQLModel:
@@ -49,9 +47,7 @@ class ModelManager:
 
         :raise EntityNotFound: if model_id not exists
         """
-        item = await self._get_item_by_id(session, model_id)
-        if item is None:
-            raise EntityNotFound(self.model)
+        item = await self.get_by_id(session, model_id)
         await self.repo.delete(session, item)
         return item
 
@@ -84,6 +80,7 @@ class ModelManager:
         :param fields: fields for get of mode_type
         :return: return model collection if fields argument is None else return collection of dict with model fields
         """
+        filters = self._drop_extra_filters(filters)
         self._transform_id_filters(filters)
 
         if fields:
@@ -93,15 +90,11 @@ class ModelManager:
         else:
             return await self.repo.get_items(session, self.model, filters=filters, offset=offset, limit=limit)
 
-    async def _get_item_by_id(self, session, uid: uuid.UUID) -> SQLModel:
+    async def commit(self, session) -> None:
+        """ Low level operation. Commit session transactions
+        :session: opened database session
         """
-        Get item by id
-        :param session: opened database session
-        :param uid: item uid
-        :return: item from repository
-        """
-        items = await self.repo.get_items(session, self.model, filters={'id': uid})
-        return None if not items else items[0]
+        await self.repo.commit(session)
 
     @staticmethod
     def _zip_query_result(fields: list[str], query_result: list) -> list:
@@ -136,3 +129,6 @@ class ModelManager:
                     filters['id'] = [uuid.UUID(str(el)) for el in filters['id']]
                 else:
                     filters['id'] = uuid.UUID(str(filters['id']))
+
+    def _drop_extra_filters(self, filters: dict) -> dict:
+        return {k: v for k, v in filters.items() if k in self.model.model_fields}

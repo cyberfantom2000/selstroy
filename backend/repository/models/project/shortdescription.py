@@ -27,8 +27,8 @@ class ProjectShortDescriptionPublic(ProjectShortDescriptionBase):
 
 
 class ProjectShortDescriptionCreate(ProjectShortDescriptionBase):
-    image_id: UUID | None = None
     project_id: UUID
+    image_id: UUID | None = None
 
 
 class ProjectShortDescriptionUpdate(ProjectShortDescriptionBase):

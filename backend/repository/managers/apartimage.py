@@ -21,7 +21,7 @@ class ApartImageManager(ModelManager):
     async def update(self, session, update_model: ApartImageUpdate):
         updated_item = await super().update(session,update_model)
 
-        if updated_item.image_id or updated_item.icon_id:
+        if update_model.image_id or updated_item.icon_id:
             updated_item = await self._update_image_fields(session, updated_item, update_model.image_id, update_model.icon_id)
 
         return updated_item

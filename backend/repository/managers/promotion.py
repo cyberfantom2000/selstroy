@@ -21,7 +21,7 @@ class PromotionManager(ModelManager):
     async def update(self, session, update_model: PromotionUpdate):
         updated_item = await super().update(session, update_model)
 
-        if updated_item.image_id:
+        if update_model.image_id:
             updated_item = await self._update_image_field(session, updated_item, update_model.image_id)
 
         return updated_item
@@ -29,7 +29,6 @@ class PromotionManager(ModelManager):
     async def _update_image_field(self, session, item: SQLModel, image_id):
         """ Updating model links with image """
         tmp_manager = ModelManager(File, self.repo)
-        files = await tmp_manager.get(session=session, filters={'id': image_id})
-        item.image = files[0]
-
-        return await super().update(session, item)
+        item.image = await tmp_manager.get_by_id(session, image_id)
+        await self.commit(session)
+        return item

@@ -21,7 +21,7 @@ class AsyncRepository:
         :return: collection of model items less than or equal to the limit
         """
         conditions = self._to_model_conditions(model_type, filters)
-        return await self._get(model_type, conditions=conditions, limit=limit, offset=offset, session=session)
+        return await self.get(model_type, session=session, conditions=conditions, limit=limit, offset=offset)
 
     async def get_fields(self, session, model_type, *fields, filters=None, limit=None, offset=None):
         """
@@ -35,7 +35,7 @@ class AsyncRepository:
         :return: collection of dict with model fields. Result size less than or equal to the limit
         """
         conditions = self._to_model_conditions(model_type, filters)
-        return await self._get(*fields, conditions=conditions, limit=limit, offset=offset, session=session)
+        return await self.get(*fields, session=session, conditions=conditions, limit=limit, offset=offset)
 
     async def create(self, session, model_type, model=None, **kwargs) -> SQLModel:
         """
@@ -47,9 +47,9 @@ class AsyncRepository:
         :param kwargs: key-value model params used for create item
         :return: new created item
         """
-        new = model_type.model_validate(model) if model else model_type(**kwargs)
-        await self.create_all(session, model_type, [new])
-        return new
+        new = model if model else model_type(**kwargs)
+        created = await self.create_all(session, model_type, [new])
+        return created[0]
 
     async def create_all(self, session, model_type, elements) -> list[SQLModel]:
         """
@@ -60,9 +60,8 @@ class AsyncRepository:
         :return: collection of created model items
         """
         new_items = [model_type.model_validate(el) for el in elements]
-        await self._add_and_commit(new_items, session)
-        await asyncio.gather(*[session.refresh(el) for el in new_items])
-        return new_items
+        await self.add_and_commit(session, new_items)
+        return await self.refresh(session, new_items)
 
     async def update(self, session, updatable, model=None, **kwargs) -> SQLModel:
         """
@@ -95,22 +94,42 @@ class AsyncRepository:
             for key, val in data.items():
                 setattr(item, key, val)
 
-        await self._add_and_commit(updatable_items, session)
-        await asyncio.gather(*[session.refresh(el) for el in updatable_items])
-        return updatable_items
+        await self.add_and_commit(session, updatable_items)
+        return await self.refresh(session, updatable_items)
 
     async def delete(self, session, to_delete) -> None:
         """
         Delete existing item from database.
         :param session: Opened session for database interaction
-        :param to_delete: item to delete. Must be inherited from SQLModel
+        :param to_delete: item to delete. Must be inherited from SQLModel or list[SQLModel]
         :return: None
         """
         deleting = to_delete if _is_collection(to_delete) else [to_delete]
-        await self._delete(deleting, session)
+        await self._delete(session, deleting)
 
     @staticmethod
-    async def _get(*args, conditions: list, limit: int, offset: int, session) -> list[SQLModel]:
+    async def refresh(session, items) -> list[SQLModel]:
+        """ Refresh items data
+        :session: Opened session for database interaction
+        :items: collection of items to update
+        """
+        to_refresh = items if _is_collection(items) else [items]
+        await asyncio.gather(*[session.refresh(el) for el in to_refresh])
+        return items
+
+    @staticmethod
+    async def add_and_commit(session, data) -> None:
+        """
+        Facade for create/update item into database and commit changed
+        :param session: opened database session
+        :param data: element for create/update
+        :return: None
+        """
+        await AsyncRepository.add(session, data)
+        await AsyncRepository.commit(session)
+
+    @staticmethod
+    async def get(*args, session, conditions: list, limit: int, offset: int) -> list[SQLModel]:
         """
         Facade for get item/items from database.
         :param args: parameters for pass to select() instruction
@@ -137,37 +156,26 @@ class AsyncRepository:
             raise e
 
     @staticmethod
-    async def _add_and_commit(data, session) -> None:
-        """
-        Facade for create/update item into database and commit changed
-        :param data: element for create/update
-        :param session: opened database session
-        :return: None
-        """
-        await AsyncRepository._add(data, session)
-        await AsyncRepository._commit(session)
-
-    @staticmethod
-    async def _delete(models, session) -> None:
+    async def _delete(session, items) -> None:
         """
         Facade for delete elements from database
-        :param models: elements for delete
         :param session: opened database session
+        :param items: elements for delete
         :return: None
         """
         try:
-            await asyncio.gather(*[session.delete(el) for el in models])
+            await asyncio.gather(*[session.delete(el) for el in items])
             await session.commit()
         except Exception as e:
             await session.rollback()
             raise e
 
     @staticmethod
-    async def _add(data, session) -> None:
+    async def add(session, data) -> None:
         """
         Facade for add element to sql query
-        :param data: element or element collection
         :param session: opened database session
+        :param data: element or element collection
         :return: None
         """
         try:
@@ -180,7 +188,7 @@ class AsyncRepository:
             raise e
 
     @staticmethod
-    async def _commit(session) -> None:
+    async def commit(session) -> None:
         """
         Commit session changed
         :param session: opened database session

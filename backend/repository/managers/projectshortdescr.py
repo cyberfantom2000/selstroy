@@ -12,7 +12,7 @@ class ProjectShortDescriptionManager(ModelManager):
     async def create(self, session, new_model: ProjectShortDescriptionCreate):
         new_item = await super().create(session, new_model)
 
-        if new_model.images_id:
+        if new_model.image_id:
             new_item = await self._update_image(session, new_item, new_model.image_id)
 
         return new_item
@@ -20,18 +20,14 @@ class ProjectShortDescriptionManager(ModelManager):
     async def update(self, session, update_model: ProjectShortDescriptionUpdate):
         updated_item = await super().update(session, update_model)
 
-        if update_model.images_id is not None:
+        if update_model.image_id:
             updated_item = await self._update_image(session, updated_item, update_model.image_id)
 
         return updated_item
 
     async def _update_image(self, session, item: SQLModel, image_id):
         """ Updating model link with file """
-        item.image = None
-
-        if image_id:
-            tmp_manager = ModelManager(File, self.repo)
-            images = await tmp_manager.get(session=session, filters={'id': image_id})
-            item.image = images[0]
-
-        return await super().update(session, item)
+        tmp_manager = ModelManager(File, self.repo)
+        item.image = await tmp_manager.get_by_id(session, image_id)
+        await self.commit(session)
+        return item
