@@ -88,7 +88,8 @@ class ModelManager:
             result = await self.repo.get_fields(session, self.model, *attrs, filters=filters, offset=offset, limit=limit)
             return self._zip_query_result(fields, result)
         else:
-            return await self.repo.get_items(session, self.model, filters=filters, offset=offset, limit=limit)
+            a = await self.repo.get_items(session, self.model, filters=filters, offset=offset, limit=limit)
+            return a
 
     async def commit(self, session) -> None:
         """ Low level operation. Commit session transactions
@@ -131,4 +132,7 @@ class ModelManager:
                     filters['id'] = uuid.UUID(str(filters['id']))
 
     def _drop_extra_filters(self, filters: dict) -> dict:
-        return {k: v for k, v in filters.items() if k in self.model.model_fields}
+        if filters:
+            return {k: v for k, v in filters.items() if k in self.model.model_fields}
+        else:
+            return filters

@@ -13,8 +13,8 @@ class ApartImageManager(ModelManager):
     async def create(self, session, new_model: ApartImageCreate):
         new_item = await super().create(session, new_model)
 
-        if new_model.image_id or new_model.icon_id:
-            new_item = await self._update_image_fields(session, new_item, new_model.image_id, new_model.icon_id)
+        if new_model.image_id or new_model.category_id:
+            new_item = await self._update_image_fields(session, new_item, new_model.image_id, new_model.category_icon_id)
 
         return new_item
 
@@ -22,19 +22,17 @@ class ApartImageManager(ModelManager):
         updated_item = await super().update(session,update_model)
 
         if update_model.image_id or updated_item.icon_id:
-            updated_item = await self._update_image_fields(session, updated_item, update_model.image_id, update_model.icon_id)
+            updated_item = await self._update_image_fields(session, updated_item, update_model.image_id, update_model.category_icon_id)
 
         return updated_item
 
-    async def _update_image_fields(self, session, item: SQLModel, icon_id, image_id):
+    async def _update_image_fields(self, session, item: SQLModel, image_id, icon_id):
         """ Updating model links with image """
 
         tmp_manager = ModelManager(File, self.repo)
         if image_id:
-            images = await tmp_manager.get(session=session, filters={'id': image_id})
-            item.image = images[0]
+            item.image = await tmp_manager.get_by_id(session, image_id)
         if icon_id:
-            icons = await tmp_manager.get(session=session, filters={'id': icon_id})
-            item.icon = icons[0]
-
-        return await super().update(session, item)
+            item.category_icon = await tmp_manager.get_by_id(session, icon_id)
+        await self.commit(session)
+        return item

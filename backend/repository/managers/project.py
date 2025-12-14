@@ -25,7 +25,7 @@ class ProjectManager(ModelManager):
         updated_item = await super().update(session, update_model)
 
         if update_model.images_ids is not None:
-            await self._set_master_plan_field(session, updated_item, update_model.images_ids)
+            await self._set_images_field(session, updated_item, update_model.images_ids)
         if update_model.master_plan_id is not None:
             await self._set_master_plan_field(session, updated_item, update_model.master_plan_id)
         if update_model.images_ids is not None or update_model.master_plan_id is not None:

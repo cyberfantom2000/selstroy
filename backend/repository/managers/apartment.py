@@ -29,7 +29,6 @@ class ApartmentManager(ModelManager):
     async def _update_pdf_field(self, session, item: SQLModel, pdf_id):
         """ Updating model links with image """
         tmp_manager = ModelManager(File, self.repo)
-        files = await tmp_manager.get(session=session, filters={'id': pdf_id})
-        item.pdf = files[0]
-
-        return await super().update(session, item)
+        item.pdf = await tmp_manager.get_by_id(session, pdf_id)
+        await self.commit(session)
+        return item

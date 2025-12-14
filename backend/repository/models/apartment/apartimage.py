@@ -29,7 +29,7 @@ class ApartImage(ApartImageBase, table=True):
 
 class ApartImagePublic(ApartImageBase):
     id: UUID
-    image: FilePublic
+    image: FilePublic | None
     category_icon: FilePublic | None
 
 
