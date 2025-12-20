@@ -9,7 +9,10 @@ from backend.repository.managers import ModelManager
 @pytest.fixture
 def model_type_mock() -> Mock:
     """ Fixture for create sql model type mock """
-    return Mock()
+    mock = Mock()
+    mock.__name__ = 'Mock'
+    mock.model_fields = ['id', 'name']
+    return mock
 
 
 @pytest.fixture
@@ -53,9 +56,9 @@ async def test_call_create(manager: ModelManager):
     :param manager: fixture of a ModelManager
     """
     new_item = Mock()
-    await manager.create(new_item)
+    await manager.create(None, new_item)
 
-    manager.repo.create.assert_awaited_once_with(manager.model, model_data=new_item)
+    manager.repo.create.assert_awaited_once_with(None, manager.model, model=new_item)
 
 
 @pytest.mark.asyncio
@@ -65,22 +68,23 @@ async def test_call_update(manager: ModelManager, model_mock_with_id: Mock):
     :param manager: fixture of a ModelManager
     :param model_mock_with_id: fixture of a sql model mock with id
     """
-    await manager.update(model_mock_with_id)
+    await manager.update(None, model_mock_with_id)
 
-    manager.repo.get_items.assert_awaited_once_with(manager.model, filters={'id': model_mock_with_id.id})
-    manager.repo.update.assert_awaited_once_with(manager.repo.get_items.return_value[0], obj=model_mock_with_id)
+    manager.repo.get_items.assert_awaited_once_with(None, manager.model, filters={'id': model_mock_with_id.id}, offset=None, limit=None)
+    manager.repo.update.assert_awaited_once_with(None, manager.repo.get_items.return_value[0], model=model_mock_with_id)
 
 
 @pytest.mark.asyncio
-async def test_update_exception(manager: ModelManager):
+async def test_update_exception(manager: ModelManager, model_mock_with_id):
     """
     Test then ModelManager raise exception if repository return None
     :param manager: fixture of a ModelManager
+    :param model_mock_with_id: fixture of a sql model mock with id
     """
     manager.repo.get_items.return_value = None
 
     with pytest.raises(EntityNotFound):
-        await manager.update(Mock())
+        await manager.update(None, model_mock_with_id)
 
 
 @pytest.mark.asyncio
@@ -92,10 +96,10 @@ async def test_call_delete(manager: ModelManager, model_mock_with_id: Mock):
     """
     manager.repo.get_items.return_value = [model_mock_with_id]
 
-    item = await manager.delete(model_mock_with_id.id)
+    item = await manager.delete(None, model_mock_with_id.id)
 
-    manager.repo.get_items.assert_awaited_once_with(manager.model, filters={'id': model_mock_with_id.id})
-    manager.repo.delete.assert_awaited_once_with(model_mock_with_id)
+    manager.repo.get_items.assert_awaited_once_with(None, manager.model, filters={'id': model_mock_with_id.id}, offset=None, limit=None)
+    manager.repo.delete.assert_awaited_once_with(None, model_mock_with_id)
     assert item == model_mock_with_id
 
 
@@ -108,7 +112,7 @@ async def test_delete_exception(manager: ModelManager):
     manager.repo.get_items.return_value = None
 
     with pytest.raises(EntityNotFound):
-        await manager.delete(uuid.uuid4())
+        await manager.delete(None, uuid.uuid4())
 
 
 @pytest.mark.asyncio
@@ -124,9 +128,9 @@ async def test_call_get_items(manager: ModelManager, model_mock_with_id: Mock):
     offset = 1
     limit = 1
 
-    items = await manager.get(filters=filters, offset=offset, limit=limit)
+    items = await manager.get(session=None, filters=filters, offset=offset, limit=limit)
 
-    manager.repo.get_items.assert_awaited_once_with(manager.model, filters=filters, offset=offset, limit=limit)
+    manager.repo.get_items.assert_awaited_once_with(None, manager.model,  filters=filters, offset=offset, limit=limit)
     assert items == manager.repo.get_items.return_value
 
 
@@ -144,7 +148,7 @@ async def test_call_get_one_field(manager: ModelManager, model_mock_with_id: Moc
     limit = 1
     fields = ['id']
 
-    result = await manager.get(filters=filters, offset=offset, limit=limit, fields=fields)
+    result = await manager.get(session=None, filters=filters, offset=offset, limit=limit, fields=fields)
 
     assert result == [{'id': model_mock_with_id.id}]
 
@@ -163,6 +167,6 @@ async def test_call_get_fields(manager: ModelManager, model_mock_with_id_and_nam
     limit = 1
     fields = ['id', 'name']
 
-    result = await manager.get(filters=filters, offset=offset, limit=limit, fields=fields)
+    result = await manager.get(session=None, filters=filters, offset=offset, limit=limit, fields=fields)
 
     assert result == [{'id': model_mock_with_id_and_name.id, 'name': model_mock_with_id_and_name.name}]
