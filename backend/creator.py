@@ -13,7 +13,7 @@ from .repository.models.apartment import *
 from .repository.managers import *
 from .repository.models.promotion import *
 from .repository.models.common import *
-from .repository.repository import AsyncRepository
+from .repository.database import AsyncRepository
 from .repository.localstorage import LocalStorage
 
 log = get_logger(settings, 'backend')
