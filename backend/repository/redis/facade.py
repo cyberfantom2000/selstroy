@@ -41,7 +41,7 @@ class RedisFacade:
                 state = self.state
 
         if state == State.UP:
-            result, ok = await self.handle_redis_exception(self.remote.add_dict(topic, data, ttl_secs))
+            result, ok = await self._handle_redis_exception(self.remote.add_dict(topic, data, ttl_secs))
             if ok:
                 return
 
@@ -60,7 +60,7 @@ class RedisFacade:
             state = self.state
 
         if state == State.UP:
-            result, ok = await self.handle_redis_exception(self.remote.get_dict(topic, fields))
+            result, ok = await self._handle_redis_exception(self.remote.get_dict(topic, fields))
             if ok:
                 return result
 
@@ -76,7 +76,7 @@ class RedisFacade:
                 state = self.state
 
         if state == State.UP:
-            result, ok = await self.handle_redis_exception(self.remote.update_dict(topic, data))
+            result, ok = await self._handle_redis_exception(self.remote.update_dict(topic, data))
             if ok:
                 return
 
@@ -92,14 +92,14 @@ class RedisFacade:
                 state = self.state
 
         if state == State.UP:
-            result, ok = await self.handle_redis_exception(self.remote.delete_dict(topic, keys))
+            result, ok = await self._handle_redis_exception(self.remote.delete_dict(topic, keys))
             if ok:
                 return
 
         await self.local.delete_dict(topic, keys)
 
-    async def handle_redis_exception(self, coroutine) -> tuple[Any, bool]:
-        """ Catch RedisException and call on_redis_down
+    async def _handle_redis_exception(self, coroutine) -> tuple[Any, bool]:
+        """ Catch RedisException and call _on_redis_down
         :param coroutine: coroutine
         :return tuple[coroutine result, status], when status is False if exception occurred
         """
@@ -107,19 +107,19 @@ class RedisFacade:
             return await coroutine, True
         except RedisError as exc:
             log.error(f'Redis error: {exc}')
-            await self.on_redis_down()
+            await self._on_redis_down()
             return None, False
 
-    async def on_redis_down(self) -> None:
+    async def _on_redis_down(self) -> None:
         """ Handling radis down event """
         async with self.state_lock:
             if self.state == State.UP:
-                log.warning('Redis has down switch to local storage')
+                log.warning('Redis has down. Switch to local storage')
                 self.state = State.DOWN
                 if self.healthcheck_task is None:
-                    self.healthcheck_task = asyncio.create_task(self.healthcheck(settings.redis.redis_healcheck_timeout_secs))
+                    self.healthcheck_task = asyncio.create_task(self._healthcheck(settings.redis_healthcheck_timeout_secs))
 
-    async def healthcheck(self, timeout_secs: int) -> None:
+    async def _healthcheck(self, timeout_secs: int) -> None:
         """ Healthcheck flow. Sleep for timeout_secs seconds and try ping Redis. If ping success - make data sync.
         If ping failed create new healthcheck task
         :param timeout_secs: timeout before ping server
@@ -132,13 +132,13 @@ class RedisFacade:
 
         try:
             await self.remote.ping()
-            await self.make_sync()
+            await self._make_sync()
             self.healthcheck_task = None
         except RedisError as exc:
             log.error(f'Redis healthcheck error: {exc}. Retry')
-            self.healthcheck_task = asyncio.create_task(self.healthcheck(settings.redis.redis_healcheck_timeout_secs))
+            self.healthcheck_task = asyncio.create_task(self._healthcheck(timeout_secs))
 
-    async def make_sync(self) -> None:
+    async def _make_sync(self) -> None:
         """ Load data from local storage to redis server.
         NOTE: A potentially controversial function. It performs I/O operations under a sync_lock.
         NOTE: However, more complex synchronization mechanisms are not yet justified.
@@ -151,11 +151,11 @@ class RedisFacade:
         log.info('Redis sync started')
         async with self.sync_lock:
             for topic, data in self.local.dicts.items():
-                await self.remote.add_dict(topic, data, self.local.ttl_secs[data])
+                await self.remote.add_dict(topic, data, self.local.ttls.get(topic, None))
 
             self.local.clear()
 
             async with self.state_lock:
                 self.state = State.UP
                 log.info('Redis sync finished')
-                log.info('Redis server again available')
+                log.info('Redis server again available. Switch to remote storage')
