@@ -1,7 +1,7 @@
 import base64
 import hashlib
 from uuid import UUID
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from datetime import datetime, UTC, timedelta
 
 from common import settings
@@ -33,13 +33,12 @@ class UserBlock:
 
 
 class AuthSystem:
-    def __init__(self, token_manager, repo, hasher, context):
+    def __init__(self, token_manager, repo, redis, hasher, context):
         self.token_manager = token_manager
         self.repo = repo
         self.hasher = hasher
         self.context = context
-        self.codes = {} # TODO to redis
-        self.login_attempts = {} # TODO to redis
+        self.redis = redis
 
     async def authorize(self, session, username: str, password: str, code_challenge: str, state: str) -> tuple[str, str]:
         blocked = await self._user_is_blocked(username)
@@ -54,11 +53,13 @@ class AuthSystem:
         await self._reset_attempts(username)
 
         code = self.token_manager.generate_simple_token()
-        self.codes[code] = CodeData(user_id=user.id, privilege=user.privilege, challenge=code_challenge, state=state, used=False)
+        code_data = CodeData(user_id=user.id, privilege=user.privilege, challenge=code_challenge, state=state, used=False)
+        await self.redis.add_dict(topic=code, data=asdict(code_data), ttl_secs=settings.code_ttl_secs)
+
         return code, state
 
     async def token(self, session, code: str, code_verifier: str, state: str) -> TokenFamily:
-        code_data = self.codes.get(code)
+        code_data = CodeData(**await self.redis.get_dict(topic=code))
         if not code_data or code_data.used or code_data.state != state:
             raise InvalidCode()
 
@@ -113,24 +114,26 @@ class AuthSystem:
 
 
     async def _user_is_blocked(self, username: str) -> UserBlock | None:
-        block = self.login_attempts.get(username)
-        if block and block.blcoked_until and block.blocked_until > datetime.now(UTC):
+        block = UserBlock(**await self.redis.get_dict(topic=f'login-blocks:{username}')) # TODO переделать на модели педантик чтобы небыло проблем с созданием использовать model_validate
+        if block and block.blocked_until and block.blocked_until > datetime.now(UTC):
             return block
         else:
             return None
 
-    async def _fail_attempt(self, username: str):
-        if username not in self.login_attempts:
-            self.login_attempts[username] = UserBlock(attempts=0, blocked_until=None)
+    async def _fail_attempt(self, username: str) -> None:
+        block = await self.redis.get_dict(topic=f'login-blocks:{username}')
+        if not block:
+            block = UserBlock(attempts=0, blocked_until=None)
 
-        block = self.login_attempts[username]
         block.attempts += 1
         if block.attempts >= settings.login_attempts_before_block:
             block.blocked_until = datetime.now(UTC) + timedelta(minutes=settings.login_block_time_minutes)
             block.attempts = 0
 
-    async def _reset_attempts(self, username: str):
-        self.login_attempts.pop(username)
+        await self.redis.add_dict(topic=f'login-blocks:{username}', data=asdict(block))
+
+    async def _reset_attempts(self, username: str) -> None:
+        await self.redis.delete_dict(topic=f'login-blocks:{username}')
 
     @staticmethod
     def _verify_pkce(verifier: str, challenge: str) -> bool:
