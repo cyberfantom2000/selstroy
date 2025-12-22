@@ -1,8 +1,8 @@
 import base64
 import hashlib
 from uuid import UUID
-from dataclasses import dataclass, asdict
 from datetime import datetime, UTC, timedelta
+from pydantic import BaseModel
 
 from common import settings
 from ..repository.models.common import User, UserCreate
@@ -10,26 +10,23 @@ from ..repository.models.auth import RefreshToken
 from .exceptions import *
 
 
-@dataclass
-class CodeData:
-    user_id: UUID
-    privilege: str
-    challenge: str
-    state: str
-    used: bool
+class CodeData(BaseModel):
+    user_id: UUID | None = None
+    privilege: str | None = None
+    challenge: str | None = None
+    state: str | None = None
+    used: bool | None = None
 
 
-@dataclass
-class TokenFamily:
+class TokenFamily(BaseModel):
     access: str
     refresh: str
     csrf: str
 
 
-@dataclass
-class UserBlock:
-    attempts: int
-    blocked_until: datetime | None
+class UserBlock(BaseModel):
+    attempts: int = 0
+    blocked_until: datetime | None = None
 
 
 class AuthSystem:
@@ -46,7 +43,7 @@ class AuthSystem:
             raise TooManyAttempts(blocked.blocked_until)
 
         user = await self.repo.get_user(session, login=username)
-        if not user or self.context.verify(password, user.password_hash):
+        if not user or not self.context.verify(password, user.password_hash):
             await self._fail_attempt(username)
             raise InvalidCredentials()
 
@@ -54,12 +51,12 @@ class AuthSystem:
 
         code = self.token_manager.generate_simple_token()
         code_data = CodeData(user_id=user.id, privilege=user.privilege, challenge=code_challenge, state=state, used=False)
-        await self.redis.add_dict(topic=code, data=asdict(code_data), ttl_secs=settings.code_ttl_secs)
+        await self.redis.add_dict(topic=code, data=code_data.model_dump(), ttl_secs=settings.code_ttl_secs)
 
         return code, state
 
     async def token(self, session, code: str, code_verifier: str, state: str) -> TokenFamily:
-        code_data = CodeData(**await self.redis.get_dict(topic=code))
+        code_data = self._model_or_none(CodeData, await self.redis.get_dict(topic=code))
         if not code_data or code_data.used or code_data.state != state:
             raise InvalidCode()
 
@@ -103,34 +100,35 @@ class AuthSystem:
             await self.repo.update_token(session, rec) # TODO проверить что токены обновятся
 
     async def registration(self, session, new_user: User | UserCreate) -> User:
-        # TODO check username and password security and correctness(spacing and other)
         users_ids = await self.repo.get_user(session=session, login=new_user.login)
         if users_ids:
+            raise LoginAlreadyUsed()
+
+        if not self._login_is_valid(new_user.login) or not self._password_is_valid(new_user.password):
             raise RegistrationError()
 
         user = User.model_validate(new_user)
         user.password_hash = self.hasher.hash(new_user.password)
-        return await self.repo.create_user(User, new_model=user)
-
+        return await self.repo.create_user(session=session, new_user=user)
 
     async def _user_is_blocked(self, username: str) -> UserBlock | None:
-        block = UserBlock(**await self.redis.get_dict(topic=f'login-blocks:{username}')) # TODO переделать на модели педантик чтобы небыло проблем с созданием использовать model_validate
+        block = self._model_or_none(UserBlock, await self.redis.get_dict(topic=f'login-blocks:{username}'))
         if block and block.blocked_until and block.blocked_until > datetime.now(UTC):
             return block
         else:
             return None
 
     async def _fail_attempt(self, username: str) -> None:
-        block = await self.redis.get_dict(topic=f'login-blocks:{username}')
-        if not block:
-            block = UserBlock(attempts=0, blocked_until=None)
+        block = self._model_or_none(UserBlock, await self.redis.get_dict(topic=f'login-blocks:{username}'))
+        if block is None:
+            block = UserBlock()
 
         block.attempts += 1
         if block.attempts >= settings.login_attempts_before_block:
             block.blocked_until = datetime.now(UTC) + timedelta(minutes=settings.login_block_time_minutes)
             block.attempts = 0
 
-        await self.redis.add_dict(topic=f'login-blocks:{username}', data=asdict(block))
+        await self.redis.add_dict(topic=f'login-blocks:{username}', data=block.model_dump())
 
     async def _reset_attempts(self, username: str) -> None:
         await self.redis.delete_dict(topic=f'login-blocks:{username}')
@@ -140,3 +138,24 @@ class AuthSystem:
         digest = hashlib.sha256(verifier.encode()).digest()
         url = base64.urlsafe_b64encode(digest).rstrip(b'=').decode()
         return url == challenge
+
+    @staticmethod
+    def _login_is_valid(login: str) -> bool:
+        return bool(' ' not in login and 3 < len(login) < 64)
+
+    @staticmethod
+    def _password_is_valid(password: str) -> bool:
+        return bool(6 < len(password) < 100  and
+                    (not password.islower() and not password.isupper()) and
+                    any(str(d) in password for d in (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)))
+
+    @staticmethod
+    def _model_or_none(model_type, kwargs) -> BaseModel | None:
+        """ Create model from kwargs. If kwargs is not dict return None
+        :param model_type: type of model for create
+        :param kwargs: model fields with values
+        """
+        if isinstance(kwargs, dict):
+            return model_type(**kwargs)
+        else:
+            return None

@@ -2,7 +2,6 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone, timedelta
 from jose import jwt
-from pydantic import BaseModel
 
 
 @dataclass

@@ -31,6 +31,11 @@ class RegistrationError(BackendException):
         BackendException.__init__(self, 'Invalid login or password')
 
 
+class LoginAlreadyUsed(BackendException):
+    def __init__(self):
+        BackendException.__init__(self, 'Login already used')
+
+
 class TooManyAttempts(BackendException):
     def __init__(self, date):
         BackendException.__init__(self, f'Too many login attempts. You are blocked until {date}')

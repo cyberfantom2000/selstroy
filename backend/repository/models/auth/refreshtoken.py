@@ -15,6 +15,7 @@ class RefreshToken(SQLModel, table=True):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     token: str = Field(nullable=False, index=True, unique=True)
     csrf: str = Field(nullable=False, index=True, unique=True)
+    user_id: UUID | None = Field(default=None, nullable=False, foreign_key='user.id')
     user: User | None = Relationship(back_populates="refresh_tokens")
     revoked: bool = Field(default=False, nullable=False)
     expires: datetime = Field(default_factory=ttl_factory, nullable=False)

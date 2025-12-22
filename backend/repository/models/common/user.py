@@ -11,14 +11,14 @@ class Privilege(str, Enum):
 class UserBase(SQLModel):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     login: str
-    privilege: Privilege
 
 
 class User(UserBase, table=True):
-    name: str
-    email: str
-    password_hash: str
+    name: str | None = Field(default=None)
+    email: str | None = Field(default=None)
+    password_hash: str | None = Field(default=None, nullable=False)
     refresh_tokens: list['RefreshToken'] = Relationship(back_populates='user')
+    privilege: Privilege = Field(default=Privilege.user)
 
 
 class UserPublic(UserBase):
