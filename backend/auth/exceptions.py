@@ -11,14 +11,34 @@ class InvalidCode(BackendException):
         BackendException.__init__(self, 'Invalid code')
 
 
+class CodeAlreadyUsed(BackendException):
+    def __init__(self):
+        BackendException.__init__(self, 'Code already used')
+
+
 class PkceFailed(BackendException):
     def __init__(self):
         BackendException.__init__(self, 'PKCE failed')
 
 
-class RefreshFailed(BackendException):
+class RefreshUnknownToken(BackendException):
     def __init__(self):
-        BackendException.__init__(self, 'Refresh failed')
+        BackendException.__init__(self, 'Refresh token unknown')
+
+
+class RefreshReuseDetected(BackendException):
+    def __init__(self):
+        BackendException.__init__(self, 'Reuse refresh token detected')
+
+
+class RefreshTokenExpired(BackendException):
+    def __init__(self):
+        BackendException.__init__(self, 'Refresh token expired')
+
+
+class CsrfFailed(BackendException):
+    def __init__(self):
+        BackendException.__init__(self, 'CSRF failed')
 
 
 class CouldNotValidateCredentials(BackendException):

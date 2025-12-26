@@ -1,7 +1,6 @@
 import asyncio
 from collections import OrderedDict
 
-# TODO add memory limit
 
 class RedisLocal:
     """ Local redis implements. Save data in memory.
@@ -11,6 +10,7 @@ class RedisLocal:
         """ Initializer """
         self.capacity = capacity
         self.dicts = OrderedDict()
+        self.uniques = OrderedDict()
         self.ttls = {}
 
     async def add_dict(self, topic: str, data: dict, ttl_secs: int = None) -> None:
@@ -67,15 +67,39 @@ class RedisLocal:
         else:
             self.dicts.pop(topic, '')
 
+    async def set_unique(self, topic: str, value, ttl_secs: int = None) -> bool:
+        """ Set the topic if it does not exist.
+        :param topic: data topic
+        :param value: data to set unique topic
+        :param ttl_secs: time to live in seconds, if not None set ttl for topic
+        :return: False if topic exists, else True
+        """
+        if topic in self.uniques or topic in self.dicts:
+            return False
+
+        self.uniques[topic] = value
+        if ttl_secs:
+            self.ttls[topic] = ttl_secs
+            asyncio.create_task(self._time_to_die(topic, ttl_secs))
+        return True
+
     def clear(self):
+        """ Clear all data """
         self.dicts.clear()
         self.ttls.clear()
+        self.uniques.clear()
 
     def _shrink_storage(self):
+        """ Remove older items if storage capacity is exceeded """
         for _ in range(0, len(self.dicts) - self.capacity):
             self.dicts.popitem(last=False)
 
+        for _ in range(0, len(self.uniques) - self.capacity):
+            self.uniques.popitem(last=False)
+
     async def _time_to_die(self, topic: str, ttl_secs: int) -> None:
+        """ Simple ttl callback """
         await asyncio.sleep(ttl_secs)
         self.dicts.pop(topic, '')
+        self.uniques.pop(topic, '')
         self.ttls.pop(topic, '')

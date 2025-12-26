@@ -98,6 +98,24 @@ class RedisFacade:
 
         await self.local.delete_dict(topic, keys)
 
+    async def set_unique(self, topic: str, value, ttl_secs: int = None) -> bool:
+        """ Set the topic if it does not exist.
+        :param topic: data topic
+        :param value: data to set unique topic
+        :param ttl_secs: time to live in seconds, if not None set ttl for topic
+        :return: False if topic exists, else True
+        """
+        async with self.sync_lock:
+            async with self.state_lock:
+                state = self.state
+
+        if state == State.UP:
+            result, ok = await self._handle_redis_exception(self.remote.set_unique(topic, value, ttl_secs))
+            if ok:
+                return result
+
+        return await self.local.set_unique(topic, value, ttl_secs)
+
     async def _handle_redis_exception(self, coroutine) -> tuple[Any, bool]:
         """ Catch RedisException and call _on_redis_down
         :param coroutine: coroutine
@@ -152,6 +170,9 @@ class RedisFacade:
         async with self.sync_lock:
             for topic, data in self.local.dicts.items():
                 await self.remote.add_dict(topic, data, self.local.ttls.get(topic, None))
+
+            for topic, data in self.local.uniques.items():
+                await self.remote.set_unique(topic, data, self.local.ttls.get(topic, None))
 
             self.local.clear()
 

@@ -76,6 +76,17 @@ async def test_delete_dict_fields(redis: RedisLocal):
 
 
 @pytest.mark.asyncio
+async def test_set_unique(redis: RedisLocal):
+    """ Test to check that the value of a unique field cannot be changed
+    :param redis: fixture of a RedisLocal
+    """
+    topic = 'test'
+
+    assert await redis.set_unique(topic, 1) == True
+    assert await redis.set_unique(topic, 2) == False
+
+
+@pytest.mark.asyncio
 async def test_ttl(redis: RedisLocal):
     """ Test to check topic is deleted after ttl expires
     :param redis: fixture of a RedisLocal

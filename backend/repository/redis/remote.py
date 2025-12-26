@@ -55,6 +55,15 @@ class RedisRemote:
         else:
             await self.client.delete(topic)
 
+    async def set_unique(self, topic: str, value, ttl_secs: int = None) -> bool:
+        """ Set the topic to redis if it does not exist.
+        :param topic: data topic
+        :param value: data to set unique topic
+        :param ttl_secs: time to live in seconds, if not None set ttl for topic
+        :return: False if topic exists, else True
+        """
+        return await self.client.set(topic, value, nx=True, ex=ttl_secs)
+
     async def ping(self):
         """ Ping redis server. Can be used to healthcheck """
         return await self.client.ping()

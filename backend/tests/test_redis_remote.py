@@ -70,7 +70,7 @@ async def test_update_dict(redis: RedisRemote):
 @pytest.mark.asyncio
 async def test_delete_dict(redis: RedisRemote):
     """ Test delete_dict call delegation in a client call
-    :param redis: fixture of a RedisRemote instance
+    :param redis: c
     """
     topic = 'test'
 
@@ -80,3 +80,20 @@ async def test_delete_dict(redis: RedisRemote):
     keys = ['f', 'k']
     await redis.delete_dict(topic, keys)
     redis.client.hdel.assert_awaited_once_with(topic, *keys)
+
+
+@pytest.mark.asyncio
+async def test_set_unique(redis: RedisRemote):
+    """ Test to check that the value of a unique field cannot be changed
+    :param redis: fixture of a RedisRemote instance
+    """
+    topic = 'test'
+    ttl=1
+
+    redis.client.set.return_value = True
+
+    assert await redis.set_unique(topic, 1, ttl_secs=ttl) == True
+    redis.client.set.assert_awaited_once_with(topic, 1, nx=True, ex=ttl)
+
+    redis.client.set.return_value = False
+    assert await redis.set_unique(topic, 1, ttl_secs=ttl) == False

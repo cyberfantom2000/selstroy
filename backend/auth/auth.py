@@ -11,59 +11,121 @@ from .exceptions import *
 
 
 class CodeData(BaseModel):
+    """ Data stored when requesting an authorization code """
     user_id: UUID | None = None
     privilege: str | None = None
     challenge: str | None = None
     state: str | None = None
-    used: bool | None = None
 
 
 class TokenFamily(BaseModel):
+    """ The entity returned as an artifact when requesting or updating a token """
     access: str
     refresh: str
     csrf: str
 
 
 class UserBlock(BaseModel):
+    """ User login status.
+    attempts - number of failed attempts
+    blocked_until - user login blocked until. None if not blocked
+    """
     attempts: int = 0
     blocked_until: datetime | None = None
 
 
 class AuthSystem:
-    def __init__(self, token_manager, repo, redis, hasher, context):
+    """ System of authorize and generating access tokens """
+    def __init__(self, token_manager, repo, redis, hasher):
+        """ Initializer
+        :param token_manager: token generator
+        :param repo: async repository
+        :param redis: redis storage. used for save temporary data
+        :param hasher: crypt hasher
+        """
         self.token_manager = token_manager
         self.repo = repo
-        self.hasher = hasher
-        self.context = context
         self.redis = redis
+        self.hasher = hasher
 
     async def authorize(self, session, username: str, password: str, code_challenge: str, state: str) -> tuple[str, str]:
+        """ Perform user authorization and issue an OAuth2 authorization code.
+
+        This method implements the Authorization Code flow (OAuth 2.0) with PKCE.
+        It authenticates the user using username and password, applies brute-force
+        protection, and issues a short-lived, single-use authorization code.
+
+        The authorization code is stored in a temporary storage (Redis) together
+        with the PKCE code challenge and client-provided state value. The code can
+        later be exchanged for an access token and refresh token.
+
+        Security guarantees:
+        - Applies brute-force protection on login attempts
+        - Verifies user credentials using a password hash
+        - Issues a short-lived authorization code with TTL
+        - Binds the authorization code to a PKCE code challenge
+        - Preserves the `state` value to protect against CSRF attacks
+        - The authorization code is intended to be single-use
+
+        :param session: An active database session used to load user data.
+        :param username: User login identifier.
+        :param password: Plain-text user password (validated against stored password hash).
+        :param code_challenge: PKCE code challenge derived from the client's code verifier.
+        Stored together with the authorization code and verified during the token exchange step.
+        :param state: Opaque client-provided value that will be returned unchanged.
+        Used by the client to correlate requests and protect against CSRF.
+
+        :return tuple[str, str]:
+                - authorization code: a short-lived code that can be exchanged for tokens
+                - state: the same state value provided by the client
+
+        :raises: TooManyAttempts: If the user is temporarily blocked due to repeated failed authentication attempts.
+        :raises: InvalidCredentials: If the username does not exist or the password is incorrect.
+        """
         blocked = await self._user_is_blocked(username)
         if blocked:
             raise TooManyAttempts(blocked.blocked_until)
 
         user = await self.repo.get_user(session, login=username)
-        if not user or not self.context.verify(password, user.password_hash):
+        if not user or not self.hasher.verify(password, user.password_hash):
             await self._fail_attempt(username)
             raise InvalidCredentials()
 
         await self._reset_attempts(username)
 
         code = self.token_manager.generate_simple_token()
-        code_data = CodeData(user_id=user.id, privilege=user.privilege, challenge=code_challenge, state=state, used=False)
-        await self.redis.add_dict(topic=code, data=code_data.model_dump(), ttl_secs=settings.code_ttl_secs)
+        code_data = CodeData(user_id=user.id, privilege=user.privilege, challenge=code_challenge, state=state)
+        await self.redis.add_dict(topic=f'auth-code:{code}', data=code_data.model_dump(), ttl_secs=settings.code_ttl_secs)
 
         return code, state
 
     async def token(self, session, code: str, code_verifier: str, state: str) -> TokenFamily:
-        code_data = self._model_or_none(CodeData, await self.redis.get_dict(topic=code))
-        if not code_data or code_data.used or code_data.state != state:
+        """ Exchange an OAuth2 authorization code for an access token and refresh token.
+        Validate the authorization code, enforce single-use semantics, and verify
+        PKCE and state values before issuing tokens.
+
+        :param session: opened database session
+        :param code: authorization code previously issued by the authorize method
+        :param code_verifier: PKCE code verifier generated by the client
+        :param state: state value provided during authorization, used to protect against CSRF and to correlate requests
+
+        :return: TokenFamily containing a newly issued access token, refresh token, and CSRF token
+
+        :raises InvalidCode: if the authorization code does not exist, has already been used, has expired,
+        or the state value does not match
+        :raises PkceFailed: if PKCE verification fails
+        """
+        code_data = self._model_or_none(CodeData, await self.redis.get_dict(topic=f'auth-code:{code}'))
+        if not code_data or code_data.state != state:
             raise InvalidCode()
+
+        if not await self.redis.set_unique(topic=f'auth-code:{code}:used', value=True, ttl_secs=settings.code_ttl_secs):
+            raise CodeAlreadyUsed()
 
         if not self._verify_pkce(code_verifier, code_data.challenge):
             raise PkceFailed()
 
-        code_data.used = True
+        await self.redis.add_dict(topic=f'auth-code:{code}', data=code_data.model_dump(), ttl_secs=settings.code_ttl_secs)
 
         access = self.token_manager.create_access_token(str(code_data.user_id), {'privilege': code_data.privilege})
         refresh = self.token_manager.create_simple_token()
@@ -72,10 +134,35 @@ class AuthSystem:
         await self.repo.create_token(session, RefreshToken(token=refresh, csrf=csrf, user_id=code_data.user_id))
         return TokenFamily(access=access, refresh=refresh, csrf=csrf)
 
-    async def refresh(self, session, token: str) -> TokenFamily:
+    async def refresh(self, session, token: str, csrf: str) -> TokenFamily:
+        """ Exchange a valid refresh token for a new token family using refresh token
+        rotation and CSRF protection. Detect reuse of revoked tokens and invalidate all user sessions on reuse attempt.
+
+        :param session: opened database session
+        :param token: refresh token used to obtain a new access token
+        :param csrf: CSRF token bound to the refresh token and required to confirm the refresh request
+
+        :return: TokenFamily containing a new access token, refresh token, and CSRF token
+
+        :raises RefreshUnknownToken: if the refresh token does not exist
+        :raises RefreshReuseDetected: if the refresh token has already been revoked;
+        indicates refresh token reuse and triggers revocation of all user refresh tokens
+        :raises RefreshTokenExpired: if the refresh token has expired
+        :raises CsrfFailed: if the provided CSRF token does not match the stored one
+        """
         rec = await self.repo.get_token(session=session, token=token)
         if not rec:
-            raise RefreshFailed()
+            raise RefreshUnknownToken()
+
+        if rec.revoked:
+            await self.revoke_all(session, token)
+            raise RefreshReuseDetected()
+
+        if rec.expires < datetime.now():
+            raise RefreshTokenExpired()
+
+        if rec.csrf != csrf:
+            raise CsrfFailed()
 
         rec.revoked = True
         await self.repo.update_token(rec)
@@ -87,12 +174,29 @@ class AuthSystem:
         return TokenFamily(access=access, refresh=refresh, csrf=csrf)
 
     async def revoke_one(self, session, token: str) -> None:
+        """ Revoke a single refresh token by marking it as revoked. The operation is idempotent: calling it
+        multiple times for the same token produces the same final state.
+
+        :param session: opened database session
+        :param token: refresh token to revoke
+
+        :return: None
+        """
         rec = await self.repo.get_token(session, token)
         if rec:
             rec.revoked = True
             await self.repo.update_token(session, rec)
 
     async def revoke_all(self, session, token) -> None:
+        """ Revoke all refresh tokens belonging to the user associated with the given token.
+        This is typically used when a token reuse is detected or the user performs a global logout.
+        The operation is idempotent: multiple calls will produce the same final state.
+
+        :param session: opened database session
+        :param token: any refresh token belonging to the user; all tokens for this user will be revoked
+
+        :return: None
+        """
         rec = await self.repo.get_token(session, token)
         if rec:
             for token in rec.user.refresh_tokens:
@@ -100,6 +204,17 @@ class AuthSystem:
             await self.repo.update_token(session, rec) # TODO проверить что токены обновятся
 
     async def registration(self, session, new_user: User | UserCreate) -> User:
+        """ Register a new user by creating an account with a unique login and hashed password.
+        Performs validation of login and password strength before storing the user.
+
+        :param session: opened database session
+        :param new_user: User or UserCreate object containing login and password
+
+        :return: newly created User object with hashed password
+
+        :raises LoginAlreadyUsed: if a user with the same login already exists
+        :raises RegistrationError: if the login or password does not meet validation requirements
+        """
         users_ids = await self.repo.get_user(session=session, login=new_user.login)
         if users_ids:
             raise LoginAlreadyUsed()
@@ -112,6 +227,10 @@ class AuthSystem:
         return await self.repo.create_user(session=session, new_user=user)
 
     async def _user_is_blocked(self, username: str) -> UserBlock | None:
+        """ Check if a user is blocked
+        :param username: User login identifier
+        :return: UserBlock object or None
+        """
         block = self._model_or_none(UserBlock, await self.redis.get_dict(topic=f'login-blocks:{username}'))
         if block and block.blocked_until and block.blocked_until > datetime.now(UTC):
             return block
@@ -119,6 +238,11 @@ class AuthSystem:
             return None
 
     async def _fail_attempt(self, username: str) -> None:
+        """ Record a failed login attempt for a user and apply temporary blocking if
+        the number of consecutive failed attempts exceeds the configured threshold.
+
+        :param username: User login identifier
+        """
         block = self._model_or_none(UserBlock, await self.redis.get_dict(topic=f'login-blocks:{username}'))
         if block is None:
             block = UserBlock()
@@ -128,9 +252,10 @@ class AuthSystem:
             block.blocked_until = datetime.now(UTC) + timedelta(minutes=settings.login_block_time_minutes)
             block.attempts = 0
 
-        await self.redis.add_dict(topic=f'login-blocks:{username}', data=block.model_dump())
+        await self.redis.add_dict(topic=f'login-blocks:{username}', data=block.model_dump(), ttl=settings.login_block_time_minutes * 60)
 
     async def _reset_attempts(self, username: str) -> None:
+        """ Reset user login attempts """
         await self.redis.delete_dict(topic=f'login-blocks:{username}')
 
     @staticmethod

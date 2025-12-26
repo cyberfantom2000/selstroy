@@ -98,10 +98,14 @@ async def test_delete_dict(redis: RedisFacade):
 async def test_sync_done(redis: RedisFacade):
     topic = 'test'
     data = {'test': 'test'}
+    unique_topic = 'unique'
+    unique_data = 1
 
     redis.remote.add_dict.side_effect = RedisError("Test BOOM!")
     redis.local.dicts = {'test': data}
+    redis.local.uniques = {'unique': 1}
     redis.local.ttls = {}
+
     await redis.add_dict(topic, data)
 
     redis.remote.add_dict.side_effect = None
@@ -109,7 +113,9 @@ async def test_sync_done(redis: RedisFacade):
     await asyncio.sleep(settings.redis_healthcheck_timeout_secs + 1)
 
     redis.remote.ping.assert_awaited_once_with()
-    redis.remote.add_dict.assert_has_awaits([call(topic, data, None), call(topic, data, None)])
+    redis.remote.add_dict.assert_has_awaits([call(topic, data, None),
+                                             call(topic, data, None)],
+                                             call(unique_topic, unique_data, None))
     redis.local.clear.assert_called_once()
 
     redis.remote.get_dict.return_value = data
