@@ -13,3 +13,9 @@ class EntityNotFound(DatabaseException):
             DatabaseException.__init__(self, entity)
         else:
             DatabaseException.__init__(self, f'{entity.__name__} not found!')
+
+
+class InvalidSlug(DatabaseException):
+    """ Invalid slug exception """
+    def __init__(self, slug):
+        DatabaseException.__init__(self, f'Invalid slug: {slug}')

@@ -4,6 +4,7 @@ from .base import ModelManager
 
 from ..models.project import ProjectUpdate, ProjectCreate
 from ..models.common import File
+from ..utils import raise_for_invalid_slug
 
 
 class ProjectManager(ModelManager):
@@ -11,6 +12,8 @@ class ProjectManager(ModelManager):
     to File models from an id
     """
     async def create(self, session, new_model: ProjectCreate):
+        raise_for_invalid_slug(new_model.slug)
+
         new_item = await super().create(session, new_model)
 
         await self._set_images_field(session, new_item, new_model.images_ids)
@@ -22,6 +25,9 @@ class ProjectManager(ModelManager):
         return new_item
 
     async def update(self, session, update_model: ProjectUpdate):
+        if update_model.slug:
+            raise_for_invalid_slug(update_model.slug)
+
         updated_item = await super().update(session, update_model)
 
         if update_model.images_ids is not None:

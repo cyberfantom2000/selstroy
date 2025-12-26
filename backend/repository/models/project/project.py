@@ -30,7 +30,7 @@ class ProjectBase(SQLModel):
 
 
 class Project(ProjectBase, table=True):
-    slug: str | None = Field(default=None)
+    slug: str | None = Field(default=None, unique=True, index=True)
     active: bool = Field(default=False)
     images: list[File] = Relationship(back_populates=None, link_model=ProjectImageLink, sa_relationship_kwargs={"lazy": "selectin"})
     master_plan: File | None = Relationship(back_populates=None, link_model=ProjectMasterPlanLink, sa_relationship_kwargs={"lazy": "selectin"})
@@ -56,6 +56,7 @@ class ProjectCreate(ProjectBase):
 
 class ProjectUpdate(ProjectBase):
     id: UUID
+    slug: str | None = None
     title: str | None = None
     square_max: int | None = None
     square_min: int | None = None
