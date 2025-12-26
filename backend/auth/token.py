@@ -39,7 +39,7 @@ class TokenManager:
 
     @staticmethod
     def create_simple_token() -> str:
-        """ Create new refresh token """
+        """ Create new simple token """
         return str(uuid.uuid4())
 
     def decode(self, token: str) -> dict:

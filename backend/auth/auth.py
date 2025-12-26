@@ -66,24 +66,24 @@ class AuthSystem:
         code_data.used = True
 
         access = self.token_manager.create_access_token(str(code_data.user_id), {'privilege': code_data.privilege})
-        refresh = self.token_manager.generate_refresh_token()
-        csrf = self.token_manager.generate_refresh_token()
+        refresh = self.token_manager.create_simple_token()
+        csrf = self.token_manager.create_simple_token()
 
         await self.repo.create_token(session, RefreshToken(token=refresh, csrf=csrf, user_id=code_data.user_id))
         return TokenFamily(access=access, refresh=refresh, csrf=csrf)
 
     async def refresh(self, session, token: str) -> TokenFamily:
-        rec = await self.repo.get(filters={'token': token})
+        rec = await self.repo.get_token(session=session, token=token)
         if not rec:
             raise RefreshFailed()
 
         rec.revoked = True
         await self.repo.update_token(rec)
 
-        access = self.token_manager.create_access_token(str(rec.user.id), {'privilege': rec.user.privilege})
-        refresh = self.token_manager.generate_refresh_token()
-        csrf = self.token_manager.generate_refresh_token()
-        await self.repo.create_token(session, RefreshToken(token=refresh, csrf=csrf, user_id=rec.user.id))
+        access = self.token_manager.create_access_token(str(rec.user_id), {'privilege': rec.user.privilege})
+        refresh = self.token_manager.create_simple_token()
+        csrf = self.token_manager.create_simple_token()
+        await self.repo.create_token(session, RefreshToken(token=refresh, csrf=csrf, user_id=rec.user_id))
         return TokenFamily(access=access, refresh=refresh, csrf=csrf)
 
     async def revoke_one(self, session, token: str) -> None:
@@ -95,7 +95,7 @@ class AuthSystem:
     async def revoke_all(self, session, token) -> None:
         rec = await self.repo.get_token(session, token)
         if rec:
-            for token in rec.user.tokens:
+            for token in rec.user.refresh_tokens:
                 token.revoked = True
             await self.repo.update_token(session, rec) # TODO проверить что токены обновятся
 

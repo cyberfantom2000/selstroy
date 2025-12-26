@@ -1,12 +1,16 @@
 import pytest
+import hashlib
+import base64
 from uuid import uuid4
 from unittest.mock import AsyncMock, Mock, ANY
 from datetime import datetime, timedelta, UTC
 
-from backend.auth.auth import AuthSystem, User, UserCreate
-from backend.auth.auth import RegistrationError, LoginAlreadyUsed, TooManyAttempts, InvalidCode
-from backend.auth.exceptions import InvalidCredentials
 from common import settings
+
+from backend.auth.auth import AuthSystem, User, UserCreate, RefreshToken
+from backend.auth.auth import (RegistrationError, LoginAlreadyUsed, TooManyAttempts,
+                               InvalidCode, InvalidCredentials, PkceFailed, RefreshFailed)
+
 
 @pytest.fixture
 def token_manager() -> Mock:
@@ -220,5 +224,145 @@ async def test_token_invalid_code(auth_system: AuthSystem):
 
 @pytest.mark.asyncio
 async def test_token_pkce_failed(auth_system: AuthSystem):
-    # TODO
-    pass
+    """ Test token method. Invalid verifier passed.
+    :param auth_system: fixture of an AuthSystem"""
+    session = None
+    code = str(uuid4())
+    challenge = base64.urlsafe_b64encode(hashlib.sha256('test'.encode()).digest()).rstrip(b'=').decode()
+    verifier = str(uuid4())
+    state = 'state'
+
+    auth_system.redis.get_dict.return_value = {'used': False, 'state': state, 'challenge': challenge}
+
+    with pytest.raises(PkceFailed):
+        await auth_system.token(session, code, verifier, state)
+
+
+@pytest.mark.asyncio
+async def test_token_successfully(auth_system: AuthSystem):
+    """ Test token method. Token request successful.
+    :param auth_system: fixture of an AuthSystem
+    """
+    session = None
+    code = str(uuid4())
+    verifier = str(uuid4())
+    challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).rstrip(b'=').decode()
+    state = 'state'
+    user_id = str(uuid4())
+    privilege = 'test'
+
+    auth_system.redis.get_dict.return_value = {'user_id': user_id,
+                                               'privilege': privilege,
+                                               'used': False,
+                                               'state': state,
+                                               'challenge': challenge}
+
+    access = str(uuid4())
+    refresh = str(uuid4())
+    csrf = str(uuid4())
+    auth_system.token_manager.create_access_token.return_value = access
+    auth_system.token_manager.create_simple_token.side_effect = [refresh, csrf]
+
+    token_family = await auth_system.token(session, code, verifier, state)
+
+    assert token_family.access == access
+    assert token_family.refresh == refresh
+    assert token_family.csrf == csrf
+    auth_system.token_manager.create_access_token.assert_called_once_with(user_id, {'privilege': privilege})
+    assert auth_system.token_manager.create_simple_token.call_count == 2
+    auth_system.repo.create_token.assert_awaited_once_with(session, ANY)
+
+
+@pytest.mark.asyncio
+async def test_refresh_failed(auth_system: AuthSystem):
+    """ Test refresh method. Bad token passed
+    :param auth_system: fixture of an AuthSystem
+    """
+    auth_system.repo.get_token.return_value = None
+
+    with pytest.raises(RefreshFailed):
+        await auth_system.refresh(None, 'test')
+
+
+@pytest.mark.asyncio
+async def test_refresh_successfully(auth_system: AuthSystem):
+    """ Test refresh method. Refresh successful
+    1. Passed token revoked
+    2. New TokenFamily created
+    :param auth_system: fixture of an AuthSystem
+    """
+    session = None
+    refresh_token = RefreshToken(token=str(uuid4()), csrf=str(uuid4()), user_id=str(uuid4()))
+    refresh_token.user = User(login='Username', password_hash=str(uuid4()), privilege='test')
+    auth_system.repo.get_token.return_value = refresh_token
+
+    access = str(uuid4())
+    refresh = str(uuid4())
+    csrf = str(uuid4())
+    auth_system.token_manager.create_access_token.return_value = access
+    auth_system.token_manager.create_simple_token.side_effect = [refresh, csrf]
+
+    token_family = await auth_system.refresh(session, refresh_token.token)
+
+    auth_system.repo.get_token.assert_called_once_with(session=session, token=refresh_token.token)
+    assert refresh_token.revoked == True
+    auth_system.repo.update_token.assert_called_once_with(refresh_token)
+    auth_system.repo.create_token.assert_awaited_once_with(session, ANY)
+    assert token_family.access == access
+    assert token_family.refresh == refresh
+    assert token_family.csrf == csrf
+
+
+@pytest.mark.asyncio
+async def test_revoke_one_drain(auth_system: AuthSystem):
+    """ Test revoke_one method. Try to revoke token but token not found. Method mus be idempotent
+    :param auth_system: fixture of an AuthSystem
+    """
+    auth_system.repo.get_token.return_value = None
+    await auth_system.revoke_one(None, 'test')
+    auth_system.repo.get_token.assert_awaited_once_with(None, 'test')
+
+
+@pytest.mark.asyncio
+async def test_revoke_one_successful(auth_system: AuthSystem):
+    """ Test revoke_one method. Successful revoke one token
+    :param auth_system: fixture of an AuthSystem
+    """
+    refresh_token = RefreshToken(token=str(uuid4()), csrf=str(uuid4()), user_id=str(uuid4()))
+    auth_system.repo.get_token.return_value = refresh_token
+
+    await auth_system.revoke_one(None, refresh_token.token)
+
+    auth_system.repo.get_token.assert_awaited_once_with(None, refresh_token.token)
+    auth_system.repo.update_token.assert_awaited_once_with(None, refresh_token)
+    assert refresh_token.revoked == True
+
+
+@pytest.mark.asyncio
+async def test_revoke_all_drain(auth_system: AuthSystem):
+    """ Test revoke_all method. Try to revoke all user's tokens but token not found. Method mus be idempotent
+    :param auth_system: fixture of an AuthSystem
+    """
+    auth_system.repo.get_token.return_value = None
+    await auth_system.revoke_all(None, 'test')
+    auth_system.repo.get_token.assert_awaited_once_with(None, 'test')
+
+
+@pytest.mark.asyncio
+async def test_revoke_all_successful(auth_system: AuthSystem):
+    """ Test revoke_all method. Successful revoke all user's tokens
+    :param auth_system: fixture of an AuthSystem
+    """
+    token1 = RefreshToken(token=str(uuid4()), csrf=str(uuid4()), user_id=str(uuid4()))
+    user = User(login='Username', password_hash=str(uuid4()), privilege='test')
+    user.refresh_tokens = [RefreshToken(token=str(uuid4()), csrf=str(uuid4()), user_id=str(uuid4()))]
+    token1.user = user
+
+    auth_system.repo.get_token.return_value = token1
+
+    await auth_system.revoke_all(None, token1.token)
+
+    auth_system.repo.get_token.assert_awaited_once_with(None, token1.token)
+    auth_system.repo.update_token.assert_awaited_once_with(None, token1)
+    assert token1.revoked == True
+    assert any([el.revoked == True for el in user.refresh_tokens])
