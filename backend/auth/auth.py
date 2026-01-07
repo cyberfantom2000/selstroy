@@ -10,6 +10,10 @@ from ..repository.models.auth import RefreshToken
 from .exceptions import *
 
 
+AUTH_CODE_TEMPLATE = 'auth-code:{0}'
+LOGIN_BLOCKS_TEMPLATE = 'login-blocks:{0}'
+
+
 class CodeData(BaseModel):
     """ Data stored when requesting an authorization code """
     user_id: UUID | None = None
@@ -95,7 +99,8 @@ class AuthSystem:
 
         code = self.token_manager.generate_simple_token()
         code_data = CodeData(user_id=user.id, privilege=user.privilege, challenge=code_challenge, state=state)
-        await self.redis.add_dict(topic=f'auth-code:{code}', data=code_data.model_dump(), ttl_secs=settings.code_ttl_secs)
+        topic = AUTH_CODE_TEMPLATE.format(code)
+        await self.redis.add_dict(topic=topic, data=code_data.model_dump(), ttl_secs=settings.code_ttl_secs)
 
         return code, state
 
@@ -113,26 +118,27 @@ class AuthSystem:
 
         :raises InvalidCode: if the authorization code does not exist, has already been used, has expired,
         or the state value does not match
+        :raises CodeAlreadyUsed: if the authorization code already used
         :raises PkceFailed: if PKCE verification fails
         """
-        code_data = self._model_or_none(CodeData, await self.redis.get_dict(topic=f'auth-code:{code}'))
+        topic = AUTH_CODE_TEMPLATE.format(code)
+        code_data = self._model_or_none(CodeData, await self.redis.get_dict(topic=topic))
         if not code_data or code_data.state != state:
             raise InvalidCode()
 
-        if not await self.redis.set_unique(topic=f'auth-code:{code}:used', value=True, ttl_secs=settings.code_ttl_secs):
+        if not await self.redis.set_unique(topic=f'{topic}:used', value=True, ttl_secs=settings.code_ttl_secs):
             raise CodeAlreadyUsed()
 
         if not self._verify_pkce(code_verifier, code_data.challenge):
             raise PkceFailed()
 
-        await self.redis.add_dict(topic=f'auth-code:{code}', data=code_data.model_dump(), ttl_secs=settings.code_ttl_secs)
+        await self.redis.add_dict(topic=topic, data=code_data.model_dump(), ttl_secs=settings.code_ttl_secs)
 
-        access = self.token_manager.create_access_token(str(code_data.user_id), {'privilege': code_data.privilege})
-        refresh = self.token_manager.create_simple_token()
-        csrf = self.token_manager.create_simple_token()
+        token_family = self._create_token_family(str(code_data.user_id), code_data.privilege)
 
-        await self.repo.create_token(session, RefreshToken(token=refresh, csrf=csrf, user_id=code_data.user_id))
-        return TokenFamily(access=access, refresh=refresh, csrf=csrf)
+        await self.repo.create_token(session, RefreshToken(token=token_family.refresh, csrf=token_family.csrf, user_id=code_data.user_id))
+
+        return token_family
 
     async def refresh(self, session, token: str, csrf: str) -> TokenFamily:
         """ Exchange a valid refresh token for a new token family using refresh token
@@ -167,11 +173,11 @@ class AuthSystem:
         rec.revoked = True
         await self.repo.update_token(rec)
 
-        access = self.token_manager.create_access_token(str(rec.user_id), {'privilege': rec.user.privilege})
-        refresh = self.token_manager.create_simple_token()
-        csrf = self.token_manager.create_simple_token()
-        await self.repo.create_token(session, RefreshToken(token=refresh, csrf=csrf, user_id=rec.user_id))
-        return TokenFamily(access=access, refresh=refresh, csrf=csrf)
+        token_family = self._create_token_family(str(rec.user_id), rec.user.privilege)
+
+        await self.repo.create_token(session, RefreshToken(token=token_family.refresh, csrf=token_family.csrf, user_id=rec.user_id))
+
+        return token_family
 
     async def revoke_one(self, session, token: str) -> None:
         """ Revoke a single refresh token by marking it as revoked. The operation is idempotent: calling it
@@ -231,7 +237,8 @@ class AuthSystem:
         :param username: User login identifier
         :return: UserBlock object or None
         """
-        block = self._model_or_none(UserBlock, await self.redis.get_dict(topic=f'login-blocks:{username}'))
+        topic = LOGIN_BLOCKS_TEMPLATE.format(username)
+        block = self._model_or_none(UserBlock, await self.redis.get_dict(topic=topic))
         if block and block.blocked_until and block.blocked_until > datetime.now(UTC):
             return block
         else:
@@ -243,7 +250,8 @@ class AuthSystem:
 
         :param username: User login identifier
         """
-        block = self._model_or_none(UserBlock, await self.redis.get_dict(topic=f'login-blocks:{username}'))
+        topic = LOGIN_BLOCKS_TEMPLATE.format(username)
+        block = self._model_or_none(UserBlock, await self.redis.get_dict(topic=topic))
         if block is None:
             block = UserBlock()
 
@@ -252,11 +260,11 @@ class AuthSystem:
             block.blocked_until = datetime.now(UTC) + timedelta(minutes=settings.login_block_time_minutes)
             block.attempts = 0
 
-        await self.redis.add_dict(topic=f'login-blocks:{username}', data=block.model_dump(), ttl=settings.login_block_time_minutes * 60)
+        await self.redis.add_dict(topic=topic, data=block.model_dump(), ttl=settings.login_block_time_minutes * 60)
 
     async def _reset_attempts(self, username: str) -> None:
         """ Reset user login attempts """
-        await self.redis.delete_dict(topic=f'login-blocks:{username}')
+        await self.redis.delete_dict(topic=LOGIN_BLOCKS_TEMPLATE.format(username))
 
     @staticmethod
     def _verify_pkce(verifier: str, challenge: str) -> bool:
@@ -284,3 +292,14 @@ class AuthSystem:
             return model_type(**kwargs)
         else:
             return None
+
+    def _create_token_family(self, user_id: str, privilege: str) -> TokenFamily:
+        """ Create token family collection. Collection contains access, refresh and csrf tokens
+        :param user_id: user login identifier
+        :param privilege: user privileges
+        :return: TokenFamily
+        """
+        access = self.token_manager.create_access_token(user_id, {'privilege': privilege})
+        refresh = self.token_manager.create_simple_token()
+        csrf = self.token_manager.create_simple_token()
+        return TokenFamily(access=access, refresh=refresh, csrf=csrf)

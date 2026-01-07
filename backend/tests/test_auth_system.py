@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, UTC
 
 from common import settings
 
-from backend.auth.auth import AuthSystem, User, UserCreate, RefreshToken
+from backend.auth.auth import AuthSystem, User, UserCreate, RefreshToken, AUTH_CODE_TEMPLATE, LOGIN_BLOCKS_TEMPLATE
 from backend.auth.auth import (RegistrationError, LoginAlreadyUsed, TooManyAttempts,InvalidCode, InvalidCredentials,
                                PkceFailed, RefreshTokenExpired, RefreshReuseDetected, RefreshUnknownToken, CsrfFailed,
                                CodeAlreadyUsed)
@@ -168,7 +168,7 @@ async def test_authorize_invalid_credentials(auth_system: AuthSystem):
     with pytest.raises(InvalidCredentials):
         await auth_system.authorize(None, 'Username', 'Password1', 'code_challenge', 'state')
 
-    auth_system.redis.add_dict.assert_awaited_once_with(topic='login-blocks:Username',
+    auth_system.redis.add_dict.assert_awaited_once_with(topic=LOGIN_BLOCKS_TEMPLATE.format('Username'),
                                                         data={'attempts': 1, 'blocked_until': None},
                                                         ttl=settings.login_block_time_minutes * 60)
 
@@ -188,9 +188,10 @@ async def test_authorize_successfully(auth_system: AuthSystem):
 
     assert code
     assert state == 'state'
-    auth_system.redis.delete_dict.assert_awaited_once_with(topic='login-blocks:Username')
+    auth_system.redis.delete_dict.assert_awaited_once_with(topic=LOGIN_BLOCKS_TEMPLATE.format('Username'))
     expected_data = {'user_id': user.id, 'privilege': user.privilege.name, 'challenge': 'code_challenge', 'state': 'state'}
-    auth_system.redis.add_dict.assert_awaited_once_with(topic=f'auth-code:{code}', data=expected_data, ttl_secs=settings.code_ttl_secs)
+    topic = AUTH_CODE_TEMPLATE.format(code)
+    auth_system.redis.add_dict.assert_awaited_once_with(topic=topic, data=expected_data, ttl_secs=settings.code_ttl_secs)
 
 
 @pytest.mark.asyncio
