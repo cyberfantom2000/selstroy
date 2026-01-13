@@ -25,7 +25,7 @@ from .repository.localstorage import LocalStorage
 from .repository.redis import RedisLocal, RedisRemote, RedisFacade
 
 
-log = get_logger(settings, 'Backend')
+log = get_logger(settings, 'BackendCreator')
 
 def register(app, lifespan) -> None:
     """ Register backend

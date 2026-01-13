@@ -16,7 +16,7 @@ from backend.repository.models.apartment import Apartment, ApartElement, ApartIm
 from backend.repository.models.project import *
 
 
-log = get_logger(settings, 'migrations', store=False)
+log = get_logger(settings, 'Migrations', store=False)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
