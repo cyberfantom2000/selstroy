@@ -25,6 +25,7 @@ class CodeData(BaseModel):
 class TokenFamily(BaseModel):
     """ The entity returned as an artifact when requesting or updating a token """
     access: str
+    access_expires_in_secs: int
     refresh: str
     csrf: str
 
@@ -91,7 +92,7 @@ class AuthSystem:
             raise TooManyAttempts(blocked.blocked_until)
 
         user = await self.repo.get_user(session, login=username)
-        if not user or not self.hasher.verify(password, user.password_hash):
+        if not user or not await self.hasher.verify(password, user.password_hash):
             await self._fail_attempt(username)
             raise InvalidCredentials()
 
@@ -140,13 +141,14 @@ class AuthSystem:
 
         return token_family
 
-    async def refresh(self, session, token: str, csrf: str) -> TokenFamily:
+    async def refresh(self, session, token: str, csrf_cookie: str, csrf_header: str) -> TokenFamily:
         """ Exchange a valid refresh token for a new token family using refresh token
         rotation and CSRF protection. Detect reuse of revoked tokens and invalidate all user sessions on reuse attempt.
 
         :param session: opened database session
         :param token: refresh token used to obtain a new access token
-        :param csrf: CSRF token bound to the refresh token and required to confirm the refresh request
+        :param csrf_cookie: CSRF token from cookie bound to the refresh token and required to confirm the refresh request
+        :param csrf_header: CSRF token from header bound to the refresh token and required to confirm the refresh request
 
         :return: TokenFamily containing a new access token, refresh token, and CSRF token
 
@@ -156,26 +158,28 @@ class AuthSystem:
         :raises RefreshTokenExpired: if the refresh token has expired
         :raises CsrfFailed: if the provided CSRF token does not match the stored one
         """
-        rec = await self.repo.get_token(session=session, token=token)
-        if not rec:
-            raise RefreshUnknownToken()
+        async with session.begin():
+            rec = await self.repo.get_token_for_update(session=session, token=token)
+            if not rec:
+                raise RefreshUnknownToken()
 
-        if rec.revoked:
-            await self.revoke_all(session, token)
-            raise RefreshReuseDetected()
+            if rec.revoked:
+                self._mark_as_revoked(rec.user.refresh_tokens)
+                raise RefreshReuseDetected()
 
-        if rec.expires < datetime.now():
-            raise RefreshTokenExpired()
+            if rec.expires < datetime.now():
+                raise RefreshTokenExpired()
 
-        if rec.csrf != csrf:
-            raise CsrfFailed()
+            if not csrf_cookie or not csrf_header or csrf_cookie != csrf_header or csrf_cookie != rec.csrf:
+                raise CsrfFailed()
 
-        rec.revoked = True
-        await self.repo.update_token(rec)
+            self._mark_as_revoked([rec])
 
-        token_family = self._create_token_family(str(rec.user_id), rec.user.privilege)
+            token_family = self._create_token_family(str(rec.user_id), rec.user.privilege)
 
-        await self.repo.create_token(session, RefreshToken(token=token_family.refresh, csrf=token_family.csrf, user_id=rec.user_id))
+            await self.repo.create_token(session, RefreshToken(token=token_family.refresh,
+                                                               csrf=token_family.csrf,
+                                                               user_id=rec.user_id))
 
         return token_family
 
@@ -188,12 +192,12 @@ class AuthSystem:
 
         :return: None
         """
-        rec = await self.repo.get_token(session, token)
-        if rec:
-            rec.revoked = True
-            await self.repo.update_token(session, rec)
+        async with session.begin():
+            rec = await self.repo.get_token_for_update(session=session, token=token)
+            if rec:
+                self._mark_as_revoked([rec])
 
-    async def revoke_all(self, session, token) -> None:
+    async def revoke_all(self, session, token: str) -> None:
         """ Revoke all refresh tokens belonging to the user associated with the given token.
         This is typically used when a token reuse is detected or the user performs a global logout.
         The operation is idempotent: multiple calls will produce the same final state.
@@ -203,11 +207,11 @@ class AuthSystem:
 
         :return: None
         """
-        rec = await self.repo.get_token(session, token)
-        if rec:
-            for token in rec.user.refresh_tokens:
-                token.revoked = True
-            await self.repo.update_token(session, rec) # TODO проверить что токены обновятся
+        async with session.begin():
+            rec = await self.repo.get_token(session, token)
+            if rec:
+                tokens = await self.repo.get_user_tokens_for_update(session=session, user_id=rec.user_id)
+                self._mark_as_revoked(tokens)
 
     async def registration(self, session, new_user: User | UserCreate) -> User:
         """ Register a new user by creating an account with a unique login and hashed password.
@@ -221,16 +225,32 @@ class AuthSystem:
         :raises LoginAlreadyUsed: if a user with the same login already exists
         :raises RegistrationError: if the login or password does not meet validation requirements
         """
-        users_ids = await self.repo.get_user(session=session, login=new_user.login)
-        if users_ids:
+        # TODO add limit for creating user from same ip
+        existing_user = await self.repo.get_user(session=session, login=new_user.login)
+        if existing_user:
             raise LoginAlreadyUsed()
 
         if not self._login_is_valid(new_user.login) or not self._password_is_valid(new_user.password):
             raise RegistrationError()
 
         user = User.model_validate(new_user)
-        user.password_hash = self.hasher.hash(new_user.password)
+        user.password_hash = await self.hasher.hash(new_user.password)
         return await self.repo.create_user(session=session, new_user=user)
+
+    async def user_by_token(self, session, token: str) -> User:
+        """ Get user model by token
+        :param session: opened database session
+        :param token: access token
+
+        :return: User model object
+
+        :raises UserNotFound: if user not found by token payload
+        """
+        payload = self.token_manager.decode(token)
+        user = await self.repo.get_user(session, uid=UUID(payload.sub))
+        if not user:
+            raise UserNotFound()
+        return user
 
     async def _user_is_blocked(self, username: str) -> UserBlock | None:
         """ Check if a user is blocked
@@ -267,6 +287,12 @@ class AuthSystem:
         await self.redis.delete_dict(topic=LOGIN_BLOCKS_TEMPLATE.format(username))
 
     @staticmethod
+    def _mark_as_revoked(tokens: list[RefreshToken]) -> None:
+        """ Mark all tokens as revoked """
+        for token in tokens:
+            token.revoked = True
+
+    @staticmethod
     def _verify_pkce(verifier: str, challenge: str) -> bool:
         digest = hashlib.sha256(verifier.encode()).digest()
         url = base64.urlsafe_b64encode(digest).rstrip(b'=').decode()
@@ -278,7 +304,7 @@ class AuthSystem:
 
     @staticmethod
     def _password_is_valid(password: str) -> bool:
-        return bool(6 < len(password) < 100  and
+        return bool(6 < len(password) < 72  and
                     (not password.islower() and not password.isupper()) and
                     any(str(d) in password for d in (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)))
 
@@ -302,4 +328,4 @@ class AuthSystem:
         access = self.token_manager.create_access_token(user_id, {'privilege': privilege})
         refresh = self.token_manager.create_simple_token()
         csrf = self.token_manager.create_simple_token()
-        return TokenFamily(access=access, refresh=refresh, csrf=csrf)
+        return TokenFamily(access=access, refresh=refresh, csrf=csrf, access_expires_in_secs=settings.access_token_ttl_minutes * 60)

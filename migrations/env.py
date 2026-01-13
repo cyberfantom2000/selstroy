@@ -9,7 +9,7 @@ from alembic import context
 
 from sqlmodel import SQLModel
 
-from common import settings, get_logger
+from common import settings, get_logger, DatabaseDSN
 from backend.repository.models.common import *
 from backend.repository.models.promotion import *
 from backend.repository.models.apartment import Apartment, ApartElement, ApartImage
@@ -27,8 +27,9 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option("sqlalchemy.url", settings.db_url)
-log.debug(f'Using database url: {settings.db_url}')
+dsn = DatabaseDSN(settings)
+config.set_main_option("sqlalchemy.url", dsn.to_url())
+log.debug(f'database url: {dsn}')
 
 # add your model's MetaData object here
 # for 'autogenerate' support

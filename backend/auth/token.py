@@ -16,15 +16,22 @@ class TokenConfig:
     refresh_ttl_days: int
 
 
+@dataclass
+class TokenPayload:
+    sub: str
+    ext: datetime
+    extra: dict = None
+
+
 class TokenManager:
     """ Access token manager. Create and decode access token """
-    def __init__(self, secrets: AuthSecrets, token_config: TokenConfig):
+    def __init__(self, secrets: AuthSecrets, config: TokenConfig):
         """ Initializer
         :param secrets: token encoding params
-        :param token_config: access token config
+        :param config: access token config
         """
         self.secrets = secrets
-        self.token_config = token_config
+        self.config = config
 
     def create_access_token(self, user_id: str, data: dict = None) -> str:
         """ Create new access token
@@ -32,19 +39,33 @@ class TokenManager:
         :param data: additional data to encode
         :return: access token string
         """
-        expire = datetime.now(timezone.utc) + timedelta(minutes=self.token_config.access_ttl_minutes)
-        payload = {'sub': user_id, 'ext': expire}
-        payload.update(data)
-        return jwt.encode(payload, self.secrets.key, algorithm=self.secrets.algorithm)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=self.config.access_ttl_minutes)
+        payload = TokenPayload(sub=user_id, ext=expire, extra=data)
+        return jwt.encode(self._serialize_payload(payload), self.secrets.key, algorithm=self.secrets.algorithm)
 
     @staticmethod
     def create_simple_token() -> str:
         """ Create new simple token """
         return str(uuid.uuid4())
 
-    def decode(self, token: str) -> dict:
+    def decode(self, token: str) -> TokenPayload:
         """ Decode access token
         :param token: token string
-        :return: decoded data
+        :return: TokenPayload
         """
-        return jwt.decode(token, self.secrets.key, algorithms=[self.secrets.algorithm])
+        data = jwt.decode(token, self.secrets.key, algorithms=[self.secrets.algorithm])
+        return self._deserialize_payload(data)
+
+    @staticmethod
+    def _serialize_payload(payload: TokenPayload) -> dict:
+        data = {'sub': payload.sub, 'ext': payload.ext}
+        data.update(payload.extra)
+        return data
+
+    @staticmethod
+    def _deserialize_payload(data: dict) -> TokenPayload:
+        payload = TokenPayload(sub=data['sub'], ext=data['ext'])
+        data.pop('sub')
+        data.pop('ext')
+        payload.extra = data
+        return payload

@@ -66,7 +66,7 @@ class ModelManager:
 
     async def get(self, *args,
                   session,
-                  filters: dict | None = None,
+                  filters: dict = None,
                   limit: int = None,
                   offset: int = None,
                   fields: list[str] = None) -> list[SQLModel] | list[dict]:
@@ -88,8 +88,27 @@ class ModelManager:
             result = await self.repo.get_fields(session, self.model, *attrs, filters=filters, offset=offset, limit=limit)
             return self._zip_query_result(fields, result)
         else:
-            a = await self.repo.get_items(session, self.model, filters=filters, offset=offset, limit=limit)
-            return a
+            return await self.repo.get_items(session, self.model, filters=filters, offset=offset, limit=limit)
+
+    async def get_for_update(self, *args,
+                             session,
+                             filters: dict = None,
+                             limit: int = None,
+                             offset: int = None,
+                             relationships: list = None) -> list[SQLModel]:
+        """
+        Get items and locks rows in a database for changes until a transaction is completed.
+        :param args: positional arguments are not available
+        :param session: opened database session. The session transaction must be started
+        :param filters: dict with filters. key - is a model attribute as string, value - item or collection for compare
+        :param limit: count of request items
+        :param offset: offset relative to the first element in the query
+        :param relationships: list of fields that should be loaded immediately
+        :return: return model collection if fields argument is None else return collection of dict with model fields
+        """
+        filters = self._drop_extra_filters(filters)
+        self._transform_id_filters(filters)
+        return await self.repo.get_for_update(session, self.model, filters=filters, limit=limit, offset=offset, selectin_fields=relationships)
 
     async def commit(self, session) -> None:
         """ Low level operation. Commit session transactions

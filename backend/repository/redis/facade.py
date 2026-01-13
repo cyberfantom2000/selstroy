@@ -124,7 +124,7 @@ class RedisFacade:
         try:
             return await coroutine, True
         except RedisError as exc:
-            log.error(f'Redis error: {exc}')
+            log.error(f'error: {exc}')
             await self._on_redis_down()
             return None, False
 
@@ -132,7 +132,7 @@ class RedisFacade:
         """ Handling radis down event """
         async with self.state_lock:
             if self.state == State.UP:
-                log.warning('Redis has down. Switch to local storage')
+                log.warning('remote drop down, switch to local storage')
                 self.state = State.DOWN
                 if self.healthcheck_task is None:
                     self.healthcheck_task = asyncio.create_task(self._healthcheck(settings.redis_healthcheck_timeout_secs))
@@ -153,7 +153,7 @@ class RedisFacade:
             await self._make_sync()
             self.healthcheck_task = None
         except RedisError as exc:
-            log.error(f'Redis healthcheck error: {exc}. Retry')
+            log.error(f'healthcheck error: {exc}. Retry')
             self.healthcheck_task = asyncio.create_task(self._healthcheck(timeout_secs))
 
     async def _make_sync(self) -> None:
@@ -161,12 +161,13 @@ class RedisFacade:
         NOTE: A potentially controversial function. It performs I/O operations under a sync_lock.
         NOTE: However, more complex synchronization mechanisms are not yet justified.
         """
+        log.info('sync starting')
+
         async with self.state_lock:
             if self.state != State.DOWN:
                 return
             self.state = State.SYNCING
 
-        log.info('Redis sync started')
         async with self.sync_lock:
             for topic, data in self.local.dicts.items():
                 await self.remote.add_dict(topic, data, self.local.ttls.get(topic, None))
@@ -178,5 +179,5 @@ class RedisFacade:
 
             async with self.state_lock:
                 self.state = State.UP
-                log.info('Redis sync finished')
-                log.info('Redis server again available. Switch to remote storage')
+                log.info('sync finished')
+                log.info('remote again available, switch to remote')

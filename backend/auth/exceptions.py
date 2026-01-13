@@ -58,4 +58,8 @@ class LoginAlreadyUsed(BackendException):
 
 class TooManyAttempts(BackendException):
     def __init__(self, date):
-        BackendException.__init__(self, f'Too many login attempts. You are blocked until {date}')
+        BackendException.__init__(self, f'Too many attempts. You are blocked until {date}')
+
+class UserNotFound(BackendException):
+    def __init__(self):
+        BackendException.__init__(self, 'User not found')

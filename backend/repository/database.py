@@ -1,6 +1,7 @@
 import asyncio
 
 from sqlmodel import SQLModel, select, and_, or_
+from sqlalchemy.orm import selectinload
 from typing import Iterable
 
 
@@ -21,7 +22,13 @@ class AsyncRepository:
         :return: collection of model items less than or equal to the limit
         """
         conditions = self._to_model_conditions(model_type, filters)
-        return await self.get(model_type, session=session, conditions=conditions, limit=limit, offset=offset)
+        return await self.get(model_type,
+                              session=session,
+                              conditions=conditions,
+                              limit=limit,
+                              offset=offset,
+                              options=None,
+                              for_update=False)
 
     async def get_fields(self, session, model_type, *fields, filters=None, limit=None, offset=None):
         """
@@ -35,7 +42,33 @@ class AsyncRepository:
         :return: collection of dict with model fields. Result size less than or equal to the limit
         """
         conditions = self._to_model_conditions(model_type, filters)
-        return await self.get(*fields, session=session, conditions=conditions, limit=limit, offset=offset)
+        return await self.get(*fields,
+                              session=session,
+                              conditions=conditions,
+                              limit=limit,
+                              offset=offset,
+                              options=None,
+                              for_update=False)
+
+    async def get_for_update(self, session, model_type, *, filters=None, limit=None, offset=None, selectin_fields=None) -> list[SQLModel]:
+        """
+        Get item collection and locks rows in a database for changes until a transaction is completed.
+        :param session: Opened session for database interaction. The session transaction must be started
+        :param model_type: model type for get. Must be inherited from SQLModel
+        :param filters: dict with filters. key - is a model attribute as string, value - item or collection for compare
+        :param limit: count of request item from DB
+        :param offset: offset relative to the first element in the query
+        :param selectin_fields: list of fields that should be loaded immediately
+        :return: collection of model items less than or equal to the limit
+        """
+        conditions = self._to_model_conditions(model_type, filters)
+        return await self.get(model_type,
+                              session=session,
+                              conditions=conditions,
+                              limit=limit,
+                              offset=offset,
+                              options=[selectinload(*selectin_fields)],
+                              for_update=True)
 
     async def create(self, session, model_type, model=None, **kwargs) -> SQLModel:
         """
@@ -129,14 +162,16 @@ class AsyncRepository:
         await AsyncRepository.commit(session)
 
     @staticmethod
-    async def get(*args, session, conditions: list, limit: int, offset: int) -> list[SQLModel]:
+    async def get(*args, session, conditions: list, limit: int, offset: int, options: list, for_update: bool) -> list[SQLModel]:
         """
         Facade for get item/items from database.
         :param args: parameters for pass to select() instruction
+        :param session: Opened session for database interaction
         :param conditions: collection of conditions used in 'where' instruction. All conditions concat from and_()
         :param limit: count of request item from database
         :param offset: offset relative to the first element in the query
-        :param session: Opened session for database interaction
+        :param options: collection of options used in 'options' instruction
+        :param for_update: use with_for_update instruction
         :return: collection of items
         """
         try:
@@ -148,6 +183,10 @@ class AsyncRepository:
                 statement = statement.offset(offset)
             if conditions:
                 statement = statement.where(and_(*conditions))
+            if options:
+                statement = statement.options(*options)
+            if for_update:
+                statement = statement.with_for_update()
 
             res = await session.exec(statement)
             return list(res)

@@ -1,5 +1,7 @@
+import uuid
 from uuid import UUID
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, select
+from sqlalchemy.orm import selectinload, relationship
 
 from ..models.auth import RefreshToken
 from ..models.common.user import User
@@ -42,6 +44,13 @@ class AuthModelManager:
         :return found RefreshToken or None
         """
         items = await self.token_manager.get(session=session, filters={'token': token})
+        return items[0] if items else None
+
+    async def get_user_tokens_for_update(self, session, user_id: uuid.UUID) -> list[SQLModel]:
+        return await self.token_manager.get_for_update(session=session, filters={'user_id': user_id})
+
+    async def get_token_for_update(self, session, token: str) -> SQLModel | None:
+        items = await self.token_manager.get_for_update(session=session, filters={'token': token}, relationships=[RefreshToken.user])
         return items[0] if items else None
 
     async def create_token(self, session, token: RefreshToken) -> SQLModel:

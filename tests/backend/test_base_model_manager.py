@@ -170,3 +170,23 @@ async def test_call_get_fields(manager: ModelManager, model_mock_with_id_and_nam
     result = await manager.get(session=None, filters=filters, offset=offset, limit=limit, fields=fields)
 
     assert result == [{'id': model_mock_with_id_and_name.id, 'name': model_mock_with_id_and_name.name}]
+
+
+@pytest.mark.asyncio
+async def test_call_get_for_update(manager: ModelManager, model_mock_with_id: Mock):
+    """
+    Test then ModelManager correctly call get items for update
+    :param manager: fixture of a ModelManager
+    :param model_mock_with_id: fixture of a sql model mock with id
+    """
+    manager.repo.get_for_update.return_value = [model_mock_with_id]
+
+    filters = {'id': model_mock_with_id.id}
+    offset = 1
+    limit = 1
+    fields = ['user']
+
+    items = await manager.get_for_update(session=None, filters=filters, offset=offset, limit=limit, relationships=fields)
+
+    manager.repo.get_for_update.assert_awaited_once_with(None, manager.model, filters=filters, limit=limit, offset=offset, selectin_fields=fields)
+    assert items == manager.repo.get_for_update.return_value
