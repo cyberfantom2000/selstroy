@@ -24,7 +24,7 @@ def custom_openapi(app, exclude_auth_routes: list[str]):
         }
 
         for path, methods in openapi_schema['paths'].items():
-            if path not in exclude_auth_routes:
+            if path not in exclude_auth_routes and path.startswith('/api/'):
                 for method, method_descr in methods.items():
                     if method.upper() in ['POST', 'PUT', 'PATCH', 'DELETE']:
                         method_descr['security'] = [{'BearerAuth': []}]

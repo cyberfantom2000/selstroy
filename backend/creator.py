@@ -24,6 +24,8 @@ from .repository.database import AsyncRepository
 from .repository.localstorage import LocalStorage
 from .repository.redis import RedisLocal, RedisRemote, RedisFacade
 
+from .views import MainViewRouter
+from .views.templates import static_files
 
 log = get_logger(settings, 'BackendCreator')
 
@@ -115,3 +117,9 @@ def register(app, lifespan) -> None:
 
     lifespan.add_starting_task(scheduler.start)
     lifespan.add_shutdown_task(scheduler.shutdown)
+
+    app.mount('/static', static_files, name='static')
+    view_routers = [MainViewRouter()]
+    for router in view_routers:
+        log.debug(f'register view router: {router}')
+        app.include_router(router.router)
