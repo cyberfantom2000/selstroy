@@ -208,3 +208,6 @@ __marimo__/
 
 .secrets
 .env
+
+frontend/tailwind/node_modules
+package-lock.json

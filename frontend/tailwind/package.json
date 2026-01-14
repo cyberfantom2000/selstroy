@@ -1,0 +1,23 @@
+{
+  "name": "tailwind",
+  "version": "1.0.0",
+  "description": "Landwind is a free and open-source landing page built with Tailwind CSS and Flowbite for SaaS and product websites.",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx tailwindcss -i ./input.css -o ../static/css/output.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyberfantom2000/selstroy.git"
+  },
+  "author": "tak.sebek@yandex.ru",
+  "bugs": {
+    "url": "https://github.com/cyberfantom2000/selstroy/issues"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.1.4"
+  },
+  "dependencies": {
+    "flowbite": "^1.8.1"
+  }
+}
