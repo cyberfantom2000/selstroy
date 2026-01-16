@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media (hover: none) and (pointer: coarse) {
+  .touch\:opacity-100 { opacity: 1 !important; }
+  .touch\:visible { visibility: visible !important; }
+  .touch\:opacity-0 { opacity: 0 !important; }
+  .touch\:invisible { visibility: hidden !important; }
+  .touch\:max-h-20 { max-height: 5rem !important; }
+}

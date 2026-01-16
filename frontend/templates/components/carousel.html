@@ -1,0 +1,20 @@
+<div class="relative w-full h-full mx-auto overflow-hidden rounded-3xl" >
+    <div name="slides-placeholder" class="absolute z-0 inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse transition-opacity duration-300"></div>
+
+    <div name="slides-track" class="absolute z-10 inset-0 flex   transition-transform duration-500 ease-in-out">
+        
+        <div name="slide" class="relative w-full h-full flex-shrink-0">
+            <img 
+            src="/static/images/main_background.png" 
+                class="w-full h-full object-cover"
+            />
+            <a href="" class="absolute left-4 bottom-4 bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white dark:text-gray-300 dark:hover:text-gray-100 rounded-3xl text-sm px-4 py-2 transition-all active:scale-95">Подробнее</a>
+        </div>
+    </div>
+
+    <div name="dots-container" class="absolute z-20 bottom-4 right-4 flex gap-2">
+        <button class="dot w-2 h-2 rounded-full bg-white/50"></button>
+        <button class="dot w-2 h-2 rounded-full bg-white/50"></button>
+        <button class="dot w-2 h-2 rounded-full bg-white/50"></button>
+    </div>
+</div>
