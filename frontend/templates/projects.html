@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="w-full bg-gray-200 dark:bg-gray-800">
+        <div class="max-w-xl md:max-w-xl lg:max-w-7xl px-4 py-8 mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="projects-container">
+                    <!-- dummy -->
+                <div class="flex-1 group">
+                    <div class="h-[200px] lg:h-[400px] group-hover:h-[160px] lg:group-hover:h-[320px] transition-all duration-300 ease-in-out">
+                        {% include 'components/dynamic-image.html' %}
+                    </div>
+                                        
+                    <div class="flex flex-col lg:flex-row md:flex-row lg:justify-between items-start lg:items-center pb-1 md:pb-0 lg:pb-0 pt-4">
+                        <h3 name="title" class="text-black dark:text-gray-300 text-xl">Дом на набережной</h3>
+                        <span name="short-description" class="text-gray-600 dark:text-gray-400 text-sm font-normal">Сдача: 4 квартал 2025</span>
+                    </div>
+                    
+                    <div name="extra-description-container" class="flex flex-col gap-1 opacity-0 pt-0 max-h-0 group-hover:max-h-20 group-hover:opacity-100 touch:opacity-100 touch:max-h-20 group-hover:pt-2 transition-all duration-300 ease-in-out">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Статус: Открыты продажи</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Площадь: от 30 до 80 м²</span>
+                    </div>
+                </div>
+                <div class="flex-1 group">
+                    <div class="h-[200px] lg:h-[400px] group-hover:h-[160px] lg:group-hover:h-[320px] transition-all duration-300 ease-in-out">
+                        {% include 'components/dynamic-image.html' %}
+                    </div>
+                                        
+                    <div class="flex flex-col lg:flex-row md:flex-row lg:justify-between items-start lg:items-center pb-1 md:pb-0 lg:pb-0 pt-4">
+                        <h3 name="title" class="text-black dark:text-gray-300 text-xl">Дом на набережной</h3>
+                        <span name="short-description" class="text-gray-600 dark:text-gray-400 text-sm font-normal">Сдача: 4 квартал 2025</span>
+                    </div>
+                    
+                    <div name="extra-description-container" class="flex flex-col gap-1 opacity-0 pt-0 max-h-0 group-hover:max-h-20 group-hover:opacity-100 touch:opacity-100 touch:max-h-20 group-hover:pt-2 transition-all duration-300 ease-in-out">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Статус: Открыты продажи</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Площадь: от 30 до 80 м²</span>
+                    </div>
+                </div>
+                <!-- dummy end -->
+            </div>
+        </div>
+    </div>
+
+{% include 'components/templates/carousel.html' %}
+{% include 'components/templates/project-item.html' %}
+
+{% endblock %}
+
+{% block include_js %}
+
+{% endblock %}
