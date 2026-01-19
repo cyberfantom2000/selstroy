@@ -1,19 +1,56 @@
 <template id="project-item-template">
-    <div class="flex-1 group">
-        <div class="h-[200px] lg:h-[400px] group-hover:h-[160px] lg:group-hover:h-[320px] transition-all duration-300 ease-in-out">
-            {% include 'components/dynamic-image.html' %}
-        </div>
-                        
-        <div class="flex flex-col lg:flex-row md:flex-row lg:justify-between items-start lg:items-center pb-1 md:pb-0 lg:pb-0 pt-4">
-            <h3 name="title" class="text-black dark:text-gray-300 text-xl"></h3>
-            <span name="short-description" class="text-gray-600 dark:text-gray-400 text-sm font-normal"></span>
-        </div>
+    <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-2 p-4">
+            <div name="project-description-container" class="relative h-[200px] lg:h-[200px]">
+                <div name="tags-container" class="absolute z-30 left-4 top-4 flex space-x-3">
 
-        <div name="extra-description-container" class=class="flex flex-col gap-1 opacity-0 pt-0 max-h-0 group-hover:max-h-20 group-hover:opacity-100 touch:opacity-100 touch:max-h-20 group-hover:pt-2 transition-all duration-300 ease-in-out">
+                </div>
+                
+                <div class="absolute z-30 left-4 bottom-4">
+                    <span name="project-title" class="text-5xl text-white">Title</span>
+                </div>
+                {% include 'components/dynamic-image.html' %}
+            </div>
+
+            <div name="apartments-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                
+            </div>
+                        
+            <div class="flex w-full justify-center">
+                <button name="load-more-btn" class="hidden bg-primary-600 hover:bg-primary-500 rounded-3xl text-gray-300 hover:text-white p-3">
+                    Показать еще
+                </button>
+            </div>
         </div>
     </div>
 </template>
 
-<template id="project-extra-description-template">
-    <span class="text-sm text-gray-600 dark:text-gray-400">Статус: Открыты продажи</span>
+<template id="project-tag-template">
+    <div class="flex items-center bg-black/50 px-2 rounded-xl">
+        <span class="text-sm text-gray-300">ул. Королёва</span>
+    </div>
+</template>
+
+<template id="project-apartment-template">
+    <a name="apartment-ref" href="#" class="flex-1 space-y-2 bg-gray-760 rounded-3xl p-4">
+        <div class="h-[200px] lg:h-[200px]">
+            {% include 'components/dynamic-image.html' %}
+        </div>
+
+        <div class="flex justify-between">
+            <div name="extra-info-container" class="flex flex-row text-sm items-center space-x-2 text-gray-600 dark:text-gray-400">
+
+            </div>
+
+            <span name="cost" class="text-xl text-black dark:text-gray-300">7400000 Р</span>
+        </div>
+    </a>
+</template>
+
+<template id="extra-info-template">
+    <span></span>
+</template>
+
+<template id="dot-separator-template">
+    <div class="dot w-1 h-1 rounded-full bg-gray-600 dark:bg-gray-400"></div>
 </template>

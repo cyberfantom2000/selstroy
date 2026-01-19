@@ -14,11 +14,11 @@ class MainViewRouter:
     async def index(self, request: Request) -> HTMLResponse:
         return templates.TemplateResponse(
             request=request,
-            name='index.html',
+            name='pages/index.html',
         )
 
     async def projects(self, request: Request) -> HTMLResponse:
         return templates.TemplateResponse(
             request=request,
-            name='projects.html',
+            name='pages/projects.html',
         )

@@ -1,0 +1,19 @@
+<template id="short-project-item-template">
+    <div class="flex-1 group">
+        <div class="h-[200px] lg:h-[400px] group-hover:h-[160px] lg:group-hover:h-[320px] transition-all duration-300 ease-in-out">
+            {% include 'components/dynamic-image.html' %}
+        </div>
+                        
+        <div class="flex flex-col lg:flex-row md:flex-row lg:justify-between items-start lg:items-center pb-1 md:pb-0 lg:pb-0 pt-4">
+            <h3 name="title" class="text-black dark:text-gray-300 text-xl"></h3>
+            <span name="short-description" class="text-gray-600 dark:text-gray-400 text-sm font-normal"></span>
+        </div>
+
+        <div name="extra-description-container" class="flex flex-col gap-1 opacity-0 pt-0 max-h-0 group-hover:max-h-20 group-hover:opacity-100 touch:opacity-100 touch:max-h-20 group-hover:pt-2 transition-all duration-300 ease-in-out">
+        </div>
+    </div>
+</template>
+
+<template id="short-project-extra-description-template">
+    <span class="text-sm text-gray-600 dark:text-gray-400">Статус: Открыты продажи</span>
+</template>

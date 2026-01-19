@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="w-full bg-gray-200 dark:bg-gray-800">
+        <div class="max-w-xl md:max-w-xl lg:max-w-7xl py-8 mx-auto">
+            <div class="flex flex-col gap-4">
+                <!-- dummy -->
+                <div class="flex flex-col gap-2 p-4">
+                    <a href="" class="relative h-[200px] lg:h-[200px]">
+                        <div name="project-tags-container" class="absolute z-30 left-4 top-4 flex flex-wrap gap-2">
+                            <div class="flex items-center bg-black/50 px-2 rounded-xl">
+                                <span class="text-sm text-gray-100 dark:text-gray-300">Державинский район</span>
+                            </div>
+                            <div class="flex items-center bg-black/50 px-2 rounded-xl">
+                                <span class="text-sm text-gray-100 dark:text-gray-300">ул. Королёва</span>
+                            </div>
+                            
+                        </div>
+                        <div class="absolute z-30 left-4 bottom-4">
+                            <span class="text-5xl text-white">ЖК "Королёв"</span>
+                        </div>
+                        {% include 'components/dynamic-image.html' %}
+                    </a>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                       
+                        <a href="#" class="flex-1 space-y-2 bg-gray-300 dark:bg-gray-760 rounded-3xl p-4">
+                            <div class="h-[200px] lg:h-[200px]">
+                                {% include 'components/dynamic-image.html' %}
+                            </div>
+
+                            <div class="flex justify-between">
+                                <div class="flex flex-row text-sm items-center space-x-2 text-gray-600 dark:text-gray-400">
+                                    <span>1-комн.</span>
+                                    <div class="dot w-1 h-1 rounded-full bg-gray-600 dark:bg-gray-400"></div>
+                                    <span>32 м²</span>
+                                    <div class="dot w-1 h-1 rounded-full bg-gray-600 dark:bg-gray-400"></div>
+                                    <span>6/9 этаж</spn>
+                                </div>
+                                <span class="text-xl text-black dark:text-gray-300">7400000 Р</span>
+                            </div>
+                        </a>
+
+                        <a href="#" class="flex-1 space-y-2 bg-gray-300 dark:bg-gray-760 rounded-3xl p-4">
+                            <div class="h-[200px] lg:h-[200px]">
+                                {% include 'components/dynamic-image.html' %}
+                            </div>
+
+                            <div class="flex justify-between">
+                                <div class="flex flex-row text-sm items-center space-x-2 text-gray-600 dark:text-gray-400">
+                                    <span>1-комн.</span>
+                                    <div class="dot w-1 h-1 rounded-full bg-gray-600 dark:bg-gray-400"></div>
+                                    <span>32 м²</span>
+                                    <div class="dot w-1 h-1 rounded-full bg-gray-600 dark:bg-gray-400"></div>
+                                    <span>6/9 этаж</spn>
+                                </div>
+                                <span class="text-xl text-black dark:text-gray-300">7400000 Р</span>
+                            </div>
+                        </a>
+
+                        <a href="#" class="flex-1 space-y-2 bg-gray-300 dark:bg-gray-760 rounded-3xl p-4">
+                            <div class="h-[200px] lg:h-[200px]">
+                                {% include 'components/dynamic-image.html' %}
+                            </div>
+
+                            <div class="flex justify-between">
+                                <div class="flex flex-row text-sm items-center space-x-2 text-gray-600 dark:text-gray-400">
+                                    <span>1-комн.</span>
+                                    <div class="dot w-1 h-1 rounded-full bg-gray-600 dark:bg-gray-400"></div>
+                                    <span>32 м²</span>
+                                    <div class="dot w-1 h-1 rounded-full bg-gray-600 dark:bg-gray-400"></div>
+                                    <span>6/9 этаж</spn>
+                                </div>
+                                <span class="text-xl text-black dark:text-gray-300">7400000 Р</span>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="flex w-full justify-center">
+                        <a href="#" class="bg-primary-600 hover:bg-primary-500 rounded-3xl text-gray-100 dark:text-gray-300 hover:text-white p-3">Показать еще</a>
+                    </div>
+                </div>
+                <!-- dummy end -->
+            </div>
+        </div>
+    </div>
+
+    {% include 'components/templates/project-item.html' %}
+
+{% endblock %}
+
+{% block include_js %}
+
+{% endblock %}
