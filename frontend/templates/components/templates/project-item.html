@@ -1,16 +1,16 @@
 <template id="project-item-template">
     <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-2 p-4">
-            <div name="project-description-container" class="relative h-[200px] lg:h-[200px]">
+            <a name="project-ref" class="relative h-[200px] lg:h-[200px]">
                 <div name="tags-container" class="absolute z-30 left-4 top-4 flex space-x-3">
 
                 </div>
-                
+
                 <div class="absolute z-30 left-4 bottom-4">
                     <span name="project-title" class="text-5xl text-white">Title</span>
                 </div>
                 {% include 'components/dynamic-image.html' %}
-            </div>
+            </a>
 
             <div name="apartments-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 
@@ -27,12 +27,12 @@
 
 <template id="project-tag-template">
     <div class="flex items-center bg-black/50 px-2 rounded-xl">
-        <span class="text-sm text-gray-300">ул. Королёва</span>
+        <span class="text-sm text-gray-100 dark:text-gray-300">ул. Королёва</span>
     </div>
 </template>
 
 <template id="project-apartment-template">
-    <a name="apartment-ref" href="#" class="flex-1 space-y-2 bg-gray-760 rounded-3xl p-4">
+    <a name="apartment-ref" href="#" class="flex-1 space-y-2 bg-gray-300 hover:bg-gray-320 dark:bg-gray-760 dark:hover:bg-gray-730 rounded-3xl p-4">
         <div class="h-[200px] lg:h-[200px]">
             {% include 'components/dynamic-image.html' %}
         </div>
