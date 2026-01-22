@@ -4,7 +4,7 @@ module.exports = {
     "../templates/**/*.html", 
     "../static/js/**/*.js"
   ],
-  // darkMode: "class",
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -21,6 +21,15 @@ module.exports = {
           900: '#022b1b',  
         },
         gray: {
+          210: "#E3E5E9",
+          220: "#E1E3E7",
+          230: "#DFE1E5",
+          240: "#DDDFE3",
+          250: "#DBDDE1",
+          260: "#D9DBDF",
+          270: "#D7D9DD",
+          280: "#D5D7DB",
+          290: "#D3D5D9",
           310: "#CCD0D7",
           320: "#C6CBD2",
           330: "#C1C6CE",
