@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="w-full bg-gray-200 dark:bg-gray-800">
+        <div class="max-w-xl md:max-w-xl lg:max-w-7xl mx-auto py-4">
+            <div class="flex flex-col gap-4 px-4">
+                <h1 class="text-black dark:text-gray-300 text-3xl md:text-4xl lg:text-4xl text-center lg:text-left">Наши объекты</h1>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="gallery-container">
+                    <!-- dummy -->
+                    <div class="flex-1 w-full h-[300px] rounded-xl">{% include 'components/dynamic-image.html' %}</div>
+                    <div class="flex-1 w-full h-[300px] rounded-xl">{% include 'components/dynamic-image.html' %}</div>
+                    <div class="flex-1 w-full h-[300px] rounded-xl">{% include 'components/dynamic-image.html' %}</div>
+                    <div class="flex-1 w-full h-[300px] rounded-xl">{% include 'components/dynamic-image.html' %}</div>
+                    <div class="flex-1 w-full h-[300px] rounded-xl">{% include 'components/dynamic-image.html' %}</div>
+                    <div class="flex-1 w-full h-[300px] rounded-xl">{% include 'components/dynamic-image.html' %}</div>
+                    <div class="flex-1 w-full h-[300px] rounded-xl">{% include 'components/dynamic-image.html' %}</div>
+                    <!-- dummy end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'components/templates/gallery-item.html' %}
+
+{% endblock %}
+
+{% block include_js %}
+
+{% endblock %}
