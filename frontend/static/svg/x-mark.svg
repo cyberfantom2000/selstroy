@@ -1,5 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg">
-<symbol viewBox="0 0 321 321" id="x">
-<path d="M310.6 265.425C323.1 277.925 323.1 298.175 310.6 310.675C304.4 316.925 296.2 320.025 288 320.025C279.8 320.025 271.62 316.9 265.38 310.65L160 205.325L54.63 310.625C48.38 316.925 40.19 320.025 32 320.025C23.81 320.025 15.63 316.925 9.375 310.625C-3.125 298.125 -3.125 277.875 9.375 265.375L114.775 159.975L9.375 54.625C-3.125 42.125 -3.125 21.875 9.375 9.375C21.875 -3.125 42.125 -3.125 54.625 9.375L160 114.825L265.4 9.425C277.9 -3.075 298.15 -3.075 310.65 9.425C323.15 21.925 323.15 42.175 310.65 54.675L205.25 160.075L310.6 265.425Z" fill="currentColor"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<symbol viewBox="0 0 24 24" id="x">
+    <g id="Iconly/Two-tone/Arrow---Right-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g transform="translate(12.000000, 12.000000) rotate(90.000000) translate(-12.000000, -12.000000) translate(5.000000, 5)" stroke="currentColor" stroke-width="2">
+            <polyline id="Stroke-1" points="14 0 7 7 0 0"></polyline>
+        </g>
+        <g transform="translate(12.000000, 12.000000) rotate(-90.000000) translate(-12.000000, -12.000000) translate(5.000000, 5)" stroke="currentColor" stroke-width="2">
+            <polyline id="Stroke-1" points="14 0 7 7 0 0"></polyline>
+        </g>
+    </g>
 </symbol>
 </svg>
