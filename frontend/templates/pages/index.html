@@ -18,7 +18,7 @@
                     ООО «Спецзастройщик «Новгородсельстрой»
                 </h2>
                 <div class="flex justify-center">
-                    <a href="#" class="bg-white dark:bg-gray-200 hover:bg-gray-200 dark:hover:bg-gray-100 transition-all active:scale-95 focus:outline-none text-black font-semibold rounded-xl py-3 px-6 lg:py-4 lg:px-8">
+                    <a href="/projects" class="bg-white dark:bg-gray-200 hover:bg-gray-200 dark:hover:bg-gray-100 transition-all active:scale-95 focus:outline-none text-black font-semibold rounded-xl py-3 px-6 lg:py-4 lg:px-8">
                         Смотреть предложения
                     </a>
                 </div>
@@ -26,7 +26,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-5 md:gap-12 lg:gap-24 py-4 px-4 lg:px-8 lg:py-10">
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-5 md:gap-12 lg:gap-24 py-4 px-4 lg:px-8">
         <div class="flex flex-col gap-2 items-center">
             <span class="flex text-4xl md:text-6xl lg:text-8xl font-bold lg:font-semibold text-black dark:text-gray-300">19<span class="text-2xl lg:text-4xl align-super">лет</span></span>
             <span class="flex text-md lg:text-xl text-gray-500 dark:text-gray-400">На рынке недвижимости</span>
@@ -47,10 +47,26 @@
 
     <div class="w-full">
         <div class="max-w-xl md:max-w-4xl lg:max-w-7xl p-4 mx-auto">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div class="flex flex-row gap-4">
-                    <div class="flex-1 h-[200px] lg:h-[400px]">{% include 'components/dynamic-image.html' %}</div>
-                    <div class="flex-1 h-[200px] lg:h-[400px]">{% include 'components/dynamic-image.html' %}</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <a href="/renovation" class="flex-1 flex flex-col relative h-[200px] md:h-[400px] bg-gray-300 dark:bg-gray-760 rounded-3xl">
+                        <div class="flex flex-col p-4 z-20">
+                            <span class="text-2xl font-semibold text-gray-800 dark:text-gray-300">Ремонт</span>
+                            <span class="text-2xl font-semibold text-gray-800 dark:text-gray-300">от застройщика</span>
+                            <span class="text-sm font-semibold text-gray-600 dark:text-gray-500 pt-2">• Премиальные материалы</span>
+                            <span class="text-sm font-semibold text-gray-600 dark:text-gray-500">• Опытные мастера</span>
+                            <span class="text-sm font-semibold text-gray-600 dark:text-gray-500">• Включаем в ипотеку</span>
+                        </div>
+                        <img src="/static/images/repair-logo.png" class="absolute bottom-1 right-1 h-[130px] w-[130px] lg:h-[200px] lg:w-[200px] z-10"/>
+                    </a>
+                    <a href="/about" class="flex-1 flex flex-col relative h-[200px] md:h-[400px] bg-gray-300 dark:bg-gray-760 rounded-3xl">
+                        <div class="flex flex-col p-4 z-20">
+                            <span class="text-2xl font-semibold text-gray-800 dark:text-gray-300">Расскажем</span>
+                            <span class="text-2xl font-semibold text-gray-800 dark:text-gray-300">о нас</span>
+                            <span class="text-sm font-semibold text-gray-600 dark:text-gray-500 pt-2">Что же такое Новгородсельстрой?</span>
+                        </div>
+                        <img src="/static/images/logo_color_big.png" class="absolute bottom-1 right-4 h-[100px] w-[130px] lg:h-[150px] lg:w-[200px] z-10"/>
+                    </a>
                 </div>
 
                 <div class="flex">
