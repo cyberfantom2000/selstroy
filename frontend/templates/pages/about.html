@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="w-full bg-gray-200 dark:bg-gray-800">
+        <div class="max-w-xl md:max-w-4xl lg:max-w-7xl mx-auto py-4">
+            <div class="flex flex-col gap-4 px-4">
+                <h1 class="text-black dark:text-gray-300 text-3xl md:text-4xl lg:text-4xl text-center lg:text-left">О компании</h1>
+
+                <div class="flex flex-col gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4 rounded-3xl bg-gray-240 dark:bg-gray-840">
+                        <div class="flex-1 w-full h-[300px] md:h-full">{% include 'components/dynamic-image.html' %}</div>
+                        <div class="flex flex-col gap-5">
+                            <div class="w-full justify-center md:justify-start">
+                                <h3 class="text-2xl font-semibold">Кратко о нас</h3>
+                            </div>
+                            <p class="text-lg">
+                                Созданный в 1992 году, как НПКЦ «Сельстрой», претерпевший ряд реорганизаций и переименований, 
+                                сегодня Новгородсельстрой это группа компаний состоящая из 6 организаций, обеспечивающих выполнение основных 
+                                строительных работ. Строительный комплекс практически полностью обеспечен своим машинным парком и механизмами, 
+                                набором средств малой механизации.
+                            </p>
+                            <p class="text-lg">
+                                ООО «Специализированный застройщик «Новгородсельстрой» традиционно строит кирпичные жилые дома по 
+                                индивидуальным проектам. Жилье строится в строгом соответствии с Федеральным законом 214-ФЗ, вводится 
+                                в эксплуатацию в срок или ранее предполагаемого срока.
+                            </p>
+                            <p class="text-lg">
+                                Разнообразие построенных объектов и объем освоенных средств говорит о возможности компании построить на 
+                                территории нашей области объект практически любой сложности, а наш опыт помогает изменить жизнь к лучшему, 
+                                предлагая жильё высокого качества, надёжность покупки, комфорт и функциональность проживания.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-4 p-4 rounded-3xl bg-gray-240 dark:bg-gray-840">
+                        <div class="w-full justify-center md:justify-start">
+                            <h3 class="text-2xl font-semibold">Виды деятельности</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 h-[300px] gap-4">
+                            <div class="relative h-full flex-1">
+                                <h3 class="absolute z-30 left-4 right-4 text-white text-3xl p-2">Жилые дома</h3>
+                                {% include 'components/dynamic-image.html' %}
+                            </div>
+                            <div class="relative h-full flex-1">
+                                <h3 class="absolute z-30 left-4 right-4 text-white text-3xl p-2">Инвестиционные объекты</h3>
+                                {% include 'components/dynamic-image.html' %}
+                            </div>
+                            <div class="relative h-full flex-1">
+                                <h3 class="absolute z-30 left-4 right-4 text-white text-3xl p-2">Производство стройматериалов</h3>
+                                {% include 'components/dynamic-image.html' %}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block include_js %}
+
+{% endblock %}

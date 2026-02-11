@@ -9,3 +9,23 @@
   .touch\:invisible { visibility: hidden !important; }
   .touch\:max-h-20 { max-height: 5rem !important; }
 }
+
+@layer components {
+  .no-spin::-webkit-inner-spin-button,
+  .no-spin::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .no-spin {
+    -moz-appearance: textfield;
+  }
+
+  .range-slider::-webkit-slider-thumb {
+    @apply w-3 h-3 rounded-full cursor-pointer bg-primary-500;
+  }
+
+  .range-slider::-moz-range-thumb {
+    @apply w-3 h-3 rounded-full cursor-pointer bg-primary-500;
+  }
+}
