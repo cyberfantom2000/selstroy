@@ -10,10 +10,10 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 p-4 gap-4">
                 <div class="flex flex-1 flex-col">
-                    <h2 class="text-3xl font-medium text-gray-550">Знакомьтесь</h2>
-                    <h2 class="text-3xl font-medium text-gray-800">ЖК "Королёв" - космос комфорта</h2>
+                    <h2 class="text-3xl font-medium text-gray-550 dark:text-gray-400">Знакомьтесь</h2>
+                    <h2 class="text-3xl font-medium text-gray-800 dark:text-gray-300">ЖК "Королёв" - космос комфорта</h2>
                 </div>
-                <div class="flex flex-1 flex-col gap-4">
+                <div class="flex flex-1 flex-col gap-4 text-gray-800 dark:text-gray-400">
                     <p>
                         Жилой комплекс, где технологии и уют соединяются, а современная архитектура отражает дух будущего. Большие кухни, 
                         панорамные лоджии, стеклянные входные группы и подсветка фасадов создают атмосферу комфорта и легкости.
@@ -29,83 +29,83 @@
             </div>
         </div>
 
-        <div class="rounded-t-[2.5rem] bg-gray-200">
+        <div class="rounded-t-[2.5rem] bg-gray-200 dark:bg-gray-800">
             <div class="max-w-xl md:max-w-4xl lg:max-w-7xl mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="flex flex-1 flex-col items-center justify-center p-4 gap-2">
+                    <div class="flex flex-1 flex-col items-center justify-center p-4">
                         <div class="flex w-full justify-start">
-                            <div class="flex flex-row flex-wrap bg-gray-300 rounded-2xl p-[3px]">
+                            <div class="flex flex-row flex-wrap bg-gray-300 dark:bg-gray-600 rounded-2xl rounded-br-none rounded-bl-none p-[3px]">
                                 <label class="inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="peer hidden" />
-                                    <div class="min-w-20 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                                    <div class="min-w-20 flex items-center justify-center rounded-2xl p-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                         <span>Этаж</span>
                                     </div>
                                 </label>
                                 <label class="inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="peer hidden" />
-                                    <div class="min-w-20 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                                    <div class="min-w-20 flex items-center justify-center rounded-2xl p-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                         <span>Доска</span>
                                     </div>
                                 </label>
                                 <label class="inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="peer hidden" />
-                                    <div class="min-w-20 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                                    <div class="min-w-20 flex items-center justify-center rounded-2xl p-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                         <span>Генплан</span>
                                     </div>
                                 </label>
                                 <label class="inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="peer hidden" />
-                                    <div class="min-w-20 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                                    <div class="min-w-20 flex items-center justify-center rounded-2xl p-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                         <span>На карте</span>
                                     </div>
                                 </label>
                             </div>
                         </div>
                         
-                        <div class="flex w-full min-h-[300px] md:min-h-[400px]">
-                            <svg class="w-full text-black">
+                        <div class="flex w-full min-h-[300px] md:min-h-[400px] bg-gray-300 dark:bg-gray-600 rounded-3xl rounded-tl-none p-2">
+                            <svg class="w-full text-black ">
                                 <use href="/static/svg/korolev-floor.svg#img"></use>
                             </svg>
                         </div>
 
-                        <div class="flex w-full min-h-[300px] md:min-h-[400px] hidden">
+                        <div class="flex w-full min-h-[300px] md:min-h-[400px] bg-gray-300 dark:bg-gray-600 rounded-3xl rounded-tl-none p-2 hidden">
                             {% include 'components/dynamic-image.html' %}
                         </div>
 
-                        <div class="flex w-full min-h-[300px] md:min-h-[400px] hidden">
+                        <div class="flex w-full min-h-[300px] md:min-h-[400px] bg-gray-300 dark:bg-gray-600 rounded-3xl rounded-tl-none p-2 hidden">
                             {% include 'components/dynamic-image.html' %}
                         </div>
 
-                        <div class="flex w-full min-h-[300px] md:min-h-[400px] hidden">
+                        <div class="flex w-full min-h-[300px] md:min-h-[400px] bg-gray-300 dark:bg-gray-600 rounded-3xl rounded-tl-none p-2 hidden">
                             <iframe class="rounded-xl w-full h-full" src="https://yandex.ru/map-widget/v1/?um=constructor%3A067d714827d96e0f2fb3e273d50251a07fd3f7f8620f798f09126cba41ed185c&amp;source=constructor" frameborder="0"></iframe>
                         </div>
                     </div>
                     <div class="flex flex-1 flex-col gap-4 py-4 px-2">
                         <div class="flex flex-col lg:flex-row gap-2">
                             <div class="flex flex-col gap-1 w-full">
-                                <span class="text-xs text-gray-600">Количество комнат</span>
+                                <span class="text-xs text-gray-600 dark:text-gray-500">Количество комнат</span>
                                 <div class="flex flex-row flex-wrap gap-1">
                                     <label class="inline-flex items-center cursor-pointer">
                                         <input type="checkbox" class="peer hidden" />
-                                        <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                                        <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                             <span>Студия</span>
                                         </div>
                                     </label>
                                     <label class="inline-flex items-center cursor-pointer">
                                         <input type="checkbox" class="peer hidden" />
-                                        <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                                        <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                             <span>1</span>
                                         </div>
                                     </label>
                                     <label class="inline-flex items-center cursor-pointer">
                                         <input type="checkbox" class="peer hidden" />
-                                        <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                                        <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                             <span>2</span>
                                         </div>
                                     </label>
                                     <label class="inline-flex items-center cursor-pointer">
                                         <input type="checkbox" class="peer hidden" />
-                                        <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                                        <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                             <span>3+</span>
                                         </div>
                                     </label>
@@ -113,17 +113,17 @@
                             </div>
                                                     
                             <div class="relative flex flex-col gap-1 w-full">
-                                <span class="text-xs text-gray-600">Стоимость, млн ₽</span>
-                                <div class="relative flex flex-col bg-gray-300 rounded-2xl gap-2 p-2">
+                                <span class="text-xs text-gray-600 dark:text-gray-500">Стоимость, млн ₽</span>
+                                <div class="relative flex flex-col bg-gray-300 dark:bg-gray-600 rounded-2xl gap-2 p-2">
                                     <div class="flex items-center justify-between gap-2 px-2">
                                         <div class="flex items-center gap-1">
-                                            <span class="text-gray-500">от</span>
-                                            <input type="number" class="w-14 outline-none bg-transparent no-spin">
+                                            <span class="text-gray-500 dark:text-gray-400">от</span>
+                                            <input type="number" class="w-14 outline-none bg-transparent no-spin text-black dark:text-gray-300">
                                         </div>
-                                        <span class="text-gray-500">-</span>
+                                        <span class="text-gray-500 dark:text-gray-400">-</span>
                                         <div class="flex items-center gap-1">
-                                            <span class="text-gray-500">до</span>
-                                            <input type="number" class="w-14 outline-none bg-transparent no-spin ">
+                                            <span class="text-gray-500 dark:text-gray-400">до</span>
+                                            <input type="number" class="w-14 outline-none bg-transparent no-spin text-black dark:text-gray-300">
                                         </div>
                                     </div>
                                     <div class="absolute -bottom-2 flex flex-row px-2">
@@ -137,19 +137,19 @@
                         <div class="flex flex-row flex-wrap gap-1">
                             <label class="inline-flex items-center cursor-pointer">
                                 <input type="checkbox" class="peer hidden" />
-                                <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                                <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                     <span>Балкон</span>
                                 </div>
                             </label>
                             <label class="inline-flex items-center cursor-pointer">
                                 <input type="checkbox" class="peer hidden" />
-                                <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                                <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                     <span>Линейная планировка</span>
                                 </div>
                             </label>
                             <label class="inline-flex items-center cursor-pointer">
                                 <input type="checkbox" class="peer hidden" />
-                                <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                                <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                     <span>Линейная планировка</span>
                                 </div>
                             </label>
@@ -162,15 +162,15 @@
             </div>
         </div>
 
-        <div class="bg-gray-200">
-            <div class="rounded-t-[2.5rem] bg-gray-100">
+        <div class="bg-gray-200 dark:bg-gray-800">
+            <div class="rounded-t-[2.5rem] bg-gray-100 dark:bg-gray-840">
                 <div class="flex flex-col gap-2 max-w-xl md:max-w-4xl lg:max-w-7xl mx-auto">
                     <div class="grid grid-cols-1 lg:grid-cols-2 p-4 gap-4">
                         <div class="flex flex-1 flex-col">
-                            <h2 class="text-3xl font-medium text-gray-550">Что там за дверью?</h2>
-                            <h2 class="text-3xl font-medium text-gray-800">Давайте посмотрим</h2>
+                            <h2 class="text-3xl font-medium text-gray-550 dark:text-gray-400">Что там за дверью?</h2>
+                            <h2 class="text-3xl font-medium text-gray-800 dark:text-gray-300">Давайте посмотрим</h2>
                         </div>
-                        <div class="flex flex-1 flex-col gap-4">
+                        <div class="flex flex-1 flex-col gap-4 text-gray-800 dark:text-gray-400">
                             <p>
                                 Как будет выглядеть отделка в вашем новом доме.
                             </p>
@@ -185,10 +185,10 @@
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 p-4 gap-4">
                         <div class="flex flex-1 flex-col">
-                            <h2 class="text-3xl font-medium text-gray-550">Благоустройство</h2>
-                            <h2 class="text-3xl font-medium text-gray-800">Размеренная жизнь в спальном районе</h2>
+                            <h2 class="text-3xl font-medium text-gray-550 dark:text-gray-400">Благоустройство</h2>
+                            <h2 class="text-3xl font-medium text-gray-800 dark:text-gray-300">Размеренная жизнь в спальном районе</h2>
                         </div>
-                        <div class="flex flex-1 flex-col gap-4">
+                        <div class="flex flex-1 flex-col gap-4 text-gray-800 dark:text-gray-400">
                             <p>
                                 Мы ценим приватность резидентов ЖК «Королёв» и их гостей, поэтому дворовая территория будет огорожена, 
                                 а входные группы снабжены умными домофонами — безопасность и удобство без посторонних.
@@ -205,10 +205,10 @@
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 p-4 gap-4">
                         <div class="flex flex-1 flex-col">
-                            <h2 class="text-3xl font-medium text-gray-550">Траспортная доступность</h2>
-                            <h2 class="text-3xl font-medium text-gray-800">До любой локации удобно и быстро</h2>
+                            <h2 class="text-3xl font-medium text-gray-550 dark:text-gray-400">Траспортная доступность</h2>
+                            <h2 class="text-3xl font-medium text-gray-800 dark:text-gray-300">До любой локации удобно и быстро</h2>
                         </div>
-                        <div class="flex flex-1 flex-col gap-4">
+                        <div class="flex flex-1 flex-col gap-4 text-gray-800 dark:text-gray-400">
                             <p>
                                 Куда бы вы ни запланировали отправиться, ЖК «Королёв» — это идеальное начало маршрута. 
                                 Рядом главные улицы, Большая-Московская и Большая Санкт-Петербургская, которые доведут вас до театров, 
@@ -228,34 +228,34 @@
             
         </div>
 
-        <div class="rounded-t-[2.5rem] bg-gray-200">
+        <div class="rounded-t-[2.5rem] bg-gray-200 dark:bg-gray-800">
             <div class="flex flex-col gap-2 max-w-xl md:max-w-4xl lg:max-w-7xl mx-auto p-4">
                 <div class="flex w-full py-2">
-                    <h2 class="text-3xl font-medium text-gray-800">Выбирите квартиру</h2>
+                    <h2 class="text-3xl font-medium text-gray-800 dark:text-gray-300">Выбирите квартиру</h2>
                 </div>
                 <div class="w-full">
                     <div class="flex flex-row flex-wrap gap-1">
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="checkbox" class="peer hidden" />
-                            <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                            <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                 <span>Студия</span>
                             </div>
                         </label>
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="checkbox" class="peer hidden" />
-                            <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                            <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                 <span>1</span>
                             </div>
                         </label>
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="checkbox" class="peer hidden" />
-                            <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                            <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                 <span>2</span>
                             </div>
                         </label>
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="checkbox" class="peer hidden" />
-                            <div class="min-w-16 flex items-center justify-center rounded-2xl p-2 bg-gray-300 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black hover:text-gray-200 peer-checked:text-gray-200">
+                            <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
                                 <span>3+</span>
                             </div>
                         </label>

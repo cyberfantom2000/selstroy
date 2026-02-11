@@ -11,6 +11,7 @@ class MainViewRouter:
         self.router.add_api_route('/', self.index)
         self.router.add_api_route('/projects', self.projects)
         self.router.add_api_route('/projects/{slug}', self.project)
+        self.router.add_api_route('/flats/{slug}', self.flats)
         self.router.add_api_route('/promo', self.promo)
         self.router.add_api_route('/gallery', self.gallery)
         self.router.add_api_route('/contacts', self.contacts)
@@ -33,6 +34,12 @@ class MainViewRouter:
         return templates.TemplateResponse(
             request=request,
             name='pages/project.html',
+        )
+
+    async def flats(self, slug: str, request: Request) -> HTMLResponse:
+        return templates.TemplateResponse(
+            request=request,
+            name='pages/apartment.html',
         )
 
     async def promo(self, request: Request) -> HTMLResponse:
