@@ -80,9 +80,13 @@ def register(app, lifespan) -> None:
     redis_client = Redis(host=settings.redis_host, port=settings.redis_port, decode_responses=True)
     redis_remote = RedisRemote(client=redis_client)
     redis_facade = RedisFacade(local=redis_local, remote=redis_remote)
-    auth_system = AuthSystem(token_manager=token_manager, repo=auth_model_manager, redis=redis_facade, hasher=hasher)
-    auth_router = AuthRouter(auth_system=auth_system, prefix='/api/auth', tags=['Authorization'])
-    routers.append(auth_router)
+
+    auth_system = None
+    auth_router = None
+    if settings.with_auth:
+        auth_system = AuthSystem(token_manager=token_manager, repo=auth_model_manager, redis=redis_facade, hasher=hasher)
+        auth_router = AuthRouter(auth_system=auth_system, prefix='/api/auth', tags=['Authorization'])
+        routers.append(auth_router)
 
     for r in routers:
         log.debug(f'''register router: {r}''')
@@ -97,14 +101,17 @@ def register(app, lifespan) -> None:
     log.info('adding session middleware')
     app.add_middleware(DatabaseSessionMiddleware, session=async_session, allowed_routes=db_allowed_routes)
 
-    oauth_allowed_routes = [router.router.prefix for router in routers if router != auth_router]
-    log.info('adding oauth middleware')
-    app.add_middleware(OAuthMiddleware, auth_system=auth_system, allowed_routes=oauth_allowed_routes)
+    exclude_auth_routes = None
+    if settings.with_auth:
+        allowed_methods = ['post', 'put', 'patch', 'delete']
+        oauth_allowed_routes = {router.router.prefix: allowed_methods for router in routers if router != auth_router}
+        log.info('adding oauth middleware')
+        app.add_middleware(OAuthMiddleware, auth_system=auth_system, allowed_routes=oauth_allowed_routes)
+        exclude_auth_routes = [route.path for route in auth_router.router.routes]
 
     log.info('creating http exception mapper')
     _ = HttpExceptionMapper(app)
 
-    exclude_auth_routes = [route.path for route in auth_router.router.routes]
     log.info('customize openapi schema')
     app.openapi = custom_openapi(app, exclude_auth_routes)
 

@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     api_title: str
     api_description: str
 
+    with_auth: bool
+
     db_driver: str
     db_user: str
     db_password: str

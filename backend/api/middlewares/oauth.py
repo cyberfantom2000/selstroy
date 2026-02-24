@@ -6,7 +6,7 @@ class OAuthMiddleware(BaseHTTPMiddleware):
     """ Middleware for oauth handling.
     While dispatching a request, it waits for an open DB session in the request.state.db_session
     """
-    def __init__(self, app, auth_system, allowed_routes: list[str] = None):
+    def __init__(self, app, auth_system, allowed_routes: dict = None):
         """ Initializer
         :param app: fastapi application
         :param allowed_routes: handled routes
@@ -17,17 +17,20 @@ class OAuthMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
         """ Route handler. If request path in routes then extract user from token payload """
-        if any(request.url.path.startswith(route) for route in self.routes):
-            auth = request.headers.get('authorization')
-            if not auth:
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        for route, methods in self.routes.items():
+            if request.url.path.startswith(route) and request.method.lower() in methods:
+                auth = request.headers.get('authorization')
+                if not auth:
+                    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-            scheme, _, token = auth.partition(' ')
+                scheme, _, token = auth.partition(' ')
 
-            if scheme.lower() != 'bearer' or not token:
-                raise HTTPException( status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid authorization header')
+                if scheme.lower() != 'bearer' or not token:
+                    raise HTTPException( status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid authorization header')
 
-            request.state.user = await self.auth_system.get_user_by_token(request.state.db_session, token)
-            return await call_next(request)
-        else:
-            return await call_next(request)
+                request.state.user = await self.auth_system.get_user_by_token(request.state.db_session, token)
+                return await call_next(request)
+            else:
+                return await call_next(request)
+
+        return await call_next(request)

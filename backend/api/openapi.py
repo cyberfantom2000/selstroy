@@ -14,20 +14,21 @@ def custom_openapi(app, exclude_auth_routes: list[str]):
                                      description=settings.api_description,
                                      routes=app.routes)
 
-        openapi_schema['components']['securitySchemes'] = {
-            'BearerAuth': {
-                'type': 'http',
-                'scheme': 'bearer',
-                'bearerFormat': 'JWT',
-                'description': 'Insert access token here',
+        if settings.with_auth:
+            openapi_schema['components']['securitySchemes'] = {
+                'BearerAuth': {
+                    'type': 'http',
+                    'scheme': 'bearer',
+                    'bearerFormat': 'JWT',
+                    'description': 'Insert access token here',
+                }
             }
-        }
 
-        for path, methods in openapi_schema['paths'].items():
-            if path not in exclude_auth_routes and path.startswith('/api/'):
-                for method, method_descr in methods.items():
-                    if method.upper() in ['POST', 'PUT', 'PATCH', 'DELETE']:
-                        method_descr['security'] = [{'BearerAuth': []}]
+            for path, methods in openapi_schema['paths'].items():
+                if path not in exclude_auth_routes and path.startswith('/api/'):
+                    for method, method_descr in methods.items():
+                        if method.upper() in ['POST', 'PUT', 'PATCH', 'DELETE']:
+                            method_descr['security'] = [{'BearerAuth': []}]
 
         return openapi_schema
 
