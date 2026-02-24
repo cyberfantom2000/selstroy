@@ -16,6 +16,7 @@ class MainViewRouter:
         self.router.add_api_route('/gallery', self.gallery)
         self.router.add_api_route('/contacts', self.contacts)
         self.router.add_api_route('/about', self.about)
+        self.router.add_api_route('/renovation', self.renovation)
         self.router.add_api_route('/{fullpath:path}', self.not_found)
 
     async def index(self, request: Request) -> HTMLResponse:
@@ -31,7 +32,7 @@ class MainViewRouter:
         )
 
     async def project(self, slug: str, request: Request) -> HTMLResponse:
-        return templates.TemplateResponse(
+        return templates.TemplateResponse( 
             request=request,
             name='pages/project.html',
         )
@@ -64,6 +65,12 @@ class MainViewRouter:
         return templates.TemplateResponse(
             request=request,
             name='pages/about.html',
+        )
+
+    async def renovation(self, request: Request) -> HTMLResponse:
+        return templates.TemplateResponse(
+            request=request,
+            name='pages/renovation.html',
         )
 
     async def not_found(self, request: Request) -> HTMLResponse:
