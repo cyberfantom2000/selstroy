@@ -70,7 +70,7 @@
                 </div>
 
                 <div class="flex">
-                    <div class="flex-1 w-full h-[400px]">{% include 'components/carousel.html' %}</div>
+                    <div class="flex-1 w-full h-[400px]" id="promo-carousel">{% include 'components/carousel.html' %}</div>
                 </div>
             </div>
         </div>
@@ -125,5 +125,5 @@
 {% endblock %}
 
 {% block include_js %}
-
+<script type="module" src="static/js/pages/index.mjs"></script>
 {% endblock %}
