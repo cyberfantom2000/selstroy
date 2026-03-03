@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
         with_buttons: false,
         img_as_ref: true,
         auto_play: true,
-        auto_play_interval_secs: 15
+        auto_play_interval_secs: 15,
+        retry_interval_secs: 5
     });
 
     const promo_carousel = new ImageCarousel({

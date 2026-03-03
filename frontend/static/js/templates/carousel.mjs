@@ -1,3 +1,5 @@
+import { Timer } from '../utils.mjs';
+
 
 class SlideOptions {
     constructor({img_src, img_ref = "", btn_link = ""}) {
@@ -45,7 +47,7 @@ class DotButton {
 }
 
 export class CarouselConfig {
-    constructor({async_loader, image_field, ref_field, one_ref = false, with_buttons = false, img_as_ref=false, auto_play = false, auto_play_interval_secs = 10}) {
+    constructor({async_loader, image_field, ref_field, one_ref = false, with_buttons = false, img_as_ref=false, auto_play = false, auto_play_interval_secs = 10, retry_interval_secs = 5}) {
         this.async_loader = async_loader;
         this.image_field = image_field;
         this.ref_field = ref_field;
@@ -54,6 +56,7 @@ export class CarouselConfig {
         this.img_as_ref = img_as_ref;
         this.auto_play = auto_play;
         this.auto_play_interval_secs = auto_play_interval_secs;
+        this.retry_interval_secs = retry_interval_secs;
     }
 }
 
@@ -72,42 +75,42 @@ export class ImageCarousel {
         this.slides = [];
         this.dots = []
         this.active_index = null;
-        this.interval_id = null;
+        this.play_timer = new Timer(this.config.auto_play_interval_secs * 1000, false);
+        this.retry_timer = new Timer(this.config.retry_interval_secs * 1000, true);
 
-        this.build().then(() => { 
-            this.show_first();
-            if (this.config.auto_play)
-                this.start_auto_play(this.config.auto_play_interval_secs); 
-        });
+        this.build_and_show();
     }
 
     //private methods
 
-    async build() {
-        let items = await this.config.async_loader();
-        for (const item of items) {
-            let slide = this.build_slide(item);
-            this.slides.push(slide);
-
-            let dot = this.build_dot();
-            this.dots.push(dot);
-
-            let slide_index = this.slides.length - 1;
-            dot.onclick = () => { this.swap_slide(slide_index) };
-
-            this.slides_track.appendChild(slide.element);
-            this.dots_container.appendChild(dot.element);
-        }
+    build_and_show() {
+        this.build().then(() => { 
+            this.show_first();
+            if (this.config.auto_play)
+                this.play_timer.start(() => { this.swap_slide(this.active_index + 1) }); 
+        });
     }
 
-    start_auto_play(interval_secs) {
-        if (this.interval_id !== null)
-            clearInterval(this.interval_id);
+    async build() {
+        try {
+            let items = await this.config.async_loader();
+            for (const item of items) {
+                let slide = this.build_slide(item);
+                this.slides.push(slide);
 
-        this.interval_id = setInterval(
-            () => { this.swap_slide(this.active_index + 1) },
-            interval_secs * 1000
-        );
+                let dot = this.build_dot();
+                this.dots.push(dot);
+
+                let slide_index = this.slides.length - 1;
+                dot.onclick = () => { this.swap_slide(slide_index) };
+
+                this.slides_track.appendChild(slide.element);
+                this.dots_container.appendChild(dot.element);
+            }
+        } catch (err) {
+            // TODO post message
+            this.retry_timer.start(() => { this.retry(); });
+        }
     }
 
     show_first(){
@@ -145,4 +148,25 @@ export class ImageCarousel {
     build_dot() {
         return new DotButton(this.dot_template);
     }
+
+    retry() {
+        this.clear();
+        this.build_and_show();
+    }
+
+    clear() {
+        this.play_timer.stop();
+        this.retry_timer.stop();
+        this.active_index = null;
+        
+        while (this.slides_track.firstChild)
+            this.slides_track.removeChild(this.slides_track.firstChild);
+
+        this.slides = [];
+
+        while (this.dots_container.firstChild)
+            this.dots_container.removeChild(this.dots_container.firstChild);
+        
+        this.dots = [];
+    }    
 }
