@@ -1,5 +1,5 @@
 
-class SliceOptions {
+class SlideOptions {
     constructor({img_src, img_ref = "", btn_link = ""}) {
         this.img_src = img_src;
         this.img_ref = img_ref;
@@ -13,14 +13,6 @@ class Slide {
         this.element.querySelector('[name="img-ref"]').href = options.img_ref;
         this.element.querySelector('[name="img"]').src = options.img_src;
         this.container = this.element.querySelector('[name="slide"]');
-    }
-
-    hide() {
-        this.container.classList.add('hidden');
-    }
-
-    show() {
-        this.container.classList.remove('hidden');
     }
 }
 
@@ -95,7 +87,6 @@ export class ImageCarousel {
         let items = await this.config.async_loader();
         for (const item of items) {
             let slide = this.build_slide(item);
-            slide.hide();
             this.slides.push(slide);
 
             let dot = this.build_dot();
@@ -125,23 +116,24 @@ export class ImageCarousel {
     }
 
     swap_slide(index){
-        if (this.active_index !== null) {
-            this.slides[this.active_index].hide();
+        if (this.slides.length === 0)
+            return;
+
+        if (this.active_index !== null)
             this.dots[this.active_index].deselect();
-        }
 
         this.active_index = index % this.slides.length;
-        this.slides[this.active_index].show();
         this.dots[this.active_index].select();
+        this.slides_track.style.transform = `translateX(-${this.active_index * 100}%)`;
     }
 
     build_slide(item) {
         const href = this.config.one_ref ? this.config.ref_field : item[this.config.ref_field];
 
-        const options = new SliceOptions({
+        const options = new SlideOptions({
             img_src: '/api/file/' + item[this.config.image_field].id,
             img_link: this.config.img_as_ref ? href : '',
-            btn_link: this.with_buttons ? href : ''
+            btn_link: this.config.with_buttons ? href : ''
         });
 
         if (this.config.with_buttons)
