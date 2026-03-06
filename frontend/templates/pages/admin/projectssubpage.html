@@ -1,0 +1,221 @@
+<div class="projects-subpage" class="flex flex-col w-full p-4">
+    <div class="flex justify-start">
+        <button id="create-project-button" role="tooltip" name="id-tooltip" class="flex items-center justify-center py-2 text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+            <svg class="h-8 w-8">
+                <use href="/static/svg/plus.svg#icon"></use>
+            </svg>
+            <span>Создать проект</span>
+        </button>
+    </div>
+    <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    </div>
+</div>
+
+ <div id="project-edit-modal" class="fixed inset-0 z-50 hidden">
+    <div name="background" class="absolute inset-0 bg-black/50"></div>
+
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="relative w-full max-w-md bg-gray-200 dark:bg-gray-800 rounded-3xl shadow-xl max-h-[90vh] flex flex-col">
+            <div class="p-4 shrink-0">
+                <h2 name="title" class="text-lg font-semibold text-gray-800 dark:text-gray-300"></h2>
+                <h3 name="sub-title" class="text-sm font-medium text-gray-600 dark:text-gray-400"></h3>
+            </div>
+
+            <div class="overflow-y-auto flex-1 p-4">
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">ID</span>
+                            <button role="tooltip" name="id-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <span name="id-input" class="outline-2 outline outline-gray-100 dark:outline-gray-700 px-2 rounded-xl"></span>
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Черновик</span>
+                            <button role="tooltip" name="is-draft-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="flex w-full justify-start">
+                            <input type="checkbox" name="is-draft-input" class="rounded-xl">
+                        </div>
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Заголовок, строка *</span>
+                            <button role="tooltip" name="title-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <input type="text" name="title-input" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none px-2 rounded-xl">
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Площадь минимальная, м², целое число *</span>
+                            <button role="tooltip" name="square-min-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <input type="number" name="square-min-input" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none no-spin px-2 rounded-xl">
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Площадь максимальная, м², целое число *</span>
+                            <button role="tooltip" name="square-max-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <input type="number" name="square-max-input" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none no-spin px-2 rounded-xl">
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Дата сдачи, строка *</span>
+                            <button role="tooltip" name="release-date-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <input type="text" name="release-date-input" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none no-spin px-2 rounded-xl">
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Статус объекта, строка *</span>
+                            <button role="tooltip" name="sale-status-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <input type="text" name="sale-status-input" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none no-spin px-2 rounded-xl">
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Слаг, строка *</span>
+                            <button role="tooltip" name="slug-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <input type="text" name="slug-input" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none no-spin px-2 rounded-xl">
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Генплан, ID</span>
+                            <button role="tooltip" name="master-plan-id-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <input type="text" name="master-plan-id-input" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none no-spin px-2 rounded-xl">
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Изображение предпросмотра, ID</span>
+                            <button role="tooltip" name="preview-id-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <input type="text" name="preview-id-input" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none no-spin px-2 rounded-xl">
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Интерактивная карта этажа, svg</span>
+                            <button role="tooltip" name="floor-svg-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <textarea name="floor-svg-input" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl min-h-64 resize-none"></textarea>
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Карта местоположения, iframe</span>
+                            <button role="tooltip" name="live-map-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <textarea name="live-map-input" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl min-h-64 resize-none"></textarea>
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Изображения для карусели, ID через точку с запятой</span>
+                            <button role="tooltip" name="images-ids-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <textarea name="images-ids-input" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl min-h-64 resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 flex justify-end gap-3">
+                <button name="reject-button" class="bg-gray-300 hover:bg-gray-350  dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-300 rounded-xl p-2 transition-all active:scale-95">
+                    Отменить
+                </button>
+
+                <button name="submit-button" class="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white dark:text-gray-300 dark:hover:text-gray-100 rounded-xl p-2 transition-all active:scale-95">
+                    Подтвердить
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="project-preview-template">
+    <div class="flex-1">
+        <div class="aspect-square max-h-[400px]">
+            {% include 'components/dynamic-image.html' %}
+        </div>
+                                        
+        <div class="flex flex-col md:flex-row lg:justify-between items-start lg:items-center gap-1 p-2">
+            <div class="flex flex-col items-start gap-1">
+                <h3 name="title" class="text-black dark:text-gray-300 text-xl"></h3>
+                <span name="id" class="text-gray-600 dark:text-gray-400 text-sm font-normal"></span>
+            </div>
+            <div class="flex flex-row gap-2">
+                <label class="flex items-center cursor-pointer">
+                    <input name="checkbox" type="checkbox" class="peer hidden" />
+                    <div name="hide-button" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+                        <svg class="h-7 w-7">
+                            <use href="/static/svg/eye-blocked.svg#icon"></use>
+                        </svg>
+                    </div>
+                </label>
+                            
+                <button name="edit-button" class="flex items-center justify-center text-gray-400 hover:text-primary-500" tooltip="Редактировать">
+                    <svg class="h-7 w-7">
+                        <use href="/static/svg/edit.svg#icon"></use>
+                    </svg>
+                </button>
+                <button name="delete-button" class="flex items-center justify-center text-gray-400 hover:text-red-500" tooltip="Удалить">
+                    <svg class="h-6 w-6">
+                        <use href="/static/svg/trash.svg#icon"></use>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</template>

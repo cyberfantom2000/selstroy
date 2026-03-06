@@ -1,5 +1,7 @@
-import { CarouselConfig, ImageCarousel } from '../templates/carousel.mjs';
+import { CarouselConfig, ImageCarousel } from '../common/carousel.mjs';
+import { ProjectsPreviewConfig, ProjectsPreview } from '../projects/projectpreview.mjs';
 import { requestAllPromos } from '../api/promotion.mjs';
+import { requestAllProjectsShortDescription } from '../api/project.mjs';
 
 document.addEventListener("DOMContentLoaded", () => {
     const promo_carousel_config = new CarouselConfig({
@@ -17,5 +19,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const promo_carousel = new ImageCarousel({
         config: promo_carousel_config, 
         container_id: 'promo-carousel'
+    });
+
+    const projects_preview_config = new ProjectsPreviewConfig({
+        async_loader: requestAllProjectsShortDescription,
+        retry_interval_secs: 5
+    });
+
+    const projects_preview = new ProjectsPreview({
+        config: projects_preview_config,
+        container_id: 'projects-container'
     });
 });

@@ -7,15 +7,14 @@ export class Timer {
     }
 
     start(callback) {
-        if (this.is_running()) {
-            log.console.error('Timer is already running');
-            return;
-        }
+        if (this.is_running())
+            throw new Error('Timer already running');
 
         this.timer_id = setInterval(() => {
-            callback();
             if (this.singleshot)
                 this.stop();
+
+            callback();            
         }, this.delay);
     }
 

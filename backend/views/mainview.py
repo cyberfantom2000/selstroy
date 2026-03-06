@@ -17,6 +17,7 @@ class MainViewRouter:
         self.router.add_api_route('/contacts', self.contacts)
         self.router.add_api_route('/about', self.about)
         self.router.add_api_route('/renovation', self.renovation)
+        self.router.add_api_route('/admin', self.admin)
         self.router.add_api_route('/{fullpath:path}', self.not_found)
 
     async def index(self, request: Request) -> HTMLResponse:
@@ -71,6 +72,12 @@ class MainViewRouter:
         return templates.TemplateResponse(
             request=request,
             name='pages/renovation.html',
+        )
+
+    async def admin(self, request: Request) -> HTMLResponse:
+        return templates.TemplateResponse(
+            request=request,
+            name='pages/admin/admin.html'
         )
 
     async def not_found(self, request: Request) -> HTMLResponse:
