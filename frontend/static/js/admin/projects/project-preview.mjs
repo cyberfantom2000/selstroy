@@ -1,3 +1,5 @@
+import { mediaUrl } from "../../api/base-urls.mjs";
+
 class ProjectItemTitle {
     constructor(data, element) {
         this.title = element.querySelector('[name="title"]');
@@ -20,7 +22,7 @@ class ProjectItemImage {
     }
 
     update(data) {
-        this.image.src = '/api/file' + data.preview_image.id; // TODO /api/file перенести в отдельный файл
+        this.image.src = `${mediaUrl}/${data.preview_image.id}`;
     }
 }
 

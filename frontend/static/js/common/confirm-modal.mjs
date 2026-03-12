@@ -15,6 +15,11 @@ export class ConfirmModal {
         background.onclick = () => { this.reject(); };
         
         this.confirmBtn.onclick = () => { this.confirm(); };
+
+        this.escapeHandler = () => {
+            if (event.key === 'Escape')
+              this.hide();
+        };
     }
 
     reject() {
@@ -37,24 +42,26 @@ export class ConfirmModal {
     }
 
     setSubmitButtonStyle(style) {
-        const primaryColors = [];
-        const dangerColors = [];
-        this.confirmBtn.classList.remove(primaryColors);
-        this.confirmBtn.classList.remove(dangerColors);
+        const primaryColors = ['bg-primary-600', 'hover:bg-primary-700', 'dark:bg-primary-700', 'dark:hover:bg-primary-600'];
+        const dangerColors = ['bg-red-600', 'hover:bg-red-700', 'dark:bg-red-700', 'dark:hover:bg-red-600'];
+        this.confirmBtn.classList.remove(...primaryColors);
+        this.confirmBtn.classList.remove(...dangerColors);
 
         if (style === 'primary')
-            this.confirmBtn.classList.add(primaryColors);
+            this.confirmBtn.classList.add(...primaryColors);
         else if (style === 'danger')
-            this.confirmBtn.classList.add(dangerColors);
+            this.confirmBtn.classList.add(...dangerColors);
         else
-            ;// TOOD post message
+            throw new Error('Unknown button style');
     }
 
     show() {
         this.element.classList.remove('hidden');
+        document.addEventListener('keydown', this.escapeHandler);
     }
 
     hide() {
         this.element.classList.add('hidden');
+        document.removeEventListener('keydown', this.escapeHandler);
     }
 }

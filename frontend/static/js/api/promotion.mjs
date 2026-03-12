@@ -1,9 +1,9 @@
 import { requestModels, requestAllModels } from "./model.mjs";
+import { promoUrl } from "./base-urls.mjs";
 
-const baseUrl = '/api/promotion';
 
 export async function requestPromos(limit=100, offset=0, fields=[]) {
-    return await requestModels(baseUrl, limit, offset, fields);
+    return await requestModels(promoUrl, limit, offset, fields);
 }
 
 export async function requestAllPromos(fields=[]) {

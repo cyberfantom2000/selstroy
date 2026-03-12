@@ -1,5 +1,5 @@
-import { Timer } from "../../utils.mjs";
-import { ProjectsPreview } from "./projectpreview.mjs";
+import { Timer } from "../../utils/timer.mjs";
+import { ProjectsPreview } from "./project-preview.mjs";
 
 
 
@@ -80,7 +80,7 @@ export class ProjectsSubpage {
             this.editModal.show();
         };
 
-        this.retry_timer = new Timer(10000);
+        this.retryTimer = new Timer(10000);
 
         this.loadItems();
     }
@@ -90,12 +90,13 @@ export class ProjectsSubpage {
             const items = await this.requests.asyncLoader();
             this.preview.build(items);
         } catch (err) {
-            console.log(err);
-            this.retry_timer.start(() => {
-                this.retry_timer.stop();
+            // TODO toast message
+            this.retryTimer.start(() => {
+                this.retryTimer.stop();
                 this.preview.clear();
                 this.loadItems();
             });
         }
     }
+    
 }

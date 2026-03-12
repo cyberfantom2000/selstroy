@@ -1,4 +1,5 @@
-import { Timer } from '../utils.mjs';
+import { mediaUrl } from "../api/base-urls.mjs";
+import { Timer } from "../utils/timer.mjs";
 
 
 class SlideOptions {
@@ -134,7 +135,7 @@ export class ImageCarousel {
         const href = this.config.one_ref ? this.config.ref_field : item[this.config.ref_field];
 
         const options = new SlideOptions({
-            img_src: '/api/file/' + item[this.config.image_field].id,
+            img_src: `${mediaUrl}/${item[this.config.image_field].id}`,
             img_link: this.config.img_as_ref ? href : '',
             btn_link: this.config.with_buttons ? href : ''
         });

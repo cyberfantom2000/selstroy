@@ -1,4 +1,5 @@
-import { Timer } from '../utils.mjs';
+import { mediaUrl } from "../api/base-urls.mjs";
+import { Timer } from "../utils/timer.mjs";
 
 
 class ProjectPreviewTitle {
@@ -15,7 +16,7 @@ class ProjectPreviewTitle {
 class ProjectPreviewImage {
     constructor(data, element) {
         this.image = element.querySelector('img');
-        this.image.src = '/api/file' + data.preview_image.id; // TODO /api/file перенести в отдельный файл
+        this.image.src = `${mediaUrl}/${data.preview_image.id}`;
     }
 }
 

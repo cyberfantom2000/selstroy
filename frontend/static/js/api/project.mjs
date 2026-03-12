@@ -1,9 +1,8 @@
 import { requestModels, requestAllModels, createModel, removeModel, updateModel } from "./model.mjs";
-
-const baseUrl = '/api/project';
+import { projectUrl } from "./base-urls.mjs";
 
 export async function requestProjects(limit=100, offset=0, fields=[]) {
-    return await requestModels(baseUrl, limit, offset, fields);
+    return await requestModels(projectUrl, limit, offset, fields);
 }
 
 export async function requestAllProjects(fields=[]) {
@@ -15,15 +14,15 @@ export async function requestAllProjectsShortDescription() {
 }
 
 export async function createProject(data) {
-    return await createModel(baseUrl, data);
+    return await createModel(projectUrl, data);
 }
 
 export async function deleteProject(id) {
-    return await removeModel(baseUrl, id);
+    return await removeModel(projectUrl, id);
 }
 
 export async function updateProject(data) {
-    return await updateModel(baseUrl, data);
+    return await updateModel(projectUrl, data);
 }
 
 export async function setDraftStatus(id, isDraft) {
