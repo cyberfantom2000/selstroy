@@ -12,8 +12,8 @@
         <div id="media-container" class="flex flex-wrap justify-start gap-4">
         </div>
 
-        <div id="media-drop-overlay" class="hidden absolute inset-0 bg-blue-300/80 border-2 border-dashed border-blue-500 rounded-xl flex items-center justify-center pointer-events-none z-50">
-            <h3 class="text-black font-medium text-2xl">Перетащите файлы сюда</h3>
+        <div id="media-drop-overlay" class="hidden absolute inset-0 bg-blue-300/80 dark:bg-blue-700/80 border-2 border-dashed border-blue-500 rounded-xl flex items-center justify-center pointer-events-none z-50">
+            <h3 class="text-black dark:text-gray-200 font-medium text-2xl">Перетащите файлы сюда</h3>
         </div>
     </div>
 </div>
@@ -38,7 +38,7 @@
                     </div>
 
                     <div name="base-placeholder" class="flex aspect-square w-full max-h-full justify-center hidden">
-                        <svg name="base-placeholder" class="w-44 text-gray-800 dark:text-gray-300">
+                        <svg name="base-placeholder" class="w-44 text-gray-800 dark:text-gray-400">
                             <use href="/static/svg/file.svg#icon"></use>
                         </svg>
                     </div>
@@ -47,24 +47,24 @@
                 <div class="flex min-h-0 overflow-hidden">
                     <div class="flex flex-col rounded-3xl bg-gray-300 dark:bg-gray-600 w-full p-4 gap-3 overflow-auto">
                         <div class="flex flex-wrap gap-2">
-                            <span class="font-medium">ID:</span>
-                            <span name="id" class="text-gray-600 dark:text-gray-300 break-all"></span>
+                            <span class="font-medium text-gray-800 dark:text-gray-250">ID:</span>
+                            <span name="id" class="text-gray-600 dark:text-gray-350 break-all"></span>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <span class="font-medium">Имя:</span>
-                            <span name="name" class="text-gray-600 dark:text-gray-300 break-all"></span>
+                            <span class="font-medium text-gray-800 dark:text-gray-250">Имя:</span>
+                            <span name="name" class="text-gray-600 dark:text-gray-350 break-all"></span>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <span class="font-medium">Расширение:</span>
-                            <span name="ext" class="text-gray-600 dark:text-gray-300"></span>
+                            <span class="font-medium text-gray-800 dark:text-gray-250">Расширение:</span>
+                            <span name="ext" class="text-gray-600 dark:text-gray-350"></span>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <span class="font-medium">Размер:</span>
-                            <span name="size" class="text-gray-600 dark:text-gray-300"></span>
+                            <span class="font-medium text-gray-800 dark:text-gray-250">Размер:</span>
+                            <span name="size" class="text-gray-600 dark:text-gray-350"></span>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <span class="font-medium">Ссылка:</span>
-                            <span name="link" class="text-gray-600 dark:text-gray-300 break-all"></span>
+                            <span class="font-medium text-gray-800 dark:text-gray-250">Ссылка:</span>
+                            <span name="link" class="text-gray-600 dark:text-gray-350 break-all"></span>
                         </div>
                     </div>
                 </div>
@@ -74,35 +74,35 @@
 </div>
 
 <template id="media-item-template">
-    <div class="flex flex-row p-2 gap-2 rounded-2xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 hover:dark:bg-gray-500">
+    <div class="flex flex-row p-2 gap-2 rounded-2xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-750 hover:dark:bg-gray-700">
         <div class="flex flex-col">
             <div class="flex aspect-square hover:cursor-pointer">
                 <div name="image-placeholder" class="w-44 hidden">
                     {% include 'components/dynamic-image.html' %}
                 </div>
-                <svg name="base-placeholder" class="w-44 text-gray-800 dark:text-gray-300">
+                <svg name="base-placeholder" class="w-44 text-gray-800 dark:text-gray-400">
                     <use href="/static/svg/file.svg#icon"></use>
                 </svg>
             </div>
-            <h3 name="title" class="w-44 text-center text-gray-800 dark:text-gray-300 truncate overflow-hidden whitespace-nowrap"></h3>
+            <h3 name="title" class="w-44 text-center text-gray-800 dark:text-gray-400 truncate overflow-hidden whitespace-nowrap"></h3>
         </div>
         <div class="flex flex-col gap-2">
-            <button name="copy-button" class="flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-primary-500 active:scale-95">
+            <button name="copy-button" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-500 active:scale-95">
                 <svg class="h-4 w-4">
                     <use href="/static/svg/copy.svg#icon"></use>
                 </svg>
             </button>
-            <button name="link-button" class="flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-primary-500  active:scale-95">
+            <button name="link-button" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-500  active:scale-95">
                 <svg class="h-4 w-4">
                     <use href="/static/svg/link.svg#icon"></use>
                 </svg>
             </button>
-            <button name="download-button" class="flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-primary-500  active:scale-95">
+            <button name="download-button" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-500  active:scale-95">
                 <svg class="h-5 w-5">
                     <use href="/static/svg/download.svg#icon"></use>
                 </svg>
             </button>
-            <button name="delete-button" class="flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-red-500  active:scale-95">
+            <button name="delete-button" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-red-500  active:scale-95">
                 <svg class="h-5 w-5">
                     <use href="/static/svg/trash.svg#icon"></use>
                 </svg>
