@@ -25,7 +25,7 @@ export async function updateProject(data) {
     return await updateModel(projectUrl, data);
 }
 
-export async function setDraftStatus(id, isDraft) {
+export async function setProjectDraftStatus(id, isDraft) {
     return await updateProject({id: id, is_draft: isDraft});
 }
 

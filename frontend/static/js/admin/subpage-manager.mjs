@@ -8,9 +8,8 @@ export class SubpageManager {
 
         const activeButtonId = sessionStorage.getItem(buttonKey);
 
-        for (const [buttonId, pageId] of Object.entries(mapping)) {
+        for (const [buttonId, page] of Object.entries(mapping)) {
             const button = document.getElementById(buttonId);
-            const page = document.getElementById(pageId);
 
             button.onclick = () => {
                 this.switchActiveButton(button);
@@ -24,9 +23,9 @@ export class SubpageManager {
 
     switchActivePage(page) {
         if (this.activePage !== null)
-            this.activePage.classList.add('hidden');
+            this.activePage.hide();
 
-        page.classList.remove('hidden');
+        page.show();
         this.activePage = page;
     }
 

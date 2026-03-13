@@ -3,7 +3,7 @@ import { Timer } from "../../utils/timer.mjs";
 
 
 export class MediaSubpageDom {
-    constructor({pageContainer, itemsContainer, itemTemplate, chooseButton}){
+    constructor({pageContainer, itemsContainer, itemTemplate}){
         this.pageContainer = pageContainer;
         this.itemsContainer = itemsContainer;
         this.itemTemplate = itemTemplate;
@@ -31,8 +31,6 @@ export class MediaSubpage {
         
         this.chooseFiles.chooseChanged = (files) => this.uploadFiles(files);
         this.dnd.filesDropped = (files) => this.uploadFiles(files);
-        
-        this.items = [];
 
         this.load();
     }
@@ -68,7 +66,6 @@ export class MediaSubpage {
                 console.log(err);
                 // TODO toast message
                 item.element.remove();
-                this.items.remove(item);
             });
         }
     }
@@ -136,15 +133,11 @@ export class MediaSubpage {
     }
 
     pushItemToFront(item) {
-        this.items.push(item);
         this.dom.itemsContainer.prepend(item.fragment);
     }
 
     removeItem(item) {
         item.element.remove();
-        const index = this.items.indexOf(item);
-        if (index !== -1)
-            this.items.splice(index, 1);
     }
 
     show() {
@@ -158,7 +151,5 @@ export class MediaSubpage {
     clear() {
         while(this.dom.pageContainer.firstChild)
             this.dom.pageContainer.removeChild(this.dom.pageContainer.firstChild);
-
-        this.items = [];
     }
 }

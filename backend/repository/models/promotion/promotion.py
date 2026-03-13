@@ -14,6 +14,7 @@ class PromotionImageLink(SQLModel, table=True):
 class PromotionBase(SQLModel):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     text: str
+    is_draft: bool
 
 
 class Promotion(PromotionBase, table=True):
@@ -33,3 +34,4 @@ class PromotionUpdate(PromotionBase):
     id: UUID
     text: str | None = None
     image_id: UUID | None = None
+    is_draft: bool | None = None

@@ -16,7 +16,7 @@ export class ConfirmModal {
         
         this.confirmBtn.onclick = () => { this.confirm(); };
 
-        this.escapeHandler = () => {
+        this.escapeHandler = (event) => {
             if (event.key === 'Escape')
               this.hide();
         };

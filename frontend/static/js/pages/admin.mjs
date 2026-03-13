@@ -1,26 +1,19 @@
-import { requestAllProjects, deleteProject, setDraftStatus, updateProject, createProject } from "../api/project.mjs";
+import { requestAllProjects, deleteProject, setProjectDraftStatus, updateProject, createProject } from "../api/project.mjs";
 import { requestAllFilesDescriptions, uploadFile, deleteFile, downloadFile } from "../api/media.mjs";
+import { requestAllPromos, createPromo, updatePromo, setPromoDraftStatus, deletePromo } from "../api/promotion.mjs";
 import { TooltipModal } from "../common/tooltip-modal.mjs";
 import { ProjectEditModal } from "../admin/projects/project-edit-modal.mjs";
+import { PromoEditModal } from "../admin/promo/promo-edit-modal.mjs";
 import { ConfirmModal } from "../common/confirm-modal.mjs";
 import { ProjectsSubpage, ProjectsRequests } from "../admin/projects/projects-subpage.mjs";
 import { DndZone } from "../common/dnd.mjs";
 import { MediaSubpage, MediaRequests, MediaSubpageDom } from "../admin/media/media-subpage.mjs";
+import { PromoSubpage, PromoRequests, PromoSubageDom } from "../admin/promo/promo-subpage.mjs";
 import { ChooseFileButton } from "../common/choose-files-button.mjs";
 import { SubpageManager } from "../admin/subpage-manager.mjs";
 import { MediaModal } from "../admin/media/media-modal.mjs";
 
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById
-    const subpageManager = new SubpageManager({
-        mapping: {
-            'projects-page-button': 'projects-subpage',
-            'appartments-page-button': 'apartments-subpage',
-            'promo-page-button': 'promo-subpage',
-            'media-page-button': 'media-subpage'
-        }
-    });
-
     const tooltipModal = new TooltipModal(document.getElementById('tooltip-modal'));
     const confirmModal = new ConfirmModal(document.getElementById('confirm-modal'));
 
@@ -32,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const projectsRequests = new ProjectsRequests({
         asyncLoader: requestAllProjects,
         asyncDeleter: deleteProject,
-        asyncSetDraftStatus: setDraftStatus,
+        asyncSetDraftStatus: setProjectDraftStatus,
         asyncEditor: updateProject,
         asyncCreator: createProject,
     });
@@ -49,8 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const mediaDom = new MediaSubpageDom({
         pageContainer: document.getElementById('media-subpage'),
         itemsContainer: document.getElementById('media-container'),
-        itemTemplate: document.getElementById('media-item-template'),
-        chooseButton: document.getElementById('choose-media-button')
+        itemTemplate: document.getElementById('media-item-template')
     });
 
     const mediaRequests = new MediaRequests({
@@ -79,5 +71,42 @@ document.addEventListener("DOMContentLoaded", () => {
         infoModal: mediaInfoModal,
         confirmModal: confirmModal,
         chooseFiles: chooseFileButton
+    });
+
+    const promoRequests = new PromoRequests({
+        asyncLoader: requestAllPromos,
+        asyncCreator: createPromo,
+        asyncUpdater: updatePromo,
+        asyncDeleter: deletePromo,
+        asyncSetDraftStatus: setPromoDraftStatus
+    });
+
+    const promoDom = new PromoSubageDom({
+        pageContainer: document.getElementById('promo-subpage'),
+        itemsContainer: document.getElementById('promo-container'),
+        createButton: document.getElementById('create-promo-button'),
+        basePromoTemplate: document.getElementById('promo-item-template'),
+        adminPromoTemplate: document.getElementById('promo-editable-item-template')
+    });
+
+    const promoEditModal = new PromoEditModal({
+        modal: document.getElementById('promo-edit-modal'),
+        tooltip: tooltipModal
+    });
+
+    const promoSubpage = new PromoSubpage({
+        requests: promoRequests,
+        dom: promoDom,
+        editModal: promoEditModal,
+        confirmModal: confirmModal
+    });
+
+    const subpageManager = new SubpageManager({
+        mapping: {
+            'projects-page-button': projectsSubpage,
+            'appartments-page-button': null,
+            'promo-page-button': promoSubpage,
+            'media-page-button': mediaSubpage
+        }
     });
 });
