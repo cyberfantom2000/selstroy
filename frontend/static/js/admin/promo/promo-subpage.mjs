@@ -1,5 +1,7 @@
-import { PromoItem } from "./promo-item.mjs";
 import { Timer } from "../../utils/timer.mjs";
+import { Page } from "../page.mjs";
+import { AdminPromoItem } from "./promo-item.mjs"
+
 
 export class PromoRequests {
     constructor({asyncLoader, asyncCreator, asyncUpdater, asyncDeleter, asyncSetDraftStatus}) {
@@ -23,8 +25,9 @@ export class PromoSubageDom {
 }
 
 
-export class PromoSubpage {
+export class PromoSubpage extends Page {
     constructor({requests, dom, editModal, confirmModal}) {
+        super({ pageContainer: dom.pageContainer, itemsContainer: dom.itemsContainer });
         this.requests = requests;
         this.dom = dom;
         this.editModal = editModal;
@@ -73,13 +76,13 @@ export class PromoSubpage {
     }
 
     buildItem(data) {
-        const item = new PromoItem({
-            basePromoTemplate: this.dom.basePromoTemplate,
-            adminPromoTemplate: this.dom.adminPromoTemplate,
-            data: data
+        const item = new AdminPromoItem({
+            data: data,
+            baseTemplate: this.dom.basePromoTemplate,
+            adminTemplate: this.dom.adminPromoTemplate
         });
 
-        item.deleteClicked = (selfItem) => {
+        item.deleteClicked = (data) => {
             this.confirmModal.setText({
                 title: 'Подтвердите действие', 
                 description: `Вы уверены, что хотите удалить элемент?`
@@ -87,10 +90,10 @@ export class PromoSubpage {
             this.confirmModal.setSubmitButtonStyle('danger');
 
             this.confirmModal.onConfirm = () => {
-                selfItem.setButtonsEnabled(false);
-                this.requests.asyncDeleter(item.data.id).then((reply) => {
+                item.setButtonsEnabled(false);
+                this.requests.asyncDeleter(data.id).then((reply) => {
                     // TODO toast message
-                    selfItem.element.remove();
+                    item.element.remove();
                 }).catch((err) => {
                     console.log(err);
                     // TODO toast message
@@ -100,56 +103,39 @@ export class PromoSubpage {
             this.confirmModal.show();
         };
 
-        item.editClicked = (selfItem) => {
+        item.editClicked = (data) => {
             this.editModal.setTitle('Изменение элемента');
-            this.editModal.setData(selfItem.data);
+            this.editModal.setData(data);
 
             this.editModal.submitClicked = (data) => {
-                selfItem.setButtonsEnabled(false);
+                item.setButtonsEnabled(false);
                 this.requests.asyncUpdater(data).then((reply) => {
                     // TODO toast message
-                    selfItem.update(reply);
+                    item.update(reply);
                 }).catch((err) => {
                     // TODO toast message
                     console.log(err);
                 }).finally(() => {
-                    selfItem.setButtonsEnabled(true);
+                    item.setButtonsEnabled(true);
                 });
             };
 
             this.editModal.show();
         };
 
-        item.draftClicked = (selfItem) => {
-            selfItem.setButtonsEnabled(false);
-            this.requests.asyncSetDraftStatus(selfItem.data.id, !selfItem.data.is_draft).then((reply) => {
+        item.draftClicked = (data) => {
+            item.setButtonsEnabled(false);
+            this.requests.asyncSetDraftStatus(data.id, !data.is_draft).then((reply) => {
                 // TODO toast message
-                selfItem.update(reply);
+                item.update(reply);
             }).catch((err) => {
                 // TODO toast message
                 console.log(err);
             }).finally(() => {
-                selfItem.setButtonsEnabled(true);
+                item.setButtonsEnabled(true);
             });
         };
 
         return item;
-    }
-
-    pushItemToFront(item) {
-        this.dom.itemsContainer.prepend(item.fragment);
-    }
-
-    show() {
-        this.dom.pageContainer.classList.remove('hidden');
-    }
-
-    hide() {
-        this.dom.pageContainer.classList.add('hidden');
-    }
-
-    clear() {
-        while(this.dom.itemsContainer.firstChild)
-            this.dom.itemsContainer.removeChild(this.dom.itemsContainer.firstChild);
     }
 }

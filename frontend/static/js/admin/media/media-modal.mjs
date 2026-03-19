@@ -1,6 +1,4 @@
 
-import { mediaUrl } from "../../api/base-urls.mjs";
-
 function prettySize(bytes, decimals = 2) {
     if (bytes === 0) return '0 Bytes';
     if (bytes === null || bytes === undefined || isNaN(bytes)) return '—';

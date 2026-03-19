@@ -26,17 +26,18 @@ class ProjectPreviewImageLink(SQLModel, table=True):
 class ProjectBase(SQLModel):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     title: str
-    square_max: int
-    square_min: int
+    tags: str | None = Field(default=None)
+    square_max: float
+    square_min: float
     release_date: str
     is_draft: bool
+    slug: str = Field(unique=True, index=True)
     floor_svg: str | None = Field(default=None)
     live_map: str | None = Field(default=None)
     sale_status: str | None = Field(default=None)
 
 
 class Project(ProjectBase, table=True):
-    slug: str | None = Field(default=None, unique=True, index=True)
     images: list[File] = Relationship(back_populates=None, link_model=ProjectImageLink, sa_relationship_kwargs={"lazy": "selectin"})
     master_plan: File | None = Relationship(back_populates=None, link_model=ProjectMasterPlanLink, sa_relationship_kwargs={"lazy": "selectin"})
     details: list[ProjectDetails] = Relationship(back_populates=None, cascade_delete=True, sa_relationship_kwargs={"lazy": "selectin"})
@@ -54,7 +55,6 @@ class ProjectPublic(ProjectBase):
 
 
 class ProjectCreate(ProjectBase):
-    slug: str
     images_ids: list[UUID] | None = None
     master_plan_id: UUID | None = None
     preview_image_id: UUID | None = None
@@ -63,9 +63,10 @@ class ProjectCreate(ProjectBase):
 class ProjectUpdate(ProjectBase):
     id: UUID
     slug: str | None = None
+    tags: str | None = None
     title: str | None = None
-    square_max: int | None = None
-    square_min: int | None = None
+    square_max: float | None = None
+    square_min: float | None = None
     release_date: str | None = None
     is_draft: bool | None = None
     floor_svg: str | None = None

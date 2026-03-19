@@ -19,9 +19,10 @@ class ProjectManager(ModelManager):
         await self._set_images_field(session, new_item, new_model.images_ids)
         if new_model.master_plan_id:
             await self._set_master_plan_field(session, new_item, new_model.master_plan_id)
-        if new_model.images_ids or new_model.master_plan_id:
+        if new_model.preview_image_id:
+            await self._set_preview_image_field(session, new_item, new_model.preview_image_id)
+        if new_model.images_ids or new_model.master_plan_id or new_model.preview_image_id:
             await self.commit(session)
-
         return new_item
 
     async def update(self, session, update_model: ProjectUpdate):
@@ -34,7 +35,9 @@ class ProjectManager(ModelManager):
             await self._set_images_field(session, updated_item, update_model.images_ids)
         if update_model.master_plan_id is not None:
             await self._set_master_plan_field(session, updated_item, update_model.master_plan_id)
-        if update_model.images_ids is not None or update_model.master_plan_id is not None:
+        if update_model.preview_image_id is not None:
+            await self._set_preview_image_field(session, updated_item, update_model.preview_image_id)
+        if update_model.images_ids is not None or update_model.master_plan_id is not None or update_model.preview_image_id is not None:
             updated_item = await super().update(session, updated_item)
 
         return updated_item
@@ -51,4 +54,10 @@ class ProjectManager(ModelManager):
         """ Updating model links with master plan """
         tmp_manager = ModelManager(File, self.repo)
         item.master_plan = await tmp_manager.get_by_id(session, master_plan_id)
+        return item
+
+    async def _set_preview_image_field(self, session, item: SQLModel, preview_image_id):
+        """ Updating model links with preview image """
+        tmp_manager = ModelManager(File, self.repo)
+        item.preview_image = await tmp_manager.get_by_id(session, preview_image_id)
         return item

@@ -1,11 +1,10 @@
 <template id="promo-item-template">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4 rounded-3xl bg-gray-240 dark:bg-gray-840 w-full">
-        <div name="image" class="flex-1 w-full aspect-square max-h-[400px]">
+    <div class="flex flex-col md:flex-row gap-4 rounded-3xl bg-gray-240 dark:bg-gray-840 w-full">
+        <div class="aspect-square h-[400px]">
             {% include 'components/dynamic-image.html' %}
         </div>
 
         <div name="description" class="flex-1 w-full whitespace-pre-line text-black dark:text-gray-300">
-
         </div>
     </div>
 </template>

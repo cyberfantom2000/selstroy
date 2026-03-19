@@ -16,8 +16,9 @@ class ApartmentPdfLink(SQLModel, table=True):
 class ApartmentBase(SQLModel):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     title: str
-    size: float
+    square: float
     type: str
+    total_floors: int
 
 
 class Apartment(ApartmentBase, table=True):
@@ -42,8 +43,9 @@ class ApartmentCreate(ApartmentBase):
 class ApartmentUpdate(ApartmentBase):
     id: UUID
     title: str | None = None
-    size: float | None = None
+    square: float | None = None
     type: str | None = None
+    total_floors: int = None
     pdf: str | None = None
     pdf_id: UUID | None = None
     project_id: UUID | None = None

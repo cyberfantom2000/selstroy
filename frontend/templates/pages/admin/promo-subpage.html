@@ -14,24 +14,24 @@
 {% include 'components/templates/promo-item.html' %}
 
 <template id="promo-editable-item-template">
-    <div class="flex flex-col gap-1 w-full bg-gray-240 dark:bg-gray-840 rounded-3xl pb-4 pr-4">
+    <div class="flex flex-col gap-1 w-full bg-gray-240 dark:bg-gray-840 rounded-3xl p-4">
         
-        <div name="preview-container" class="flex w-full">
+        <div name="item-container" class="flex w-full">
 
         </div>
 
         <div class="flex flex-row gap-2 justify-end">
-            <button name="edit-button" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-500 active:scale-95">
+            <button name="edit-button" title="Изменить" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-500 active:scale-95">
                 <svg class="h-5 w-5">
                     <use href="/static/svg/edit.svg#icon"></use>
                 </svg>
             </button>
-            <button name="draft-button" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-500  active:scale-95">
+            <button name="draft-button" title="Сделать черновиком" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-500  active:scale-95">
                 <svg class="h-5 w-5">
                     <use href="/static/svg/eye-blocked.svg#icon"></use>
                 </svg>
             </button>
-            <button name="delete-button" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-red-500  active:scale-95">
+            <button name="delete-button" title="Удалить" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-red-500  active:scale-95">
                 <svg class="h-5 w-5">
                     <use href="/static/svg/trash.svg#icon"></use>
                 </svg>

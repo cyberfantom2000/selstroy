@@ -1,5 +1,6 @@
 import { MediaItem } from "./media-item.mjs";
 import { Timer } from "../../utils/timer.mjs";
+import { Page } from "../page.mjs";
 
 
 export class MediaSubpageDom {
@@ -19,8 +20,9 @@ export class MediaRequests {
     }
 }
 
-export class MediaSubpage {
+export class MediaSubpage extends Page {
     constructor({requests, dom, infoModal, confirmModal, dnd, chooseFiles}){
+        super({ pageContainer: dom.pageContainer, itemsContainer: dom.itemsContainer });
         this.requests = requests;
         this.dom = dom;
         this.dnd = dnd;
@@ -132,24 +134,7 @@ export class MediaSubpage {
         return item;
     }
 
-    pushItemToFront(item) {
-        this.dom.itemsContainer.prepend(item.fragment);
-    }
-
     removeItem(item) {
         item.element.remove();
-    }
-
-    show() {
-        this.dom.pageContainer.classList.remove('hidden');
-    }
-
-    hide() {
-        this.dom.pageContainer.classList.add('hidden');
-    }
-
-    clear() {
-        while(this.dom.pageContainer.firstChild)
-            this.dom.pageContainer.removeChild(this.dom.pageContainer.firstChild);
     }
 }

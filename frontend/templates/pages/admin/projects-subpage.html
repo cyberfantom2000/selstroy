@@ -1,15 +1,48 @@
 <div id="projects-subpage" class="flex flex-col w-full p-4 hidden">
     <div class="flex justify-start">
-        <button id="create-project-button" role="tooltip" name="id-tooltip" class="flex items-center justify-center py-2 text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+        <button id="create-project-button" role="tooltip" name="id-tooltip" class="flex items-center justify-center py-2 text-gray-500 dark:text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
             <svg class="h-8 w-8">
                 <use href="/static/svg/plus.svg#icon"></use>
             </svg>
-            <span>Создать проект</span>
+            <span>Создать</span>
         </button>
     </div>
-    <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div id="projects-container" class="flex flex-col gap-4 w-full">
     </div>
 </div>
+
+{% include 'components/templates/project-item.html' %}
+<!-- {% include 'components/templates/project-preview-item.html' %} -->
+
+<template id="admin-project-item-template">
+    <div class="flex flex-col gap-1 w-full bg-gray-240 dark:bg-gray-840 rounded-3xl p-4">
+        <div name="item-container" class="flex w-full">
+        </div>
+
+        <div class="flex flex-row gap-2 justify-end items-center">
+            <button name="preview-button" title="Предпросмотр миниатюры" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-500 active:scale-95">
+                <svg class="h-5 w-5">
+                    <use href="/static/svg/landscape.svg#icon"></use>
+                </svg>
+            </button>
+            <button name="edit-button" title="Изменить" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-500 active:scale-95">
+                <svg class="h-5 w-5">
+                    <use href="/static/svg/edit.svg#icon"></use>
+                </svg>
+            </button>
+            <button name="draft-button" title="Сделать черновиком" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-500  active:scale-95">
+                <svg class="h-5 w-5">
+                    <use href="/static/svg/eye-blocked.svg#icon"></use>
+                </svg>
+            </button>
+            <button name="delete-button" title="Удалить" class="flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-red-500  active:scale-95">
+                <svg class="h-5 w-5">
+                    <use href="/static/svg/trash.svg#icon"></use>
+                </svg>
+            </button>
+        </div>
+    </div>
+</template>
 
  <div id="project-edit-modal" class="fixed inset-0 z-50 hidden">
     <div name="background" class="absolute inset-0 bg-black/50"></div>
@@ -60,7 +93,7 @@
                     </div>
                     <div class="flex flex-col w-full p-1">
                         <div class="flex flex-row justify-between">
-                            <span class="text-sm text-gray-800 dark:text-gray-300">Площадь минимальная, м², целое число *</span>
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Площадь минимальная, м², число с плавающей точкой *</span>
                             <button role="tooltip" name="square-min-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
                                 <svg class="h-4 w-4">
                                     <use href="/static/svg/question.svg#icon"></use>
@@ -71,7 +104,7 @@
                     </div>
                     <div class="flex flex-col w-full p-1">
                         <div class="flex flex-row justify-between">
-                            <span class="text-sm text-gray-800 dark:text-gray-300">Площадь максимальная, м², целое число *</span>
+                            <span class="text-sm text-gray-800 dark:text-gray-300">Площадь максимальная, м², число с плавающей точкой *</span>
                             <button role="tooltip" name="square-max-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
                                 <svg class="h-4 w-4">
                                     <use href="/static/svg/question.svg#icon"></use>
@@ -183,39 +216,3 @@
         </div>
     </div>
 </div>
-
-<template id="project-preview-template">
-    <div class="flex-1">
-        <div class="aspect-square max-h-[400px]">
-            {% include 'components/dynamic-image.html' %}
-        </div>
-                                        
-        <div class="flex flex-col md:flex-row lg:justify-between items-start lg:items-center gap-1 p-2">
-            <div class="flex flex-col items-start gap-1">
-                <h3 name="title" class="text-black dark:text-gray-300 text-xl"></h3>
-                <span name="id" class="text-gray-600 dark:text-gray-400 text-sm font-normal"></span>
-            </div>
-            <div class="flex flex-row gap-2">
-                <label class="flex items-center cursor-pointer">
-                    <input name="checkbox" type="checkbox" class="peer hidden" />
-                    <div name="hide-button" class="flex items-center justify-center text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
-                        <svg class="h-7 w-7">
-                            <use href="/static/svg/eye-blocked.svg#icon"></use>
-                        </svg>
-                    </div>
-                </label>
-                            
-                <button name="edit-button" class="flex items-center justify-center text-gray-400 hover:text-primary-500" tooltip="Редактировать">
-                    <svg class="h-7 w-7">
-                        <use href="/static/svg/edit.svg#icon"></use>
-                    </svg>
-                </button>
-                <button name="delete-button" class="flex items-center justify-center text-gray-400 hover:text-red-500" tooltip="Удалить">
-                    <svg class="h-6 w-6">
-                        <use href="/static/svg/trash.svg#icon"></use>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-</template>

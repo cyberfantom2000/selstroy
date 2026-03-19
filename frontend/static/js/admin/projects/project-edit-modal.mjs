@@ -14,6 +14,39 @@ const tooltips = {
     'is-draft-tooltip': 'Черновик не отображается страницах, видимых пользователю. Подходит для того чтобы временно или постоянно скрыть проект, не удаляя его.'
 };
 
+
+function isEmpty(val) {
+  if (typeof val === 'string')
+    return val.trim().length === 0;
+
+  if (Array.isArray(val))
+    return val.length === 0;
+
+  if (val instanceof Map || val instanceof Set)
+    return val.size === 0;
+
+  throw new Error('Unsupported type in isEmpty');
+}
+
+
+function isNumber(value) {
+    return !isEmpty(value) && !Number.isNaN(Number(value));
+}
+
+
+function toggleOutlineRed(input, enabled) {
+    if (enabled)
+        input.classList.add('outline-red-400');
+    else
+        input.classList.remove('outline-red-400');
+}
+
+
+function inputNumberValidator(input) {
+    toggleOutlineRed(input, !Number(input.value));
+}
+
+
 export class ProjectEditModal {
     constructor({modal, tooltip}) {
         this.element = modal;
@@ -25,6 +58,7 @@ export class ProjectEditModal {
         this.squareMin = this.element.querySelector('[name="square-min-input"]');
         this.squareMax = this.element.querySelector('[name="square-max-input"]');
         this.releaseDate = this.element.querySelector('[name="release-date-input"]');
+        this.slug = this.element.querySelector('[name="slug-input"]')
         this.saleStatus = this.element.querySelector('[name="sale-status-input"]');
         this.masterPlanId = this.element.querySelector('[name="master-plan-id-input"]');
         this.previewId = this.element.querySelector('[name="preview-id-input"]');
@@ -36,10 +70,10 @@ export class ProjectEditModal {
             button.onclick = () => { this.tooltip.show(tooltips[button.name]); };
 
         for (const input of this.element.querySelectorAll('input[type="number"]'))
-            input.addEventListener('input', (event) => { event.target.value = event.target.value.replace(/\D/g, '')});
+            input.addEventListener('input', () => inputNumberValidator(input));
 
-        this.onSubmited = null;
-        this.onRejected = null;
+        this.submitClicked = null;
+        this.rejectClicked = null;
 
         this.element.querySelector('[name="submit-button"]').onclick = () => this.submit();
         this.element.querySelector('[name="reject-button"]').onclick = () => this.reject();
@@ -53,33 +87,72 @@ export class ProjectEditModal {
         this.squareMin.value = data.square_min ?? '';
         this.squareMax.value = data.square_max ?? '';
         this.releaseDate.value = data.release_date ?? '';
+        this.slug.value = data.slug ?? '';
         this.saleStatus.value = data.sale_status ?? '';
         this.masterPlanId.value = data.master_plan_id ?? '';
-        this.previewId.value = data.preview_id ?? '';
+        this.previewId.value = data.preview_image_id ?? '';
         this.floorSvg.value = data.floor_svg ?? '';
         this.liveMap.value = data.live_map ?? '';
         this.imagesIds.value = data.images_id ? data.images_id.join(', ') : "";
     }
 
     clearData() {
+        for (const input of this.element.querySelectorAll('input'))
+            toggleOutlineRed(input, false);
+
         this.setData({});
     }
 
     data() {
-        return {
-            id: this.id.textContent,
+        let required = {
             is_draft: this.isDraft.checked,
             title: this.title.value,
             square_min: this.squareMin.value,
             square_max: this.squareMax.value,
             release_date: this.releaseDate.value,
             sale_status: this.saleStatus.value,
+            slug: this.slug.value,
+        };
+
+        const optional = {
+            id: this.id.textContent,
             master_plan_id: this.masterPlanId.value,
-            preview_id: this.previewId.value, 
+            preview_image_id: this.previewId.value, 
             floor_svg: this.floorSvg.value,
             live_map: this.liveMap.value,
-            images_ids: this.imagesIds.value.split(',').map(s => s.trim())
+            images_ids: !isEmpty(this.imagesIds.value) ? this.imagesIds.value.split(',').map(s => s.trim()) : ''
         };
+
+        for (const [key, value] of Object.entries(optional)) {
+            if (!isEmpty(value))
+                required[key] = value;
+        }
+
+        return required;
+    }
+
+    validate() {
+        let ok = true;
+
+        ok &&= isNumber(this.squareMin.value);
+        toggleOutlineRed(this.squareMin, !isNumber(this.squareMin.value));
+
+        ok &&= isNumber(this.squareMin.value);
+        toggleOutlineRed(this.squareMax, !isNumber(this.squareMax.value));
+
+        ok &&= !isEmpty(this.title.value);
+        toggleOutlineRed(this.title, isEmpty(this.title.value));
+
+        ok &&= !isEmpty(this.releaseDate.value);
+        toggleOutlineRed(this.releaseDate, isEmpty(this.releaseDate.value));
+
+        ok &&= !isEmpty(this.saleStatus.value);
+        toggleOutlineRed(this.saleStatus, isEmpty(this.saleStatus.value));
+
+        ok &&= !isEmpty(this.slug.value);
+        toggleOutlineRed(this.slug, isEmpty(this.slug.value));
+
+        return ok;
     }
 
     setTitle(title) {
@@ -87,15 +160,18 @@ export class ProjectEditModal {
     }
 
     submit() {
-        if (this.onSubmited !== null)
-            this.onSubmited(this.data());
+        if (!this.validate())
+            return;
+
+        if (this.submitClicked !== null)
+            this.submitClicked(this.data());
 
         this.hide();
     }
 
     reject() {
-        if (this.onRejected !== null)
-            this.onRejected();
+        if (this.rejectClicked !== null)
+            this.rejectClicked();
 
         this.hide();
     }
