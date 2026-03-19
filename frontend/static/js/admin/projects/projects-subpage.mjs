@@ -1,4 +1,4 @@
-import { Timer } from "../../utils/timer.mjs";
+import { Timer } from "../../common/timer.mjs";
 import { Page } from "../page.mjs";
 import { AdminProjectItem } from "./project-item.mjs";
 

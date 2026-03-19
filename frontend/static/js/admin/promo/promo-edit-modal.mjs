@@ -1,3 +1,7 @@
+import { Modal } from "../../common/modal.mjs";
+import { isEmpty, toggleOutlineRed } from "../../common/utils.mjs";
+
+
 const tooltips = {
     'id-tooltip': 'Уникальный идентификатор элемента. Присваевается автоматически, неизменяемый. Служебная информация, не отображается на сайте.',
     'is-draft-tooltip': 'Черновик не отображается страницах, видимых пользователю. Подходит для того чтобы временно или постоянно скрыть элемент, не удаляя его.',
@@ -5,38 +9,23 @@ const tooltips = {
     'description-tooltip': 'Текст акции. Отображается в элементе. Для форматирования текста необходимо использовать html разметку и классы tailwind'
 };
 
-export class PromoEditModal {
+export class PromoEditModal extends Modal{
     constructor({modal, tooltip}) {
-        this.modal = modal;
-        this.title = this.modal.querySelector('[name="title"]');
-        this.id = this.modal.querySelector('[name="id-input"]');
-        this.draftCheckbox = this.modal.querySelector('[name="is-draft-input"]');
-        this.imageId = this.modal.querySelector('[name="image-id-input"]');
-        this.description = this.modal.querySelector('[name="description-input"]');
+        super(modal);
 
-        this.submitClicked = null;
+        this.title = this.element.querySelector('[name="title"]');
+        this.id = this.element.querySelector('[name="id-input"]');
+        this.draftCheckbox = this.element.querySelector('[name="is-draft-input"]');
+        this.imageId = this.element.querySelector('[name="image-id-input"]');
+        this.description = this.element.querySelector('[name="description-input"]');
 
-        const submitButton = this.modal.querySelector('[name="submit-button"]');
-        submitButton.onclick = () => { 
-            if (this.submitClicked) 
-                this.submitClicked(this.data()); 
+        this.element.querySelector('[name="submit-button"]').onclick = () => this.submit();
+        this.element.querySelector('[name="reject-button"]').onclick = () => this.reject();
+        this.element.querySelector('[name="background"]').onclick = () => this.reject();
 
-            this.hide();
-        };
-
-        const rejectButton = this.modal.querySelector('[name="reject-button"]');
-        rejectButton.onclick = () => this.hide();
-        
-        const background = this.modal.querySelector('[name="background"]');
-        background.onclick = () => this.hide();
-
-        for (const button of this.modal.querySelectorAll('[role="tooltip"]'))
+        for (const button of this.element.querySelectorAll('[role="tooltip"]'))
             button.onclick = () => { tooltip.show(tooltips[button.name]); };
 
-        this.escapeHandler = (event) => {
-            if (event.key === 'Escape')
-              this.hide();
-        };
     }
 
     setTitle(text) {
@@ -48,6 +37,13 @@ export class PromoEditModal {
         this.draftCheckbox.checked = data.is_draft ?? false;
         this.imageId.value = data.image ? data.image.id : '';
         this.description.value = data.text ?? '';
+    }
+
+    clearData() {
+        for (const input of this.element.querySelectorAll('input, textarea'))
+            toggleOutlineRed(input, false);
+
+        this.setData({});
     }
 
     data() {
@@ -63,13 +59,15 @@ export class PromoEditModal {
         return result;
     }
 
-    show() {
-        this.modal.classList.remove('hidden');
-        document.addEventListener('keydown', this.escapeHandler);
-    }
+    validate() {
+        let ok = true;
 
-    hide() {
-        this.modal.classList.add('hidden');
-        document.removeEventListener('keydown', this.escapeHandler);
+        ok &&= !isEmpty(this.imageId.value);
+        toggleOutlineRed(this.imageId, isEmpty(this.imageId.value));
+
+        ok &&= !isEmpty(this.description.value);
+        toggleOutlineRed(this.description, isEmpty(this.description.value));
+
+        return ok;
     }
 }

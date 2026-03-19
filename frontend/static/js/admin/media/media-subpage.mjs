@@ -1,5 +1,5 @@
 import { MediaItem } from "./media-item.mjs";
-import { Timer } from "../../utils/timer.mjs";
+import { Timer } from "../../common/timer.mjs";
 import { Page } from "../page.mjs";
 
 

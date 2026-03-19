@@ -1,3 +1,7 @@
+import { Modal } from "../../common/modal.mjs";
+import { isEmpty, isNumber, toggleOutlineRed } from "../../common/utils.mjs";
+
+
 const tooltips = {
     'id-tooltip': 'Уникальный идентификатор проекта. Присваевается автоматически, неизменяемый. Служебная информация, не отображается на сайте.',
     'title-tooltip': 'Заголовок проекта. Отоборажается на превью и на странице проекта',
@@ -15,41 +19,15 @@ const tooltips = {
 };
 
 
-function isEmpty(val) {
-  if (typeof val === 'string')
-    return val.trim().length === 0;
-
-  if (Array.isArray(val))
-    return val.length === 0;
-
-  if (val instanceof Map || val instanceof Set)
-    return val.size === 0;
-
-  throw new Error('Unsupported type in isEmpty');
-}
-
-
-function isNumber(value) {
-    return !isEmpty(value) && !Number.isNaN(Number(value));
-}
-
-
-function toggleOutlineRed(input, enabled) {
-    if (enabled)
-        input.classList.add('outline-red-400');
-    else
-        input.classList.remove('outline-red-400');
-}
-
-
 function inputNumberValidator(input) {
     toggleOutlineRed(input, !Number(input.value));
 }
 
 
-export class ProjectEditModal {
+export class ProjectEditModal extends Modal{
     constructor({modal, tooltip}) {
-        this.element = modal;
+        super(modal);
+        
         this.tooltip = tooltip;
         this.modalTitle = this.element.querySelector('[name="title"]');
         this.id = this.element.querySelector('[name="id-input"]');
@@ -71,9 +49,6 @@ export class ProjectEditModal {
 
         for (const input of this.element.querySelectorAll('input[type="number"]'))
             input.addEventListener('input', () => inputNumberValidator(input));
-
-        this.submitClicked = null;
-        this.rejectClicked = null;
 
         this.element.querySelector('[name="submit-button"]').onclick = () => this.submit();
         this.element.querySelector('[name="reject-button"]').onclick = () => this.reject();
@@ -157,30 +132,5 @@ export class ProjectEditModal {
 
     setTitle(title) {
         this.modalTitle.textContent = title;
-    }
-
-    submit() {
-        if (!this.validate())
-            return;
-
-        if (this.submitClicked !== null)
-            this.submitClicked(this.data());
-
-        this.hide();
-    }
-
-    reject() {
-        if (this.rejectClicked !== null)
-            this.rejectClicked();
-
-        this.hide();
-    }
-
-    show() {
-        this.element.classList.remove('hidden');
-    }
-
-    hide() {
-        this.element.classList.add('hidden');
     }
 }

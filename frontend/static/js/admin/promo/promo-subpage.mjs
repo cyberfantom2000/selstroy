@@ -1,4 +1,4 @@
-import { Timer } from "../../utils/timer.mjs";
+import { Timer } from "../../common/timer.mjs";
 import { Page } from "../page.mjs";
 import { AdminPromoItem } from "./promo-item.mjs"
 
@@ -59,7 +59,7 @@ export class PromoSubpage extends Page {
 
     onCreate() {
         this.editModal.setTitle('Создание новой акции')
-        this.editModal.setData({});
+        this.editModal.clearData();
 
         this.editModal.submitClicked  = (data) => {
             this.requests.asyncCreator(data).then((reply) => {
