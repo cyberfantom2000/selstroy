@@ -1,8 +1,8 @@
 
 export class DndZone {
-    constructor({wrapper, dndzone}) {
+    constructor({wrapper, zone}) {
         this.wrapper = wrapper;
-        this.zone = dndzone;
+        this.zone = zone;
         this.dragCounter = 0;
         this.isDraggingFile = false;
         this.filesDropped = null;
@@ -35,10 +35,8 @@ export class DndZone {
         event.preventDefault();
         this.dragCounter = 0;
         this.hideDropZone();
-
-        const files = event.dataTransfer.files;
-        if (this.filesDropped !== null)
-            this.filesDropped(files);
+        if (this.filesDropped)
+            this.filesDropped(event.dataTransfer.files);
     }
 
     overEvent(event) {

@@ -1,3 +1,5 @@
+import { ModalEvents } from "../../core/events.mjs";
+import { Modal } from "../../common/modal.mjs";
 
 function prettySize(bytes, decimals = 2) {
     if (bytes === 0) return '0 Bytes';
@@ -11,9 +13,12 @@ function prettySize(bytes, decimals = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
 }
 
-export class MediaModal {
-    constructor({element}) {
-        this.element = element;
+
+export class MediaModal extends Modal {
+    constructor({registry, bus}) {
+        super(registry.get('media-modal'));
+        this.bus = bus;
+        
         this.id = this.element.querySelector('[name="id"]');
         this.name = this.element.querySelector('[name="name"]');
         this.ext = this.element.querySelector('[name="ext"]');
@@ -26,41 +31,38 @@ export class MediaModal {
         this.basePlaceholder = this.element.querySelector('[name="base-placeholder"]');
         this.image = this.element.querySelector('img');
 
-        this.background.onclick = () => this.hide();
-        this.closeButton.onclick = () => this.hide();
+        this.background.onclick = () => this.reject();
+        this.closeButton.onclick = () => this.reject();
+
+        this.bus.on(ModalEvents.Media.Open, (payload) => {
+            this.update(payload);
+            this.show();
+        });
     }
 
-    show(item) {
-        this.id.textContent = item.data.id ?? 'unknown';
-        this.name.textContent = item.data.name ?? 'unknown';
-        this.ext.textContent = item.data.ext ?? 'unknown';
-        this.size.textContent = prettySize(item.data.size);
-        this.link.textContent = item.absoluteLink ?? 'unknown';
+    update(data) {
+        this.id.textContent = data.id;
+        this.name.textContent = data.name;
+        this.ext.textContent = data.ext;
+        this.size.textContent = prettySize(data.size);
+        this.link.textContent = data.absoluteUrl;
 
-        this.setImagePlaceholderVisible(item.isImage);
-        this.setBasePlaceholderVisible(!item.isImage);
-
-        if(item.isImage)
-            this.image.src = item.relativeLink;
-
-        this.element.classList.remove('hidden');
+        this.updateImage(data.isImage, data.url);
+        this.updateImageVisibility(data.isImage);
     }
 
-    hide() {
-        this.element.classList.add('hidden');
+    updateImage(isImage, url) {
+        if (isImage && url)
+            this.image.src = url;
     }
 
-    setImagePlaceholderVisible(visible) {
-        if (visible)
+    updateImageVisibility(isImage) {
+        if (isImage) {
             this.imagePlaceholder.classList.remove('hidden');
-        else
-            this.imagePlaceholder.classList.add('hidden')
-    }
-
-    setBasePlaceholderVisible(visible) {
-        if (visible)
-            this.basePlaceholder.classList.remove('hidden');
-        else
             this.basePlaceholder.classList.add('hidden')
+        } else {
+            this.imagePlaceholder.classList.add('hidden');
+            this.basePlaceholder.classList.remove('hidden');
+        }
     }
 }

@@ -26,7 +26,7 @@ class ProjectManager(ModelManager):
         return new_item
 
     async def update(self, session, update_model: ProjectUpdate):
-        if update_model.slug:
+        if update_model.slug is not None:
             raise_for_invalid_slug(update_model.slug)
 
         updated_item = await super().update(session, update_model)

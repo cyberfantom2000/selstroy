@@ -1,38 +1,125 @@
 import { ProjectItem } from "../../projects/project-item.mjs";
+import { ImagesContainer } from "../../common/images-container.mjs";
+import { ProjectDetailsContainer } from "./project-detail-container.mjs";
+import { EditableImage } from "../../common/editable-image.mjs";
+import { EditableIFrame } from "../../common/editable-iframe.mjs";
+import { AdminProjectDescription } from "./project-description.mjs";
+import { ProjectEvents, ProjectImageType} from "../../core/events.mjs";
 
 
 export class AdminProjectItem {
-    constructor({data, baseTemplates, adminTemplate}) {
-        this.data = data;
-        this.baseItem = new ProjectItem({ data: data, templates: baseTemplates });
-        this.baseItem.setAppartmentsVisible(false);
+    constructor({registry, bus}) {
+        this.bus = bus;
+        this.element = registry.getTemplate('project-item-admin-template');
 
-        this.fragment = adminTemplate.content.cloneNode(true);
-        this.element =  this.fragment.firstElementChild;
+        this.previewButton = this.element.querySelector('[name="preview-button"]');
+        this.draftButton = this.element.querySelector('[name="draft-button"]');
+        this.deleteButton = this.element.querySelector('[name="delete-button"]');
 
-        this.container = this.fragment.querySelector('[name="item-container"]');
-        this.previewButton = this.fragment.querySelector('[name="preview-button"]');
-        this.editButton = this.fragment.querySelector('[name="edit-button"]');
-        this.draftButton = this.fragment.querySelector('[name="draft-button"]');
-        this.deleteButton = this.fragment.querySelector('[name="delete-button"]');
+        this.previewButton.onclick = () => this.bus.emit(ProjectEvents.Request.Project.Preview, this.data);
+        this.draftButton.onclick = () => this.bus.emit(ProjectEvents.Request.Project.ToggleDraft, this.data);
+        this.deleteButton.onclick = () => this.bus.emit(ProjectEvents.Request.Project.Remove, this.data);
 
-        this.previewClicked = null;
-        this.editClicked = null;
-        this.draftClicked = null;
-        this.deleteClicked = null;
+        this.baseItem = new ProjectItem(registry);
 
-        this.previewButton.onclick = () => { if (this.previewClicked) this.previewClicked(); }
-        this.editButton.onclick = () => { if (this.editClicked) this.editClicked(this.data); }
-        this.draftButton.onclick = () => { if (this.draftClicked) this.draftClicked(this.data); }
-        this.deleteButton.onclick = () => { if (this.deleteClicked) this.deleteClicked(this.data); }
+        this.description = new AdminProjectDescription(this.element.querySelector('[name="description-container"]'));
 
-        this.container.appendChild(this.baseItem.fragment);
+        this.description.editClicked = () => this.bus.emit(ProjectEvents.Request.Project.Edit, this.data);
+
+        this.carousel = new ImagesContainer({
+            container: this.element.querySelector('[name="carousel-container"]'),
+            registry: registry
+        });
+
+        this.carousel.imageClicked = (url) => this.bus.emit(ProjectEvents.Request.Image.Open, url);
+        this.carousel.imageAddClicked = () => {
+            this.bus.emit(ProjectEvents.Request.Image.Create, {
+                context: {...this.data, type: ProjectImageType.Carousel, request: ProjectEvents.Request.Image.Create},
+            });
+        }; 
+        this.carousel.imageEditClicked = (imgData) => {
+            this.bus.emit(ProjectEvents.Request.Image.Edit, {
+                context: {...this.data, type: ProjectImageType.Carousel, request: ProjectEvents.Request.Image.Edit},
+                data: imgData
+            });
+        }; 
+        this.carousel.imageRemoveClicked = (imgData) => {
+            this.bus.emit(ProjectEvents.Request.Image.Remove, {
+                context: {...this.data, type: ProjectImageType.Carousel},
+                data: imgData
+            });
+        };
+
+        this.details = new ProjectDetailsContainer({
+            element: this.element.querySelector('[name="details-container"]'),
+            registry: registry
+        });
+
+        this.details.detailAddClicked = () => this.bus.emit(ProjectEvents.Request.ProjectDetail.Create, {projectId: this.data.id});
+        this.details.detailEditClicked = (detailData) => this.bus.emit(ProjectEvents.Request.ProjectDetail.Edit, detailData);
+        this.details.detailRemoveClicked = (detailData) => this.bus.emit(ProjectEvents.Request.ProjectDetail.Remove, detailData);
+        this.details.detailImageClicked = (url) => this.bus.emit(ProjectEvents.Request.Image.Open, url);
+        this.details.detailImageAddClicked = (detailData) => {
+            this.bus.emit(ProjectEvents.Request.Image.Create, {
+                context: {...detailData, type: ProjectImageType.Detail, request: ProjectEvents.Request.Image.Create}
+            });
+        };
+        this.details.detailImageEditClicked = (detailData, imgData) => {
+            this.bus.emit(ProjectEvents.Request.Image.Edit, {
+                context: {...detailData, type: ProjectImageType.Detail, request: ProjectEvents.Request.Image.Edit},
+                data: imgData
+            });
+        }; 
+        this.details.detailImageRemoveClicked = (detailData, imgData) => {
+            this.bus.emit(ProjectEvents.Request.Image.Remove, {
+                context: {...detailData, type: ProjectImageType.Detail},
+                data: imgData
+            });
+        }; 
+
+        this.previewImage = new EditableImage(registry);
+        this.previewImage.setRemoveButtonVisible(false);
+        this.element.querySelector('[name="preview-image-container"]').appendChild(this.previewImage.element);
+
+        this.previewImage.clicked = (url) => this.bus.emit(ProjectEvents.Request.Image.Open, url);
+        this.previewImage.editClicked = () => {
+            this.bus.emit(ProjectEvents.Request.Image.Edit, {
+                context: {...this.data, type: ProjectImageType.Preview},
+                data: this.previewImage.data
+            });
+        }; 
+
+        this.masterPlane = new EditableImage(registry);
+        this.masterPlane.setRemoveButtonVisible(false);
+        this.element.querySelector('[name="master-plane-image-container"]').appendChild(this.masterPlane.element);
+
+        this.masterPlane.clicked = (url) => this.bus.emit(ProjectEvents.Request.Image.Open, url);
+        this.masterPlane.editClicked = () => {
+            this.bus.emit(ProjectEvents.Request.Image.Edit, {
+                context: {...this.data, type: ProjectImageType.MasterPlan},
+                data: this.masterPlane.data
+            });
+        }; 
+
+        this.liveMap = new EditableIFrame(registry);
+        this.element.querySelector('[name="interactive-map-container"]').appendChild(this.liveMap.element);
+
+        this.liveMap.clicked = () => this.bus.emit(ProjectEvents.Request.IFrame.Open, this.liveMap.data);
+        this.liveMap.editClicked = () => this.bus.emit(ProjectEvents.Request.IFrame.Edit, { data: this.liveMap.data, context: {...this.data} });
+
+        this.element.querySelector('[name="item-container"]').appendChild(this.baseItem.element);
     }
 
     update(data) {
         this.data = data;
         this.baseItem.update(data);
-        this.setDraftButtonSelect(data.is_draft);
+        this.description.update(data);
+        this.details.update(data.details);
+        this.previewImage.update(data.previewImage);
+        this.masterPlane.update(data.masterPlaneImage);
+        this.liveMap.update(data.liveMap);
+        this.carousel.update(data.images);
+        this.setDraftButtonSelect(data.isDraft);
     }
 
     setButtonsEnabled(enabled) {

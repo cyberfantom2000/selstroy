@@ -21,10 +21,11 @@ class ClearTokenTask:
     async def execute(self) -> None:
         log.info('starting')
         async with self.session() as session:
-            three_days_ago = datetime.now() - timedelta(days=self.ttl_days)
-            items = await self.repo.get(session, RefreshToken, conditions=[RefreshToken.expired < three_days_ago],
+            days_ago = datetime.now() - timedelta(days=self.ttl_days)
+            items = await self.repo.get(session, RefreshToken, conditions=[RefreshToken.expires < days_ago],
                                         limit=None, offset=None, options=None, for_update=None)
-            log.info(f'expired tokens: {len(items) if items else 0}')
+            log.info(f'expired tokens found: {len(items) if items else 0}')
             if items:
                 await self.repo.delete(session, items)
+            log.info(f'expired tokens cleared: {len(items) if items else 0}')
         log.info('finished')

@@ -1,30 +1,24 @@
 
 class Tag {
-    constructor({text, template}) {
-        this.fragment = template.content.cloneNode(true);
-        this.element = this.fragment.firstElementChild;
-        this.text = this.fragment.querySelector('span');
-
+    constructor({text, registry}) {
+        this.element = registry.getTemplate('project-tag-template');
+        this.text = this.element.querySelector('span');
         this.text.textContent = text;
     }
 }
 
 
 export class TagsContainer {
-    constructor({container, template}) {
+    constructor({container, registry}) {
         this.container = container;
-        this.template = template;
+        this.registry = registry;
     }
 
     add(tags) {
         for (const tag of tags) {
-            const item = this.buildItem(tag);
-            this.container.appendChild(item.fragment);
+            const item = new Tag({text: tag, registry: this.registry})
+            this.container.appendChild(item.element);
         }
-    }
-
-    buildItem(text) {
-        return new Tag({ text: text, template: this.template });
     }
 
     setVisible(visible) {

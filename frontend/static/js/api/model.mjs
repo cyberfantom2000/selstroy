@@ -1,3 +1,27 @@
+function makeErrorMessage(resp, reply) {
+    const base = `HTTP Error: ${resp.status} ${resp.statusText}`;
+
+    if (reply?.detail) {
+        if (Array.isArray(reply.detail)) {
+            const details = reply.detail
+                .map(err => {
+                    const loc = err.loc ? err.loc.join('.') : 'unknown';
+                    return `Message: ${err.msg}, Type: ${err.type}, Field: ${loc}`;
+                })
+                .join(' | ');
+
+            return `${base}, ${details}`;
+        }
+
+        if (typeof reply.detail === 'string')
+            return `${base}, Message: ${reply.detail}`;
+
+        return `${base}, Details: ${JSON.stringify(reply.detail)}`;
+    }
+
+    return `${base}, Unknown error`;
+}
+
 
 export async function requestModels(baseUrl, limit=100, offset=0, fields=[]){
     let url = baseUrl + '?limit=' + limit + '&offset=' + offset;
@@ -13,7 +37,7 @@ export async function requestModels(baseUrl, limit=100, offset=0, fields=[]){
         const reply = await resp.json();
 
         if (!resp.ok)
-            throw new Error(reply.detail);
+            throw new Error(makeErrorMessage(resp, reply));
 
        return reply;
     } catch (err) {
@@ -51,7 +75,7 @@ export async function removeModel(baseUrl, id){
     const reply = await resp.json();
 
     if (!resp.ok)
-        throw new Error(reply.detail);
+        throw new Error(makeErrorMessage(resp, reply));
 }
 
 export async function createModel(baseUrl, data){
@@ -67,7 +91,7 @@ export async function createModel(baseUrl, data){
     const reply = await resp.json();
 
     if (!resp.ok)
-        throw new Error(reply.detail);
+        throw new Error(makeErrorMessage(resp, reply));
 
     return reply;
 }
@@ -85,7 +109,7 @@ export async function updateModel(baseUrl, data){
     const reply = await resp.json();
 
     if (!resp.ok)
-        throw new Error(reply.detail);
+        throw new Error(makeErrorMessage(resp, reply));
 
     return reply;
 }
@@ -103,7 +127,7 @@ export async function queryModels(baseUrl, data) {
     const reply = await resp.json();
 
     if(!resp.ok)
-        throw new Error(reply.detail);
+        throw new Error(makeErrorMessage(resp, reply));
 
     return reply;
 }

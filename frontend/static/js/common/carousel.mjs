@@ -76,8 +76,8 @@ export class ImageCarousel {
         this.slides = [];
         this.dots = []
         this.active_index = null;
-        this.play_timer = new Timer(this.config.auto_play_interval_secs * 1000, false);
-        this.retry_timer = new Timer(this.config.retry_interval_secs * 1000, true);
+        this.play_timer = new Timer({delay: this.config.auto_play_interval_secs * 1000, singleshot: false});
+        this.retry_timer = new Timer({delay: this.config.retry_interval_secs * 1000, singleshot: true});
 
         this.build_and_show();
     }

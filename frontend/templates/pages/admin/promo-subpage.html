@@ -13,7 +13,7 @@
 
 {% include 'components/templates/promo-item.html' %}
 
-<template id="promo-editable-item-template">
+<template id="promo-item-admin-template">
     <div class="flex flex-col gap-1 w-full bg-gray-240 dark:bg-gray-840 rounded-3xl p-4">
         
         <div name="item-container" class="flex w-full">
@@ -40,7 +40,7 @@
     </div>
 </template>
 
-<div id="promo-edit-modal" class="fixed inset-0 z-50 hidden">
+<div id="promo-modal" class="fixed inset-0 z-50 hidden">
     <div name="background" class="absolute inset-0 bg-black/50"></div>
 
     <div class="flex items-center justify-center min-h-screen p-4">

@@ -29,6 +29,7 @@ class ApartImage(ApartImageBase, table=True):
 
 class ApartImagePublic(ApartImageBase):
     id: UUID
+    apartment_id: UUID
     image: FilePublic | None
     category_icon: FilePublic | None
 
@@ -44,4 +45,3 @@ class ApartImageUpdate(ApartImageBase):
     category: str | None = None
     category_icon_id: UUID | None = None
     image_id: UUID | None = None
-    apartment_id: UUID | None = None

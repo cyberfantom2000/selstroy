@@ -1,12 +1,13 @@
 
 export class Page {
     constructor({pageContainer, itemsContainer}) {
+        this.id = pageContainer.id;
         this.pageContainer = pageContainer;
         this.itemsContainer = itemsContainer;
     }
 
     pushItemToFront(item) {
-        this.itemsContainer.prepend(item.fragment);
+        this.itemsContainer.prepend(item);
     }
 
     clear() {

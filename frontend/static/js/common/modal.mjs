@@ -37,4 +37,21 @@ export class Modal {
     validate() {
         return true;
     }
+
+    data() {
+        return null;
+    }
+}
+
+export class ModalWithTwoButtons extends Modal{
+    constructor(modal) {
+        super(modal);
+
+        this.submitButton = this.element.querySelector('[name="submit-button"]');
+        this.rejectButton = this.element.querySelector('[name="reject-button"]');
+
+        this.submitButton.onclick = () => this.submit();
+        this.rejectButton.onclick = () => this.reject();
+        this.element.querySelector('[name="background"]').onclick = () => this.reject();
+    }
 }

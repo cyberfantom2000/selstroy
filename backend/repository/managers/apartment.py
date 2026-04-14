@@ -4,6 +4,7 @@ from .base import ModelManager
 
 from ..models.apartment import ApartmentUpdate, ApartmentCreate
 from ..models.common import File
+from ..utils import raise_for_invalid_slug
 
 
 class ApartmentManager(ModelManager):
@@ -11,6 +12,7 @@ class ApartmentManager(ModelManager):
     to File models from an id
     """
     async def create(self, session, new_model: ApartmentCreate):
+        raise_for_invalid_slug(new_model.slug)
         new_item = await super().create(session, new_model)
 
         if new_model.pdf_id:
@@ -19,6 +21,9 @@ class ApartmentManager(ModelManager):
         return new_item
 
     async def update(self, session, update_model: ApartmentUpdate):
+        if update_model.slug is not None:
+            raise_for_invalid_slug(update_model.slug)
+
         updated_item = await super().update(session, update_model)
 
         if update_model.pdf_id:

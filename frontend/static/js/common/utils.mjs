@@ -13,13 +13,18 @@ export function isEmpty(val) {
 
 
 export function isNumber(value) {
-    return !isEmpty(value) && !Number.isNaN(Number(value));
+  return !isEmpty(value) && !Number.isNaN(Number(value));
+}
+
+
+export function isIntegerNumber(value) {
+  return isNumber(value) && Number.isInteger(Number(value));
 }
 
 
 export function toggleOutlineRed(element, enabled) {
-    if (enabled)
-        element.classList.add('outline-red-400');
-    else
-        element.classList.remove('outline-red-400');
+  if (enabled)
+    element.classList.add('outline-red-400');
+  else
+    element.classList.remove('outline-red-400');
 }

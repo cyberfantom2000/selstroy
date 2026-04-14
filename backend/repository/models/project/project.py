@@ -68,6 +68,7 @@ class ProjectUpdate(ProjectBase):
     square_max: float | None = None
     square_min: float | None = None
     release_date: str | None = None
+    sale_status: str | None = None
     is_draft: bool | None = None
     floor_svg: str | None = None
     live_map: str | None = None

@@ -17,6 +17,7 @@ class ApartElement(ApartElementBase, table=True):
 
 class ApartElementPublic(ApartElementBase):
     id: UUID
+    apartment_id: UUID
 
 
 class ApartElementCreate(ApartElementBase):

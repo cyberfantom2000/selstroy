@@ -3,9 +3,9 @@ export class ChooseFileButton {
         this.button = button;
         this.input = input;
 
-        this.chooseChanged = null;
+        this.filesChoosed = null;
 
         button.addEventListener('click', () => this.input.click());
-        input.addEventListener('change', () => { if (this.chooseChanged !== null) this.chooseChanged(this.input.files); });
+        input.addEventListener('change', () => { if (this.filesChoosed !== null) this.filesChoosed(this.input.files); });
     }
 };

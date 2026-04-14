@@ -1,85 +1,55 @@
-import { mediaUrl } from "../../api/base-urls.mjs";
-
-
-function isImageExt(ext) {
-    return ['.png', '.jpg', '.jpeg'].includes(ext);
-}
-
+import { MediaEvents } from "../../core/events.mjs";
 
 export class MediaItem {
-    constructor({template, data}) {
-        this.data = data;
-        this.fragment = template.content.cloneNode(true);
-        this.element = this.fragment.firstElementChild;
-        this.title = this.fragment.querySelector('[name="title"]');
-        this.img = this.fragment.querySelector('img');
-        this.imagePlaceholder = this.fragment.querySelector('[name="image-placeholder"]');
-        this.basePlaceholder = this.fragment.querySelector('[name="base-placeholder"]');
-        this.copyButton = this.fragment.querySelector('[name="copy-button"]');
-        this.linkButton = this.fragment.querySelector('[name="link-button"]');
-        this.downloadButton = this.fragment.querySelector('[name="download-button"]');
-        this.deleteButton = this.fragment.querySelector('[name="delete-button"]');
+    constructor({registry, bus}) {
+        this.element = registry.getTemplate('media-item');
+        this.bus = bus;
+        
+        this.title = this.element.querySelector('[name="title"]');
+        this.img = this.element.querySelector('img');
+        this.imagePlaceholder = this.element.querySelector('[name="image-placeholder"]');
+        this.basePlaceholder = this.element.querySelector('[name="base-placeholder"]');
+        this.copyButton = this.element.querySelector('[name="copy-button"]');
+        this.linkButton = this.element.querySelector('[name="link-button"]');
+        this.downloadButton = this.element.querySelector('[name="download-button"]');
+        this.deleteButton = this.element.querySelector('[name="delete-button"]');
 
-        this.loaded = false;
-        this.relativeLink = null;
-        this.absoluteLink = null;
-        this.isImage = false;
-
-        this.clicked = null;
-        this.copyClicked = null;
-        this.linkClicked = null;
-        this.downloadClicked = null;
-        this.deleteClicked = null;
-
-        this.imagePlaceholder.onclick = () => { if(this.clicked) this.clicked(this); };
-        this.basePlaceholder.onclick = () => { if(this.clicked) this.clicked(this); };
-        this.copyButton.onclick = () => { if(this.copyClicked) this.copyClicked(this); };
-        this.linkButton.onclick = () => { if(this.linkClicked) this.linkClicked(this); };
-        this.downloadButton.onclick = () => { if(this.downloadClicked) this.downloadClicked(this); };
-        this.deleteButton.onclick = () => { if(this.deleteClicked) this.deleteClicked(this); };
-
-        this.update(data);
+        this.imagePlaceholder.onclick = () => { this.bus.emit(MediaEvents.Request.Open, this.data); };
+        this.basePlaceholder.onclick = () => { this.bus.emit(MediaEvents.Request.Open, this.data); };
+        this.copyButton.onclick = () => { this.bus.emit(MediaEvents.Request.CopyId, this.data); };
+        this.linkButton.onclick = () => { this.bus.emit(MediaEvents.Request.CopyLink, this.data); };
+        this.downloadButton.onclick = () => { this.bus.emit(MediaEvents.Request.Download, this.data); };
+        this.deleteButton.onclick = () => { this.bus.emit(MediaEvents.Request.Remove, this.data); };
     }
 
     update(data) {
         this.data = data;
-        const name = data.name ?? 'unknown';
-        const ext = data.ext ?? '';
-        this.title.textContent = name + ext;
-        this.title.title = name + ext;
+        this.title.textContent = data.name + data.ext;
+        this.title.title = data.name + data.ext;
 
-        this.isImage = isImageExt(ext);
-        this.setImagePlaceholderVisible(this.isImage);
-        this.setBasePlaceholderVisible(!this.isImage);
+        this.updateImage(data.isImage, data.url);
+        this.updateVisibility(data.isImage);
+        this.setButtonsEnabled(Boolean(data.id));
+    }
 
-        if (this.isImage)
-            this.img.src = `${mediaUrl}/${data.id}`;
+    updateImage(isImage, url) {
+        if (isImage && url)
+            this.img.src = url;
+    }
 
-        this.loaded = Boolean(data.id);
-        if (this.loaded) {
-            this.relativeLink = `${mediaUrl}/${data.id}`;
-            this.absoluteLink = window.location.origin + this.relativeLink;
+    updateVisibility(isImage) {
+        if (isImage) {
+            this.imagePlaceholder.classList.remove('hidden');
+            this.basePlaceholder.classList.add('hidden');
+        } else {
+            this.imagePlaceholder.classList.add('hidden')
+            this.basePlaceholder.classList.remove('hidden')
         }
     }
 
-    setImagePlaceholderVisible(visible) {
-        if (visible)
-            this.imagePlaceholder.classList.remove('hidden');
-        else
-            this.imagePlaceholder.classList.add('hidden')
-    }
-
-    setBasePlaceholderVisible(visible) {
-        if (visible)
-            this.basePlaceholder.classList.remove('hidden');
-        else
-            this.basePlaceholder.classList.add('hidden')
-    }
-
-    setButtonsEnabled(enaled) {
-        this.copyButton.enaled = enaled;
-        this.linkButton.enaled = enaled;
-        this.deleteButton.enabled = enaled;
-        this.downloadButton.enabled = enaled;
+    setButtonsEnabled(enabled) {
+        [this.copyButton, this.linkButton, this.downloadButton, this.deleteButton].forEach(btn => {
+            btn.disabled = !enabled;
+        });
     }
 }

@@ -1,34 +1,31 @@
 import { PromoItem } from "../../promo/promo-item.mjs";
+import { PromoEvents } from "../../core/events.mjs";
 
 
 export class AdminPromoItem {
-    constructor({data, baseTemplate, adminTemplate}) {
-        this.data = data;
-        this.baseItem = new PromoItem({ data: data, template: baseTemplate });
+    constructor({data, registry, bus}) {
+        this.bus = bus;
 
-        this.fragment = adminTemplate.content.cloneNode(true);
-        this.element = this.fragment.firstElementChild;
-        
-        this.container = this.fragment.querySelector('[name="item-container"]');
-        this.editButton = this.fragment.querySelector('[name="edit-button"]');
-        this.draftButton = this.fragment.querySelector('[name="draft-button"]');
-        this.deleteButton = this.fragment.querySelector('[name="delete-button"]');
+        this.element = registry.getTemplate('promo-item-admin-template');
+        this.container = this.element.querySelector('[name="item-container"]');
+        this.editButton = this.element.querySelector('[name="edit-button"]');
+        this.draftButton = this.element.querySelector('[name="draft-button"]');
+        this.deleteButton = this.element.querySelector('[name="delete-button"]');
 
-        this.editClicked = null;
-        this.draftClicked = null;
-        this.deleteClicked = null;
+        this.baseItem = new PromoItem({ data: data, registry: registry });
+        this.container.appendChild(this.baseItem.element);
 
-        this.editButton.onclick = () => { if (this.editClicked) this.editClicked(this.data); };
-        this.draftButton.onclick = () => { if (this.draftClicked) this.draftClicked(this.data); };
-        this.deleteButton.onclick = () => { if (this.deleteClicked) this.deleteClicked(this.data); };
+        this.editButton.onclick = () => { this.bus.emit(PromoEvents.Request.Edit, this.data); };
+        this.draftButton.onclick = () => { this.bus.emit(PromoEvents.Request.Draft, this.data); };
+        this.deleteButton.onclick = () => { this.bus.emit(PromoEvents.Request.Remove, this.data); };
 
-        this.container.appendChild(this.baseItem.fragment);
+        this.update(data);
     }
 
     update(data) {
         this.data = data;
         this.baseItem.update(data);
-        this.setDraftButtonSelect(data.is_draft);
+        this.setDraftButtonSelect(data.isDraft);
     }
 
     setDraftButtonSelect(select) {

@@ -24,10 +24,11 @@ class ProjectDetails(ProjectDetailsBase, table=True):
 
 class ProjectDetailsPublic(ProjectDetailsBase):
     images: list[FilePublic]
+    project_id: UUID
 
 
 class ProjectDetailsCreate(ProjectDetailsBase):
-    images_ids: list[UUID]
+    images_ids: list[UUID] | None = None
     project_id: UUID
 
 
@@ -36,4 +37,3 @@ class ProjectDetailsUpdate(ProjectDetailsBase):
     title: str | None = None
     text: str | None = None
     images_ids: list[UUID] | None = None
-    project_id: UUID | None = None

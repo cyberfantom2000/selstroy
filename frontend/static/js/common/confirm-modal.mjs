@@ -1,67 +1,50 @@
-export class ConfirmModal {
-    constructor(modal) {
-        this.element = modal;
-        this.confirmBtn = this.element.querySelector('[name="confirm-button"]');
-        this.title = this.element.querySelector('[name="title"]');
+import { ModalEvents } from "../core/events.mjs";
+import { ModalWithTwoButtons } from "./modal.mjs";
+
+
+export class ConfirmModal extends ModalWithTwoButtons {
+    constructor({registry, bus}) {
+        super(registry.get('confirm-modal'));
+        
+        this.bus = bus;
         this.description = this.element.querySelector('[name="description"]');
 
-        this.onConfirm = null;
-        this.onReject = null;
-        
-        const rejectBtn = this.element.querySelector('[name="reject-button"]');
-        rejectBtn.onclick = () => { this.reject(); };
+        this.bus.on(ModalEvents.Confirm.Open, (payload) => {
+            this.payload = payload;
+            if (payload.style)
+                this.setSubmitButtonStyle(payload.style);
+            this.update(payload.text ?? '');
+            this.show();
+        });
 
-        const background = this.element.querySelector('[name="background"]');
-        background.onclick = () => { this.reject(); };
-        
-        this.confirmBtn.onclick = () => { this.confirm(); };
+        this.submitClicked = () => {
+            if (this.payload)
+                this.bus.emit(ModalEvents.Confirm.Confirmed, this.payload);
+            this.payload = null;
+        };
 
-        this.escapeHandler = (event) => {
-            if (event.key === 'Escape')
-              this.hide();
+        this.rejectClicked = () => {
+            if (this.payload)
+                this.bus.emit(ModalEvents.Confirm.Rejected, this.payload);
+            this.payload = null;
         };
     }
 
-    reject() {
-        if (this.onReject !== null)
-            this.onReject();
-
-        this.hide();
-    }
-
-    confirm() {
-        if (this.onConfirm !== null)
-            this.onConfirm();
-
-        this.hide();
-    }
-
-    setText({title, description}) {
-        this.title.textContent = title;
-        this.description.textContent = description;
+    update(text) {
+        this.description.textContent = text;
     }
 
     setSubmitButtonStyle(style) {
         const primaryColors = ['bg-primary-600', 'hover:bg-primary-700', 'dark:bg-primary-700', 'dark:hover:bg-primary-600'];
         const dangerColors = ['bg-red-600', 'hover:bg-red-700', 'dark:bg-red-700', 'dark:hover:bg-red-600'];
-        this.confirmBtn.classList.remove(...primaryColors);
-        this.confirmBtn.classList.remove(...dangerColors);
+        this.submitButton.classList.remove(...primaryColors);
+        this.submitButton.classList.remove(...dangerColors);
 
         if (style === 'primary')
-            this.confirmBtn.classList.add(...primaryColors);
+            this.submitButton.classList.add(...primaryColors);
         else if (style === 'danger')
-            this.confirmBtn.classList.add(...dangerColors);
+            this.submitButton.classList.add(...dangerColors);
         else
             throw new Error('Unknown button style');
-    }
-
-    show() {
-        this.element.classList.remove('hidden');
-        document.addEventListener('keydown', this.escapeHandler);
-    }
-
-    hide() {
-        this.element.classList.add('hidden');
-        document.removeEventListener('keydown', this.escapeHandler);
     }
 }

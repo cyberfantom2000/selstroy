@@ -1,6 +1,6 @@
 
 export class Timer {
-    constructor(delay, singleshot = false) {
+    constructor({delay, singleshot = false}) {
         this.delay = delay;
         this.singleshot = singleshot;
         this.timer_id = null;

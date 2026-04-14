@@ -15,10 +15,11 @@ class ApartmentPdfLink(SQLModel, table=True):
 
 class ApartmentBase(SQLModel):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
-    title: str
     square: float
     type: str
     total_floors: int
+    is_draft: bool
+    slug: str = Field(unique=True, index=True)
 
 
 class Apartment(ApartmentBase, table=True):
@@ -30,6 +31,7 @@ class Apartment(ApartmentBase, table=True):
 
 class ApartmentPublic(ApartmentBase):
     id: UUID
+    project_id: UUID
     images: list[ApartImagePublic]
     items: list[ApartElementPublic]
     pdf: FilePublic | None
@@ -42,10 +44,9 @@ class ApartmentCreate(ApartmentBase):
 
 class ApartmentUpdate(ApartmentBase):
     id: UUID
-    title: str | None = None
     square: float | None = None
     type: str | None = None
     total_floors: int = None
-    pdf: str | None = None
     pdf_id: UUID | None = None
-    project_id: UUID | None = None
+    is_draft: bool | None = None
+    slug: str | None = None

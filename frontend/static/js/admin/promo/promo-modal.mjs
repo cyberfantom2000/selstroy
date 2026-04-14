@@ -1,4 +1,5 @@
-import { Modal } from "../../common/modal.mjs";
+import { ModalWithTwoButtons } from "../../common/modal.mjs";
+import { ModalEvents } from "../../core/events.mjs";
 import { isEmpty, toggleOutlineRed } from "../../common/utils.mjs";
 
 
@@ -9,52 +10,56 @@ const tooltips = {
     'description-tooltip': 'Текст акции. Отображается в элементе. Для форматирования текста необходимо использовать html разметку и классы tailwind'
 };
 
-export class PromoEditModal extends Modal{
-    constructor({modal, tooltip}) {
-        super(modal);
 
-        this.title = this.element.querySelector('[name="title"]');
+export class PromoModal extends ModalWithTwoButtons {
+    constructor({registry, bus}) {
+        super(registry.get('promo-modal'));
+
+        this.bus = bus;
+
+        this.windowTitle = this.element.querySelector('[name="title"]');
         this.id = this.element.querySelector('[name="id-input"]');
         this.draftCheckbox = this.element.querySelector('[name="is-draft-input"]');
         this.imageId = this.element.querySelector('[name="image-id-input"]');
         this.description = this.element.querySelector('[name="description-input"]');
 
-        this.element.querySelector('[name="submit-button"]').onclick = () => this.submit();
-        this.element.querySelector('[name="reject-button"]').onclick = () => this.reject();
-        this.element.querySelector('[name="background"]').onclick = () => this.reject();
-
         for (const button of this.element.querySelectorAll('[role="tooltip"]'))
-            button.onclick = () => { tooltip.show(tooltips[button.name]); };
+            button.onclick = () => this.bus.emit(ModalEvents.Tooltip.Open, tooltips[button.name]);
 
+        this.bus.on(ModalEvents.Promo.Open, (payload) => {
+            this.setTitle(payload.title);
+            this.update(payload.data);
+            this.show();
+        });
+
+        this.submitClicked = (data) => this.bus.emit(ModalEvents.Promo.Confirmed, data);
+        
+        this.rejectClicked = () => {
+            this.bus.emit(ModalEvents.Promo.Rejected);
+            this.resetInputOutline();
+        };
     }
 
     setTitle(text) {
-        this.title.textContent = text;
+        this.windowTitle.textContent = text;
     }
 
-    setData(data) {
+    update(data) {
         this.id.textContent = data.id ?? '';
-        this.draftCheckbox.checked = data.is_draft ?? false;
-        this.imageId.value = data.image ? data.image.id : '';
+        this.draftCheckbox.checked = data.isDraft ?? true;
+        this.imageId.value = data.imageId ?? '';
         this.description.value = data.text ?? '';
-    }
-
-    clearData() {
-        for (const input of this.element.querySelectorAll('input, textarea'))
-            toggleOutlineRed(input, false);
-
-        this.setData({});
     }
 
     data() {
         let result = {
-            is_draft: this.draftCheckbox.checked,
-            image_id: this.imageId.value,
+            isDraft: this.draftCheckbox.checked,
+            imageId: this.imageId.value,
             text: this.description.value
         };
 
         if (this.id.textContent !== '')
-            result['id'] = this.id.textContent;
+            result.id = this.id.textContent;
 
         return result;
     }
@@ -69,5 +74,10 @@ export class PromoEditModal extends Modal{
         toggleOutlineRed(this.description, isEmpty(this.description.value));
 
         return ok;
+    }
+
+    resetInputOutline() {
+        for (const input of this.element.querySelectorAll('input, textarea'))
+            toggleOutlineRed(input, false);
     }
 }
