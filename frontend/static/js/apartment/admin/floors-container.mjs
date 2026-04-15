@@ -1,8 +1,8 @@
 
-import { AdminApartmentFloor } from "./apartment-floor.mjs";
+import { AdminApartmentFloor } from "./floor.mjs";
 
 
-export class ApartmentFloorsContainer {
+export class AdminApartmentFloorsContainer {
     constructor({element, registry}) {
         this.registry = registry;
         this.container = element.querySelector('[name="items-container"]');

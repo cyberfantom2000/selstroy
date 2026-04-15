@@ -1,7 +1,7 @@
-import { CarouselConfig, ImageCarousel } from '../common/carousel.mjs';
+import { CarouselConfig, ImageCarousel } from '../../common/carousel.mjs';
 import { ProjectsPreviewConfig, ProjectsPreview } from '../projects/projectpreview.mjs';
 import { requestAllPromos } from '../api/promotion.mjs';
-import { requestAllProjectsShortDescription } from '../api/project.mjs';
+import { requestAllProjectsShortDescription } from '../../api/project.mjs';
 
 document.addEventListener("DOMContentLoaded", () => {
     const promo_carousel_config = new CarouselConfig({

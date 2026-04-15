@@ -1,4 +1,4 @@
-import { ProjectItem } from "./project-item.mjs";
+import { ProjectItem } from "./item.mjs";
 import { ApartmentsContainer } from "./apartments-container.mjs";
 
 

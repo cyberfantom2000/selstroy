@@ -1,44 +1,44 @@
-import { PopupEvents } from "../core/events.mjs";
-import { EventBus } from "../core/event-bus.mjs";
-import { DomRegistry } from "../core/dom-registry.mjs";
+import { PopupEvents } from "../../core/events.mjs";
+import { EventBus } from "../../core/event-bus.mjs";
+import { DomRegistry } from "../../core/dom-registry.mjs";
 
-import { TooltipModal } from "../common/tooltip-modal.mjs";
-import { ConfirmModal } from "../common/confirm-modal.mjs";
-import { ImageViewModal, EditableImageModal } from "../common/image-modal.mjs";
-import { IFrameViewModal, EditableIFrameModal } from "../common/iframe-modal.mjs";
+import { TooltipModal } from "../../common/tooltip-modal.mjs";
+import { ConfirmModal } from "../../common/confirm-modal.mjs";
+import { ImageViewModal, EditableImageModal } from "../../common/image-modal.mjs";
+import { IFrameViewModal, EditableIFrameModal } from "../../common/iframe-modal.mjs";
 
-import { MediaApi } from "../api/media.mjs";
-import { MediaStore } from "../store/media.mjs";
-import { MediaController } from "../admin/media/media-controller.mjs";
-import { MediaSubpage } from "../admin/media/media-subpage.mjs";
-import { MediaModal } from "../admin/media/media-modal.mjs";
+import { MediaApi } from "../../api/media.mjs";
+import { MediaStore } from "../../store/media.mjs";
+import { AdminMediaController } from "../../media/admin/controller.mjs";
+import { AdminMediaSubpage } from "../../media/admin/subpage.mjs";
+import { MediaModal } from "../../media/admin/modal.mjs";
 
-import { PromoApi } from "../api/promo.mjs";
-import { PromoStore } from "../store/promo.mjs";
-import { PromoController } from "../admin/promo/promo-controller.mjs";
-import { PromoSubpage } from "../admin/promo/promo-subpage.mjs";
-import { PromoModal } from "../admin/promo/promo-modal.mjs";
+import { PromoApi } from "../../api/promo.mjs";
+import { PromoStore } from "../../store/promo.mjs";
+import { AdminPromoController } from "../../promo/admin/controller.mjs";
+import { AdminPromoSubpage } from "../../promo/admin/subpage.mjs";
+import { PromoModal } from "../../promo/admin/modal.mjs";
 
-import { ProjectApi } from "../api/project.mjs"
-import { ProjectStore } from "../store/project.mjs"
-import { ProjectController } from "../admin/projects/project-controller.mjs"
-import { ProjectsSubpage } from "../admin/projects/projects-subpage.mjs"
-import { ProjectModal } from "../admin/projects/project-modal.mjs";
-import { ProjectDetailModal } from "../admin/projects/project-detail-modal.mjs";
+import { ProjectApi } from "../../api/project.mjs"
+import { ProjectStore } from "../../store/project.mjs"
+import { AdminProjectController } from "../../projects/admin/controller.mjs";
+import { AdminProjectsSubpage } from "../../projects/admin/subpage.mjs"
+import { ProjectModal } from "../../projects/admin/modal.mjs";
+import { ProjectDetailModal } from "../../projects/admin/detail-modal.mjs";
 
-import { ApartmentApi } from "../api/apartment.mjs";
-import { ApartmentStore } from "../store/apartment.mjs";
-import { ApartmentController } from "../admin/apartment/apartment-controller.mjs";
-import { ApartmentModal } from "../admin/apartment/apartment-modal.mjs";
-import { ApartmentImageModal } from "../admin/apartment/apartment-image-modal.mjs";
-import { ApartmentFloorModal } from "../admin/apartment/apartment-floor-modal.mjs";
+import { ApartmentApi } from "../../api/apartment.mjs";
+import { ApartmentStore } from "../../store/apartment.mjs";
+import { AdminApartmentController } from "../../apartment/admin/controller.mjs";
+import { ApartmentModal } from "../../apartment/admin/modal.mjs";
+import { ApartmentImageModal } from "../../apartment/admin/image-modal.mjs";
+import { ApartmentFloorModal } from "../../apartment/admin/floor-modal.mjs";
 
-import { SubpageNavigator } from "../admin/subpage/subpage-navigator.mjs";
-import { SubpageLoader } from "../admin/subpage/subpage-loader.mjs";
-import { SubpageController } from "../admin/subpage/subpage-controller.mjs";
+import { SubpageNavigator } from "../subpage-navigator.mjs";
+import { SubpageLoader } from "../subpage-loader.mjs";
+import { SubpageController } from "../subpage-controller.mjs";
 
-import { PopupContainer } from "../popup/container.mjs";
-import { PopupController } from "../popup/controller.mjs";
+import { PopupContainer } from "../../popup/container.mjs";
+import { PopupController } from "../../popup/controller.mjs";
 
 
 function createPopupContainer(bus, registry) {
@@ -146,7 +146,7 @@ function createMediaSubpage(bus, registry) {
         registry.register('media-dnd-dropzone', '#media-drop-overlay');
         registry.register('media-choose-button', '#choose-media-button');
         registry.register('media-choose-input', '#choose-media-input');
-        return new MediaSubpage({registry: registry, bus: bus});
+        return new AdminMediaSubpage({registry: registry, bus: bus});
     } catch (err) {
         bus.emit(PopupEvents.Message.Err.Show, err);
         console.log(err);
@@ -174,7 +174,7 @@ function createPromoSubpage(bus, registry) {
         registry.register('create-promo-button', '#create-promo-button');
         registry.register('promo-item-admin-template', '#promo-item-admin-template');
         registry.register('promo-item-base-template', '#promo-item-template');
-        return new PromoSubpage({registry: registry, bus: bus});
+        return new AdminPromoSubpage({registry: registry, bus: bus});
     } catch (err) {
         bus.emit(PopupEvents.Message.Err.Show, err);
         console.log(err);
@@ -222,7 +222,7 @@ function createProjectsSubpage(bus, registry) {
         registry.register('apartment-item-template', '#apartment-item-template');
         registry.register('apartment-item-admin-template', '#apartment-item-admin-template');
         registry.register('apartment-floor-template', '#apartment-floor-admin-template');
-        return new ProjectsSubpage({registry: registry, bus: bus});
+        return new AdminProjectsSubpage({registry: registry, bus: bus});
     } catch (err) {
         bus.emit(PopupEvents.Message.Err.Show, err);
         console.log(err);
@@ -300,20 +300,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const mediaSubpage = createMediaSubpage(bus, registry);
     const mediaApi = new MediaApi();
     const mediaStore = new MediaStore({api: mediaApi, bus: bus});
-    const mediaController = new MediaController({bus: bus, store: mediaStore});
+    const mediaController = new AdminMediaController({bus: bus, store: mediaStore});
 
     const promoModal = createPromoModal(bus, registry);
     const promoSubpage = createPromoSubpage(bus, registry);
     const promoApi = new PromoApi();
     const promoStore = new PromoStore({api: promoApi, bus: bus});
-    const promoController = new PromoController({bus: bus, store: promoStore});
+    const promoController = new AdminPromoController({bus: bus, store: promoStore});
 
     const projectModal = createProjectModal(bus, registry);
     const projectDetailModal = createProjectDetailModal(bus, registry);
     const projectsSubpage = createProjectsSubpage(bus, registry);
     const projectsApi = new ProjectApi();
     const projectsStore = new ProjectStore({api: projectsApi, bus: bus});
-    const projectsController = new ProjectController({bus: bus, store: projectsStore});
+    const projectsController = new AdminProjectController({bus: bus, store: projectsStore});
 
 
     const apartmentModal = createApartmentModal(bus, registry);
@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const floorModal = createApartmentFloorModal(bus, registry);
     const apartmentApi = new ApartmentApi();
     const apartmentStore = new ApartmentStore({api: apartmentApi, bus: bus});
-    const apartmentController = new ApartmentController({bus: bus, store: apartmentStore});
+    const apartmentController = new AdminApartmentController({bus: bus, store: apartmentStore});
 
     const pageNavigator = createSubpageNavigator(bus, registry);
     pageNavigator.bind(registry.get('projects-subpage-button'), projectsSubpage);

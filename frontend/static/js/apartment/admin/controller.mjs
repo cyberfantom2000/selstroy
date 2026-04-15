@@ -2,7 +2,7 @@ import { Timer } from "../../common/timer.mjs";
 import { ApartmentEvents, ModalEvents, PopupEvents, ModelErrorType } from "../../core/events.mjs";
 
 
-export class ApartmentController {
+export class AdminApartmentController {
     constructor({bus, store}) {
         this.bus = bus;
         this.store = store;

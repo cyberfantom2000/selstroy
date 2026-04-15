@@ -1,9 +1,9 @@
-import { Page } from "../page.mjs";
-import { AdminPromoItem } from "./promo-item.mjs"
+import { Page } from "../../pages/page.mjs";
+import { AdminPromoItem } from "./item.mjs"
 import { PromoEvents } from "../../core/events.mjs";
 
 
-export class PromoSubpage extends Page {
+export class AdminPromoSubpage extends Page {
     constructor({registry, bus}) {
         super({pageContainer: registry.get('promo-subpage'), itemsContainer: registry.get('promo-subpage-container')});
 

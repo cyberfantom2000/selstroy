@@ -2,7 +2,7 @@ import { MediaEvents, ModalEvents, PopupEvents, ModelErrorType } from "../../cor
 import { Timer } from "../../common/timer.mjs";
 
 
-export class MediaController {
+export class AdminMediaController {
     constructor({bus, store}) {
         this.bus = bus;
         this.store = store;

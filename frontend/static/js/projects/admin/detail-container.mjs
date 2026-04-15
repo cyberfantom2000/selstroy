@@ -1,6 +1,6 @@
-import { AdminProjectDetail } from "./project-detail.mjs";
+import { AdminProjectDetail } from "./detail.mjs";
 
-export class ProjectDetailsContainer {
+export class AdminProjectDetailsContainer {
     constructor({element ,registry}) {
         this.registry = registry;
         this.container = element.querySelector('[name="items-container"]');

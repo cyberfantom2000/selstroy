@@ -1,4 +1,4 @@
-import { PromoItem } from "../../promo/promo-item.mjs";
+import { PromoItem } from "../item.mjs";
 import { PromoEvents } from "../../core/events.mjs";
 
 

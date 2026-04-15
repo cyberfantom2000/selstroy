@@ -1,5 +1,5 @@
-import { AdminProjectItem } from "./project-item.mjs";
-import { ApartmentsContainer } from "../apartment/apartments-container.mjs";
+import { AdminProjectItem } from "./item.mjs";
+import { AdminApartmentsContainer } from "./apartments-container.mjs";
 import { ApartmentEvents } from "../../core/events.mjs";
 
 
@@ -12,7 +12,7 @@ export class AdminProjectGroup {
         this.project = new AdminProjectItem({registry: registry, bus: bus});
         this.element.querySelector('[name="project-container"]').appendChild(this.project.element);
 
-        this.apartments = new ApartmentsContainer({
+        this.apartments = new AdminApartmentsContainer({
             element: this.element.querySelector('[name="apartments-container"]'),
             registry: registry, 
             bus: bus

@@ -1,4 +1,4 @@
-import { ApartmentItem } from "../apartment/apartment-item.mjs";
+import { ApartmentItem } from "../apartment/item.mjs";
 import { SoldOutApartmentItem } from "../apartment/sold-out-apartment-item.mjs";
 
 

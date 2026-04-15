@@ -1,11 +1,11 @@
 import { MediaEvents } from "../../core/events.mjs";
-import { MediaItem } from "./media-item.mjs";
-import { Page } from "../page.mjs";
+import { AdminMediaItem } from "./item.mjs";
+import { Page } from "../../pages/page.mjs";
 import { DndZone } from "../../common/dnd.mjs";
 import { ChooseFileButton } from "../../common/choose-files-button.mjs";
 
 
-export class MediaSubpage extends Page {
+export class AdminMediaSubpage extends Page {
     constructor({registry, bus}){
         super({ pageContainer: registry.get('media-subpage'), itemsContainer: registry.get('media-subpage-container') });
         
@@ -40,7 +40,7 @@ export class MediaSubpage extends Page {
 
         for (const data of descriptors) {
             if (!this.items.has(data.id)) {
-                const item = new MediaItem({registry: this.registry, bus: this.bus});
+                const item = new AdminMediaItem({registry: this.registry, bus: this.bus});
                 this.items.set(data.id, item);
                 this.pushItemToFront(item.element);   
             }

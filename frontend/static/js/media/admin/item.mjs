@@ -1,6 +1,6 @@
 import { MediaEvents } from "../../core/events.mjs";
 
-export class MediaItem {
+export class AdminMediaItem {
     constructor({registry, bus}) {
         this.element = registry.getTemplate('media-item');
         this.bus = bus;

@@ -1,4 +1,4 @@
-import { SubpageEvents } from "../../core/events.mjs";
+import { SubpageEvents } from "../core/events.mjs";
 
 
 const pageKey = 'admin-active-page-id';

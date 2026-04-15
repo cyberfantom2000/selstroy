@@ -1,7 +1,7 @@
 import { ImagesContainer } from "../../common/images-container.mjs";
 import { ApartmentEvents } from "../../core/events.mjs";
-import { ApartmentFloorsContainer } from "./apartment-floors-container.mjs";
-import { AdminApartmentDescription } from "./apartment-description.mjs";
+import { AdminApartmentFloorsContainer } from "./floors-container.mjs";
+import { AdminApartmentDescription } from "./description.mjs";
 
 
 export class AdminApartmentItem {
@@ -31,7 +31,7 @@ export class AdminApartmentItem {
 
         this.description.editClicked = () => this.bus.emit(ApartmentEvents.Request.Apartment.Edit, this.data);
 
-        this.floors = new ApartmentFloorsContainer({
+        this.floors = new AdminApartmentFloorsContainer({
             element: this.element.querySelector('[name="floors-container"]'), 
             registry: registry
         });

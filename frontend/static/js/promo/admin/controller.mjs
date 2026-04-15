@@ -1,7 +1,7 @@
 import { Timer } from "../../common/timer.mjs";
 import { PromoEvents, ModalEvents, PopupEvents, ModelErrorType } from "../../core/events.mjs";
 
-export class PromoController {
+export class AdminPromoController {
     constructor({bus, store}) {
         this.bus = bus;
         this.store = store;

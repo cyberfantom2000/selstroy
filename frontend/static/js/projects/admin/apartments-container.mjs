@@ -1,9 +1,7 @@
-
-import { AdminApartmentItem } from "./apartment-item.mjs";
-import { ApartmentEvents } from "../../core/events.mjs";
+import { AdminApartmentItem } from "../../apartment/admin/item.mjs";
 
 
-export class ApartmentsContainer {
+export class AdminApartmentsContainer {
     constructor({element, registry, bus}) {
         this.registry = registry;
         this.bus = bus;

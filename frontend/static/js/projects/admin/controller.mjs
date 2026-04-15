@@ -2,7 +2,7 @@ import { Timer } from "../../common/timer.mjs";
 import { ProjectEvents, ModalEvents, PopupEvents, ModelErrorType, ProjectImageType } from "../../core/events.mjs";
 
 
-export class ProjectController {
+export class AdminProjectController {
     constructor({bus, store}) {
         this.bus = bus;
         this.store = store;
