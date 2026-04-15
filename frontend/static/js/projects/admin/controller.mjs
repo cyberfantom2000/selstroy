@@ -1,4 +1,4 @@
-import { Timer } from "../../common/timer.mjs";
+import { Timer } from "../../utils/timer.mjs";
 import { ProjectEvents, ModalEvents, PopupEvents, ModelErrorType, ProjectImageType } from "../../core/events.mjs";
 
 

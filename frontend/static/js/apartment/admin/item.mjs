@@ -1,4 +1,4 @@
-import { ImagesContainer } from "../../common/images-container.mjs";
+import { ImagesContainer } from "../../components/images-container.mjs";
 import { ApartmentEvents } from "../../core/events.mjs";
 import { AdminApartmentFloorsContainer } from "./floors-container.mjs";
 import { AdminApartmentDescription } from "./description.mjs";

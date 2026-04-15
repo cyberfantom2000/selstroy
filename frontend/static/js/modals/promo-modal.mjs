@@ -1,6 +1,6 @@
-import { ModalWithTwoButtons } from "../../common/modal.mjs";
-import { ModalEvents } from "../../core/events.mjs";
-import { isEmpty, toggleOutlineRed } from "../../common/utils.mjs";
+import { ModalWithTwoButtons } from "./modal.mjs";
+import { ModalEvents } from "../core/events.mjs";
+import { isEmpty, toggleOutlineRed } from "../utils/utils.mjs";
 
 
 const tooltips = {

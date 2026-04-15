@@ -1,5 +1,5 @@
-import { ModalEvents } from "../../core/events.mjs";
-import { Modal } from "../../common/modal.mjs";
+import { ModalEvents } from "../core/events.mjs";
+import { Modal } from "./modal.mjs";
 
 function prettySize(bytes, decimals = 2) {
     if (bytes === 0) return '0 Bytes';

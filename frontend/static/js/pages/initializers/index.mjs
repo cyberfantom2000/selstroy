@@ -1,4 +1,4 @@
-import { CarouselConfig, ImageCarousel } from '../../common/carousel.mjs';
+import { CarouselConfig, ImageCarousel } from '../../components/carousel.mjs';
 import { ProjectsPreviewConfig, ProjectsPreview } from '../projects/projectpreview.mjs';
 import { requestAllPromos } from '../api/promotion.mjs';
 import { requestAllProjectsShortDescription } from '../../api/project.mjs';

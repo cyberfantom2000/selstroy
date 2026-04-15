@@ -1,4 +1,4 @@
-import { EditableImage } from "./editable-image.mjs";
+import { EditableImage } from "../components/editable-image.mjs";
 
 
 export class ImagesContainer {

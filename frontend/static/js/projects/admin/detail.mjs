@@ -1,4 +1,4 @@
-import { ImagesContainer } from "../../common/images-container.mjs";
+import { ImagesContainer } from "../../components/images-container.mjs";
 
 
 export class AdminProjectDetail {

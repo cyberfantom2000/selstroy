@@ -1,8 +1,8 @@
 import { ProjectItem } from "../item.mjs";
-import { ImagesContainer } from "../../common/images-container.mjs";
+import { ImagesContainer } from "../../components/images-container.mjs";
 import { AdminProjectDetailsContainer } from "./detail-container.mjs";
-import { EditableImage } from "../../common/editable-image.mjs";
-import { EditableIFrame } from "../../common/editable-iframe.mjs";
+import { EditableImage } from "../../components/editable-image.mjs";
+import { EditableIFrame } from "../../components/editable-iframe.mjs";
 import { AdminProjectDescription } from "./description.mjs";
 import { ProjectEvents, ProjectImageType} from "../../core/events.mjs";
 

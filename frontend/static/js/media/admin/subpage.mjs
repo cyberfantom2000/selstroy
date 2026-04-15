@@ -1,8 +1,8 @@
 import { MediaEvents } from "../../core/events.mjs";
 import { AdminMediaItem } from "./item.mjs";
 import { Page } from "../../pages/page.mjs";
-import { DndZone } from "../../common/dnd.mjs";
-import { ChooseFileButton } from "../../common/choose-files-button.mjs";
+import { DndZone } from "../../components/dnd.mjs";
+import { ChooseFileButton } from "../../components/choose-files-button.mjs";
 
 
 export class AdminMediaSubpage extends Page {

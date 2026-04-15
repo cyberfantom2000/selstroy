@@ -1,5 +1,5 @@
 import { ModalWithTwoButtons, Modal } from "./modal.mjs";
-import { isEmpty, toggleOutlineRed } from "./utils.mjs";
+import { isEmpty, toggleOutlineRed } from "../utils/utils.mjs";
 import { ModalEvents } from "../core/events.mjs";
 
 

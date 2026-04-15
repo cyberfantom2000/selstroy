@@ -1,5 +1,5 @@
 import { mediaUrl } from "../api/base-urls.mjs";
-import { Timer } from "../common/timer.mjs";
+import { Timer } from "../utils/timer.mjs";
 
 
 class SlideOptions {

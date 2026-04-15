@@ -1,5 +1,5 @@
 import { MediaEvents, ModalEvents, PopupEvents, ModelErrorType } from "../../core/events.mjs";
-import { Timer } from "../../common/timer.mjs";
+import { Timer } from "../../utils/timer.mjs";
 
 
 export class AdminMediaController {

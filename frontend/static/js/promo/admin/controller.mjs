@@ -1,4 +1,4 @@
-import { Timer } from "../../common/timer.mjs";
+import { Timer } from "../../utils/timer.mjs";
 import { PromoEvents, ModalEvents, PopupEvents, ModelErrorType } from "../../core/events.mjs";
 
 export class AdminPromoController {

@@ -2,36 +2,36 @@ import { PopupEvents } from "../../core/events.mjs";
 import { EventBus } from "../../core/event-bus.mjs";
 import { DomRegistry } from "../../core/dom-registry.mjs";
 
-import { TooltipModal } from "../../common/tooltip-modal.mjs";
-import { ConfirmModal } from "../../common/confirm-modal.mjs";
-import { ImageViewModal, EditableImageModal } from "../../common/image-modal.mjs";
-import { IFrameViewModal, EditableIFrameModal } from "../../common/iframe-modal.mjs";
+import { TooltipModal } from "../../modals/tooltip-modal.mjs";
+import { ConfirmModal } from "../../modals/confirm-modal.mjs";
+import { ImageViewModal, EditableImageModal } from "../../modals/image-modal.mjs";
+import { IFrameViewModal, EditableIFrameModal } from "../../modals/iframe-modal.mjs";
 
 import { MediaApi } from "../../api/media.mjs";
 import { MediaStore } from "../../store/media.mjs";
 import { AdminMediaController } from "../../media/admin/controller.mjs";
 import { AdminMediaSubpage } from "../../media/admin/subpage.mjs";
-import { MediaModal } from "../../media/admin/modal.mjs";
+import { MediaModal } from "../../modals/media-modal.mjs";
 
 import { PromoApi } from "../../api/promo.mjs";
 import { PromoStore } from "../../store/promo.mjs";
 import { AdminPromoController } from "../../promo/admin/controller.mjs";
 import { AdminPromoSubpage } from "../../promo/admin/subpage.mjs";
-import { PromoModal } from "../../promo/admin/modal.mjs";
+import { PromoModal } from "../../modals/promo-modal.mjs";
 
 import { ProjectApi } from "../../api/project.mjs"
 import { ProjectStore } from "../../store/project.mjs"
 import { AdminProjectController } from "../../projects/admin/controller.mjs";
 import { AdminProjectsSubpage } from "../../projects/admin/subpage.mjs"
-import { ProjectModal } from "../../projects/admin/modal.mjs";
-import { ProjectDetailModal } from "../../projects/admin/detail-modal.mjs";
+import { ProjectModal } from "../../modals/project-modal.mjs";
+import { ProjectDetailModal } from "../../modals/project-detail-modal.mjs";
 
 import { ApartmentApi } from "../../api/apartment.mjs";
 import { ApartmentStore } from "../../store/apartment.mjs";
 import { AdminApartmentController } from "../../apartment/admin/controller.mjs";
-import { ApartmentModal } from "../../apartment/admin/modal.mjs";
-import { ApartmentImageModal } from "../../apartment/admin/image-modal.mjs";
-import { ApartmentFloorModal } from "../../apartment/admin/floor-modal.mjs";
+import { ApartmentModal } from "../../modals/apartment-modal.mjs";
+import { ApartmentImageModal } from "../../modals/apartment-image-modal.mjs";
+import { ApartmentFloorModal } from "../../modals/apartment-floor-modal.mjs";
 
 import { SubpageNavigator } from "../subpage-navigator.mjs";
 import { SubpageLoader } from "../subpage-loader.mjs";
