@@ -37,3 +37,10 @@ class Settings(BaseSettings):
 
     login_block_time_minutes: int
     login_attempts_before_block: int
+
+    smtp_host: str
+    smtp_port: int
+    smtp_sender: str
+    smtp_receiver: str
+    smtp_username: str
+    smtp_password: str

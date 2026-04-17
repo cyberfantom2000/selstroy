@@ -1,16 +1,75 @@
-import { SideModal } from "../modals/side-modal.mjs"
+import { EventBus } from "../../core/event-bus.mjs";
+import { DomRegistry } from "../../core/dom-registry.mjs";
 
+import { PopupContainer } from "../../popup/container.mjs";
+import { PopupController } from "../../popup/controller.mjs";
+
+import { FeedbackApi } from "../../api/feedback.mjs";
+import { FeedbackStore } from "../../store/feedback.mjs";
+import { FeedbackController } from "../base/feedback-controller.mjs";
+
+import { LeftSideModal, RightSideModal } from "../../modals/side-modal.mjs"
+import { FooterButtons } from "../../elements/base/footer-buttons.mjs";
+
+
+function createPopupContainer(bus, registry) {
+    try {
+        registry.register('popup-container', '#popup-container');
+        registry.register('popup-message', '#popup-message-template');
+        return new PopupContainer({registry: registry, bus: bus});
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
+
+
+function createLeftSideModal(bus, registry) {
+    try {
+        registry.register('left-side-modal', '#left-side-modal');
+        return new LeftSideModal({registry: registry, bus: bus});
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
+
+
+function createRightSideModal(bus, registry) {
+    try {
+        registry.register('right-side-modal', '#right-side-modal');
+        return new RightSideModal({registry: registry, bus: bus});
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
+
+
+function createFooterButtons(bus, registry) {
+    try {
+        registry.register('left-footer-button', '#left-footer-button');
+        registry.register('right-footer-button', '#right-footer-button');
+        return new FooterButtons({registry: registry, bus: bus});
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
+
+export const bus = new EventBus();
+export const registry = new DomRegistry();
 
 document.addEventListener("DOMContentLoaded", () => {
-    const leftModal = new SideModal('modal-left', 'left-menu-button', async (self_modal) => {
-        // post request to server
-        // add request reply to popup
-        self_modal.close();
-    });
+    const popupContainer = createPopupContainer(bus, registry);
+    const popupController = new PopupController(bus);
 
-    const rightModal = new SideModal('modal-right', 'right-menu-button', async (self_modal) => {
-        // post request to server
-        // add request reply to popup
-        self_modal.close();
-    });
+    const leftSideModal = createLeftSideModal(bus, registry);
+    const rightSideModal = createRightSideModal(bus, registry);
+
+    const footerButtons = createFooterButtons(bus, registry);
+
+    const feedbackApi = new FeedbackApi();
+    const feedbackStore = new FeedbackStore({api: feedbackApi, bus: bus});
+    const feedbackController = new FeedbackController({controller: feedbackStore, bus: bus});
 });

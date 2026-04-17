@@ -1,4 +1,4 @@
-function makeErrorMessage(resp, reply) {
+export function makeErrorMessage(resp, reply) {
     const base = `HTTP Error: ${resp.status} ${resp.statusText}`;
 
     if (reply?.detail) {

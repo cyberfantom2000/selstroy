@@ -72,9 +72,6 @@ export class ImageViewModal extends Modal {
         this.bus = bus;
         this.image = this.element.querySelector('img');
 
-        this.element.querySelector('[name="background"]').onclick = () => this.reject();
-        this.element.querySelector('[name="close-button"]').onclick = () => this.reject();
-
         this.bus.on(ModalEvents.ImageView.Open, (url) => {
             this.update(url);
             this.show();

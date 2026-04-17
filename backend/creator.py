@@ -9,7 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from common import settings, get_logger, DatabaseDSN
 
-from .api import create_model_router, ModelCollection, FileRouter, AuthRouter
+from .api import create_model_router, ModelCollection, FileRouter, AuthRouter, FeedbackRouter
 from .api.middlewares import HttpExceptionMapper, DatabaseSessionMiddleware, OAuthMiddleware
 from .api.openapi import custom_openapi
 from .auth import AuthSystem, Hasher, TokenManager, AuthSecrets, TokenConfig
@@ -23,6 +23,7 @@ from .repository.models.common import *
 from .repository.database import AsyncRepository
 from .repository.localstorage import LocalStorage
 from .repository.redis import RedisLocal, RedisRemote, RedisFacade
+from .feedback import SmtpClient
 
 from .views import MainViewRouter
 from .views.templates import static_files
@@ -61,6 +62,10 @@ def register(app, lifespan) -> None:
 
     routers = [create_model_router(manager, collection, **kwargs) for manager, collection, kwargs in elements]
 
+    smtp = SmtpClient()
+    feedback_router = FeedbackRouter(smtp, prefix='/api/feedback', tags=['Feedback'])
+    routers.append(feedback_router)
+
     log.info('creating local storage')
     local_storage = LocalStorage(Path(settings.upload_dir))
     file_manager = ModelManager(File, repo)
@@ -98,13 +103,15 @@ def register(app, lifespan) -> None:
     log.info('adding session middleware')
     app.add_middleware(DatabaseSessionMiddleware, session=async_session, allowed_routes=db_allowed_routes)
 
-    exclude_auth_routes = None
+    exclude_auth_routes = []
     if settings.with_auth:
         allowed_methods = ['post', 'put', 'patch', 'delete']
-        oauth_allowed_routes = {router.router.prefix: allowed_methods for router in routers if router != auth_router}
+        skip_routers = [feedback_router, auth_router]
+        oauth_allowed_routes = {router.router.prefix: allowed_methods for router in routers if router not in skip_routers}
         log.info('adding oauth middleware')
         app.add_middleware(OAuthMiddleware, auth_system=auth_system, allowed_routes=oauth_allowed_routes)
-        exclude_auth_routes = [route.path for route in auth_router.router.routes]
+        for el in skip_routers:
+            exclude_auth_routes.extend([route.path for route in el.router.routes])
 
     log.info('creating http exception mapper')
     _ = HttpExceptionMapper(app)

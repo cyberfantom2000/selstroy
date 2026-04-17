@@ -174,7 +174,18 @@ export const ModalEvents = {
         Open: 'modal:apartment:image:open',
         Confirmed: 'modal:apartment:image:confirmed',
         Rejected: 'modal:apartment:image:rejected',
-    }
+    },
+    SideLeft: {
+        Open: 'modal:side:left:open',
+        Confirmed: 'modal:side:left:confirmed',
+        Rejected: 'modal:side:left:rejected',
+    },
+    SideRight: {
+        Open: 'modal:side:right:open',
+        Clear: 'modal:side:right:clear',
+        Confirmed: 'modal:side:right:confirmed',
+        Rejected: 'modal:side:right:rejected',
+    },
 };
 
 
@@ -197,4 +208,14 @@ export const PopupEvents = {
         Wrn: { Show: 'popup:message:wrn:show' },
         Err: { Show: 'popup:message:err:show' },
     },
+};
+
+export const FeedbackEvents = {
+    Message: {
+        Success: 'feedback:message:success',
+    },
+    Recall: {
+        Success: 'feedback:recall:success',
+    },
+    Error: 'feedback:recall:error'
 };

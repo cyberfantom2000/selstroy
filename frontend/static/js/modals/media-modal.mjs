@@ -25,14 +25,9 @@ export class MediaModal extends Modal {
         this.size = this.element.querySelector('[name="size"]');
         this.link = this.element.querySelector('[name="link"]');
 
-        this.background = this.element.querySelector('[name="background"]');
-        this.closeButton = this.element.querySelector('[name="close-button"]');
         this.imagePlaceholder = this.element.querySelector('[name="image-placeholder"]');
         this.basePlaceholder = this.element.querySelector('[name="base-placeholder"]');
         this.image = this.element.querySelector('img');
-
-        this.background.onclick = () => this.reject();
-        this.closeButton.onclick = () => this.reject();
 
         this.bus.on(ModalEvents.Media.Open, (payload) => {
             this.update(payload);

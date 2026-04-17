@@ -1,33 +1,44 @@
-import { CarouselConfig, ImageCarousel } from '../../components/carousel.mjs';
-import { ProjectsPreviewConfig, ProjectsPreview } from '../projects/projectpreview.mjs';
-import { requestAllPromos } from '../api/promotion.mjs';
-import { requestAllProjectsShortDescription } from '../../api/project.mjs';
+import { registry, bus } from "./base.mjs";
+
+import { PopupEvents, PromoEvents } from "../../core/events.mjs";
+
+import { PromoApi } from "../../api/promo.mjs";
+import { PromoStore } from "../../store/promo.mjs";
+
+import { ImageCarousel } from "../../components/carousel.mjs";
+
+
+function createPromoCarousel(registry, bus) {
+    try {
+        registry.register('carousel-dot-template', '#carousel-dot-template');
+        registry.register('carousel-slide-template', '#carousel-slide-template');
+        registry.register('promo-carousel-container', '#promo-carousel');
+        const carousel = new ImageCarousel({container: registry.get('promo-carousel-container'), registry: registry});
+
+        bus.on(PromoEvents.Update, (items) => {
+            const slides = items.map((el) => {
+                return { url: el.imageUrl, href: '/promo' };
+            });
+
+            carousel.clear();
+            carousel.append(slides);
+            carousel.play(10);
+        });
+
+        bus.on(PromoEvents.Error, (err) => {
+            console.log(err);
+            bus.emit(PopupEvents.Message.Err.Show, 'Не получилось загрузить акции. Обновите страницу или игнорируйте это сообщение');
+        });
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 
 document.addEventListener("DOMContentLoaded", () => {
-    const promo_carousel_config = new CarouselConfig({
-        async_loader: requestAllPromos,
-        image_field: 'image',
-        ref_field: '/promo',
-        one_ref: true,
-        with_buttons: false,
-        img_as_ref: true,
-        auto_play: true,
-        auto_play_interval_secs: 15,
-        retry_interval_secs: 5
-    });
+    const promoApi = new PromoApi();
+    const promoStore = new PromoStore({api: promoApi, bus: bus});
 
-    const promo_carousel = new ImageCarousel({
-        config: promo_carousel_config, 
-        container_id: 'promo-carousel'
-    });
-
-    const projects_preview_config = new ProjectsPreviewConfig({
-        async_loader: requestAllProjectsShortDescription,
-        retry_interval_secs: 5
-    });
-
-    const projects_preview = new ProjectsPreview({
-        config: projects_preview_config,
-        container_id: 'projects-container'
-    });
+    const carousel = createPromoCarousel(registry, bus);
+    promoStore.load();
 });

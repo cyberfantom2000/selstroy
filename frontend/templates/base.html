@@ -107,7 +107,7 @@
 
         {% endblock %}
 
-        <div class="fixed inset-0 z-50 overflow-hidden hidden" id="modal-left">
+        <div class="fixed inset-0 z-50 overflow-hidden hidden" id="left-side-modal">
             <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" name="background"></div>
             
             <div class="fixed inset-y-0 left-0 flex max-w-full">
@@ -133,7 +133,7 @@
             </div>
         </div>
 
-        <div class="fixed inset-0 z-50 overflow-hidden hidden" id="modal-right">
+        <div class="fixed inset-0 z-50 overflow-hidden hidden" id="right-side-modal">
             <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" name="background"></div>
             
             <div class="fixed inset-y-0 right-0 flex max-w-full">
@@ -150,15 +150,18 @@
                         </div>
                     </div>
                     <div class="flex flex-col gap-2 p-4">
-                        <input type="text" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl" placeholder="Ваше имя*" name="name">
-                        <input type="email" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl" placeholder="E-mail*" name="email">
-                        <input type="text" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl" placeholder="Тема*" name="subject">
-                        <textarea class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl min-h-64 resize-none" placeholder="Ваше сообщение"></textarea>
+                        <input name="name" type="text" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl" placeholder="Ваше имя*">
+                        <input name="email" type="email" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl" placeholder="E-mail*">
+                        <input name="subject" type="text" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl" placeholder="Тема*">
+                        <textarea name="message" class="bg-gray-100 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl min-h-64 resize-none" placeholder="Ваше сообщение"></textarea>
                         <button name="submit" class="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white dark:text-gray-300 dark:hover:text-gray-100 rounded-xl p-2 transition-all active:scale-95">Отправить</button>
                     </div>
                 </div>
                 </div>
             </div>
+        </div>
+
+        <div id="popup-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-3 w-[300px] max-h-[50vh] overflow-hidden">
         </div>
     </main>
 
@@ -166,7 +169,7 @@
         <div class="w-full">
                 <div class="max-w-xl md:max-w-4xl lg:max-w-7xl px-4 py-8 mx-auto">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        <button id="left-menu-button" class="flex justify-between items-center bg-gray-300 hover:bg-gray-320 dark:bg-gray-600 dark:hover:bg-gray-550 rounded-3xl px-3 group">
+                        <button id="left-footer-button" class="flex justify-between items-center bg-gray-300 hover:bg-gray-320 dark:bg-gray-600 dark:hover:bg-gray-550 rounded-3xl px-3 group">
                             <div class="flex flex-col gap-2 p-3 text-left">
                                 <span class="text-gray-800 group-hover:text-black dark:text-gray-200 dark:group-hover:text-gray-100 text-xl">Появились вопросы?</span>
                                 <span class="text-gray-600 group-hover:text-gray-700 dark:text-gray-300 dark:group-hover:text-gray-200 text-lg">Мы перезвоним!</span>
@@ -189,7 +192,7 @@
                             </div>
                         </a>
 
-                        <button id="right-menu-button" class="flex justify-between items-center bg-gray-300 hover:bg-gray-320 dark:bg-gray-600 dark:hover:bg-gray-550 rounded-3xl px-3 group">
+                        <button id="right-footer-button" class="flex justify-between items-center bg-gray-300 hover:bg-gray-320 dark:bg-gray-600 dark:hover:bg-gray-550 rounded-3xl px-3 group">
                             <div class="flex flex-col gap-2 p-3 text-left">
                                 <span class="text-gray-800 group-hover:text-black dark:text-gray-200 dark:group-hover:text-gray-100 text-xl">Есть предложения?</span>
                                 <span class="text-gray-600 group-hover:text-gray-700 dark:text-gray-300 dark:group-hover:text-gray-200 text-lg">Напишите нам!</span>
@@ -218,8 +221,27 @@
             </div>
         </div>
     </footer>
+    
+    <template id="popup-message-template">
+        <div class="w-full shadow-md rounded-xl p-4 relative overflow-hidden transition-all duration-300 ease-in-out opacity-100 translate-y-0">
+            
+            <button name="close-button" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                ✕
+            </button>
+
+            <h3 name="title" class="text-sm font-semibold text-gray-900 dark:text-white">
+            </h3>
+
+            <p name="text" class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+            </p>
+
+            <div class="absolute bottom-0 left-0 h-1 w-full bg-gray-200 dark:bg-gray-700 hidden">
+                <div name="progress-bar" class="h-full bg-blue-500 w-full transition-all duration-300"></div>
+            </div>
+        </div>
+    </template>
  
-    <script type="module" src="static/js/pages/base.mjs"></script>
+    <script type="module" src="static/js/pages/initializers/base.mjs"></script>
     {% block include_js %}
 
     {% endblock %}

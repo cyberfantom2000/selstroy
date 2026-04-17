@@ -76,9 +76,6 @@ export class IFrameViewModal extends Modal {
         this.image = this.element.querySelector('img');
         this.container = this.element.querySelector('[name="iframe-container"]');
 
-        this.element.querySelector('[name="background"]').onclick = () => this.reject();
-        this.element.querySelector('[name="close-button"]').onclick = () => this.reject();
-
         this.bus.on(ModalEvents.IFrameView.Open, (url) => {
             this.update(url);
             this.show();

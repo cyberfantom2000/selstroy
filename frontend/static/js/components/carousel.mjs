@@ -1,173 +1,103 @@
-import { mediaUrl } from "../api/base-urls.mjs";
 import { Timer } from "../utils/timer.mjs";
 
 
-class SlideOptions {
-    constructor({img_src, img_ref = "", btn_link = ""}) {
-        this.img_src = img_src;
-        this.img_ref = img_ref;
-        this.btn_link = btn_link;
-    }
-}
-
 class Slide {
-    constructor(template, options) {
-        this.element = template.content.cloneNode(true);
-        this.element.querySelector('[name="img-ref"]').href = options.img_ref;
-        this.element.querySelector('[name="img"]').src = options.img_src;
-        this.container = this.element.querySelector('[name="slide"]');
+    constructor({registry, data}) {
+        this.element = registry.getTemplate('carousel-slide-template');
+        this.element.querySelector('img').src = data.url;
+        this.element.querySelector('[name="img-ref"]').href = data.href;
+        if (data.btnLink) {
+            const button = this.element.querySelector('[name="button"]');
+            button.classList.remove('hidden');
+            button.href = data.btnLink;
+        }
     }
 }
 
-class SlideWithButton extends Slide{
-    constructor(template, options) {
-        super(template, options);
-
-        this.element.querySelector('[name="btn"]').href = options.btn_link;
-    }
-}
 
 class DotButton {
-    constructor(template) {
-        this.element = template.content.cloneNode(true);
+    constructor(registry) {
+        this.element = registry.getTemplate('carousel-dot-template');
         this.onclick = null;
-
-        this.button = this.element.querySelector('button');
-        this.button.onclick = () => { if (this.onclick) this.onclick(); }
+        this.element.onclick = () => { if (this.onclick) this.onclick(); }
     }
 
     select() {
-        this.button.classList.remove('bg-white/50');
-        this.button.classList.add('bg-white');
+        this.element.classList.remove('bg-white/50');
+        this.element.classList.add('bg-white');
     }
 
     deselect() {
-        this.button.classList.add('bg-white/50');
-        this.button.classList.remove('bg-white');
+        this.element.classList.add('bg-white/50');
+        this.element.classList.remove('bg-white');
     }
 }
 
-export class CarouselConfig {
-    constructor({async_loader, image_field, ref_field, one_ref = false, with_buttons = false, img_as_ref=false, auto_play = false, auto_play_interval_secs = 10, retry_interval_secs = 5}) {
-        this.async_loader = async_loader;
-        this.image_field = image_field;
-        this.ref_field = ref_field;
-        this.one_ref = one_ref;
-        this.with_buttons = with_buttons;
-        this.img_as_ref = img_as_ref;
-        this.auto_play = auto_play;
-        this.auto_play_interval_secs = auto_play_interval_secs;
-        this.retry_interval_secs = retry_interval_secs;
-    }
-}
 
 export class ImageCarousel {
-    constructor({config, container_id}) {
-        this.config = config;
+    constructor({container, registry}) {
+        this.container = container;
+        this.registry = registry;
 
-        let main_container = document.getElementById(container_id);
-        this.slides_track = main_container.querySelector('[name="slides-track"]');
-        this.dots_container = main_container.querySelector('[name="dots-container"]');
-
-        this.dot_template = document.getElementById('carousel-dot-template');
-        this.slide_with_button_template = document.getElementById('carousel-slide-with-button-template');
-        this.slide_without_button_template = document.getElementById('carousel-slide-without-button-template');
-
+        this.slidesTrack = container.querySelector('[name="slides-track"]');
+        this.dotsContainer = container.querySelector('[name="dots-container"]');
+        
         this.slides = [];
-        this.dots = []
-        this.active_index = null;
-        this.play_timer = new Timer({delay: this.config.auto_play_interval_secs * 1000, singleshot: false});
-        this.retry_timer = new Timer({delay: this.config.retry_interval_secs * 1000, singleshot: true});
-
-        this.build_and_show();
+        this.dots = [];
+        this.activeSlideIndex = [];
+        this.timer = null;
     }
 
-    //private methods
-
-    build_and_show() {
-        this.build().then(() => { 
-            this.show_first();
-            if (this.config.auto_play)
-                this.play_timer.start(() => { this.swap_slide(this.active_index + 1) }); 
-        });
+    showFirst() {
+        this.swap(0);
     }
 
-    async build() {
-        try {
-            let items = await this.config.async_loader();
-            for (const item of items) {
-                let slide = this.build_slide(item);
-                this.slides.push(slide);
+    play(delaySecs) {
+        this.showFirst();
 
-                let dot = this.build_dot();
-                this.dots.push(dot);
+        this.timer = new Timer({delay: delaySecs * 1000, singleshot: false});
+        this.timer.start(() => this.swap(this.activeSlideIndex + 1));
+    }
 
-                let slide_index = this.slides.length - 1;
-                dot.onclick = () => { this.swap_slide(slide_index) };
+    append(items) {
+        for (const item of items) {
+            const slide = new Slide({data: item, registry: this.registry});
+            this.slides.push(slide);
+            this.slidesTrack.appendChild(slide.element);
 
-                this.slides_track.appendChild(slide.element);
-                this.dots_container.appendChild(dot.element);
-            }
-        } catch (err) {
-            // TODO post message
-            this.retry_timer.start(() => { this.retry(); });
+            const dot = new DotButton(this.registry);
+            this.dots.push(dot);
+            this.dotsContainer.appendChild(dot.element);
+
+            const slideIndex = this.slides.length - 1;
+            dot.onclick = () => { this.swap(slideIndex); };
         }
     }
 
-    show_first(){
-        if (this.slides.length > 0)
-            this.swap_slide(0);
-    }
-
-    swap_slide(index){
+    swap(index) {
         if (this.slides.length === 0)
             return;
 
-        if (this.active_index !== null)
-            this.dots[this.active_index].deselect();
+        if (this.activeSlideIndex !== null)
+            this.dots[this.activeSlideIndex].deselect();
 
-        this.active_index = index % this.slides.length;
-        this.dots[this.active_index].select();
-        this.slides_track.style.transform = `translateX(-${this.active_index * 100}%)`;
-    }
-
-    build_slide(item) {
-        const href = this.config.one_ref ? this.config.ref_field : item[this.config.ref_field];
-
-        const options = new SlideOptions({
-            img_src: `${mediaUrl}/${item[this.config.image_field].id}`,
-            img_link: this.config.img_as_ref ? href : '',
-            btn_link: this.config.with_buttons ? href : ''
-        });
-
-        if (this.config.with_buttons)
-            return new SlideWithButton(this.slide_with_button_template,  options);
-        else
-            return new Slide(this.slide_without_button_template, options);
-    }
-
-    build_dot() {
-        return new DotButton(this.dot_template);
-    }
-
-    retry() {
-        this.clear();
-        this.build_and_show();
+        this.activeSlideIndex = index % this.slides.length;
+        this.dots[this.activeSlideIndex].select();
+        this.slidesTrack.style.transform = `translateX(-${this.activeSlideIndex * 100}%)`;
     }
 
     clear() {
-        this.play_timer.stop();
-        this.retry_timer.stop();
-        this.active_index = null;
-        
-        while (this.slides_track.firstChild)
-            this.slides_track.removeChild(this.slides_track.firstChild);
+        if (this.timer)
+            this.timer.stop();
 
+        this.activeSlideIndex = null;
         this.slides = [];
-
-        while (this.dots_container.firstChild)
-            this.dots_container.removeChild(this.dots_container.firstChild);
-        
         this.dots = [];
-    }    
+        
+        while (this.slidesTrack.firstChild)
+            this.slidesTrack.removeChild(this.slidesTrack.firstChild);
+
+        while (this.dotsContainer.firstChild)
+            this.dotsContainer.removeChild(this.dotsContainer.firstChild)
+    }
 }

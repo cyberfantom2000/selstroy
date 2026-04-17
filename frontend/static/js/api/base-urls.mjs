@@ -5,3 +5,4 @@ export const promoUrl = '/api/promotion';
 export const apartmentUrl = '/api/apartment';
 export const apartmentImageUrl = '/api/apartment/image';
 export const apartmentElementUrl = '/api/apartment/element';
+export const feedbackUrl = '/api/feedback'

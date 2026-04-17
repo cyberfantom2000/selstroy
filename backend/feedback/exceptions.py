@@ -1,0 +1,3 @@
+
+class SmtpError(Exception):
+    pass

@@ -8,6 +8,7 @@ from ..repository.localstorage import LocalStorage
 from ..repository.managers import ModelManager
 from ..repository.models.common import FileCreate, FilePublic
 
+
 class FileRouter:
     """ File operations router """
     def __init__(self, storage: LocalStorage, manager: ModelManager, *args, **kwargs):

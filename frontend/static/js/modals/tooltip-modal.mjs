@@ -9,9 +9,6 @@ export class TooltipModal extends Modal{
         this.bus = bus;
         this.text = this.element.querySelector('[name="tooltip-text"]');
 
-        this.element.querySelector('[name="background"]').onclick = () => this.reject();
-        this.element.querySelector('[name="close-button"]').onclick = () => this.reject();
-
         this.bus.on(ModalEvents.Tooltip.Open, (payload) => {
             this.update(payload);
             this.show();

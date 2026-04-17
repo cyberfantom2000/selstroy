@@ -3,6 +3,14 @@ export class Modal {
         this.element = modal;
         this.escapeHandler = (event) => { if (event.key === 'Escape') this.reject(); };
 
+        this.background = this.element.querySelector('[name="background"]');
+        this.closeButton = this.element.querySelector('[name="close-button"]');
+        
+        if (this.background)
+            this.background.onclick = () => this.reject();
+        if (this.closeButton)
+            this.closeButton.onclick = () => this.reject();
+
         this.submitClicked = null;
         this.rejectClicked = null;
     }
@@ -43,6 +51,7 @@ export class Modal {
     }
 }
 
+
 export class ModalWithTwoButtons extends Modal{
     constructor(modal) {
         super(modal);
@@ -52,6 +61,5 @@ export class ModalWithTwoButtons extends Modal{
 
         this.submitButton.onclick = () => this.submit();
         this.rejectButton.onclick = () => this.reject();
-        this.element.querySelector('[name="background"]').onclick = () => this.reject();
     }
 }
