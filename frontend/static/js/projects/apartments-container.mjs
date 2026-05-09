@@ -1,61 +1,30 @@
 import { ApartmentItem } from "../apartment/item.mjs";
-import { SoldOutApartmentItem } from "../apartment/sold-out-apartment-item.mjs";
 
 
 export class ApartmentsContainer {
-    constructor({container, apartTemplate, soldOutTemplate}) {
+    constructor({container, registry}) {
         this.container = container;
-        this.apartTemplate = apartTemplate;
-        this.soldOutTemplate = soldOutTemplate;
+        this.registry = registry;
+        this.items = new Map();
     }
 
-    add(appartments) {
-        for (const apartData of appartments) {
-            const item = this.buildItem(apartData);
-            this.container.appendChild(item.fragment);
+    update(apartments) {
+        const newIds = new Set(apartments.map(i => i.id));
+        for (const [id, item] of this.items.entries()) {
+            if (!newIds.has(id)) {
+                item.element.remove();
+                this.items.delete(id);
+            }
         }
-    }
 
-    buildItem(data) {
-        if (data.items.length !== 0)
-            return this.buildApart(data);
-        else
-            return this.buildSoldOut(data);
-    }
+        for (const data of apartments) {
+            if (!this.items.has(data.id)) {
+                const item = new ApartmentItem(this.registry);
+                this.items.set(data.id, item);
+                this.container.appendChild(item.element)
+            }
 
-    buildApart(data) {
-        return new ApartmentItem({ 
-            data: {
-                href: '', // TODO
-                image_id: data.preview_image ? data.preview_image.id : null,
-                type: data.type,
-                square: data.square,
-                items_left: apartData.items.length,
-                min_cost: data.items.reduce((min, next) =>  next.cost < min.cost ? next : min )
-            }, 
-            template: this.apartTemplate 
-        });
-    }
-
-    buildSoldOut(data) {
-        return new SoldOutApartmentItem({
-            data : {
-                href: '', // TODO
-                image_id: data.preview_image ? data.preview_image.id : null
-            },
-            template: this.soldOutTemplate
-        });
-    }
-
-    clear() {
-        while (this.container.firstChild)
-            this.container.removeChild(this.container.firstChild);
-    }
-
-    setVisible(visible) {
-        if (visible)
-            this.container.classList.remove('hidden');
-        else
-            this.container.classList.add('hidden');
+            this.items.get(data.id).update(data);
+        }
     }
 }

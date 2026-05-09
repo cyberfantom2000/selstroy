@@ -11,6 +11,8 @@ import { FeedbackController } from "../base/feedback-controller.mjs";
 import { LeftSideModal, RightSideModal } from "../../modals/side-modal.mjs"
 import { FooterButtons } from "../../elements/base/footer-buttons.mjs";
 
+import { MenuHighlighter } from "../base/menu-highlighter.mjs";
+
 
 function createPopupContainer(bus, registry) {
     try {
@@ -57,6 +59,20 @@ function createFooterButtons(bus, registry) {
     }
 }
 
+function createMenuHighlighter(registry) {
+    try {
+        registry.register('menu-home', '#menu-home');
+        registry.register('menu-projects', '#menu-projects');
+        registry.register('menu-promo', '#menu-promo');
+        registry.register('menu-gallery', '#menu-gallery');
+        registry.register('menu-contacts', '#menu-contacts');
+        return new MenuHighlighter(registry);
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
+
 export const bus = new EventBus();
 export const registry = new DomRegistry();
 
@@ -72,4 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const feedbackApi = new FeedbackApi();
     const feedbackStore = new FeedbackStore({api: feedbackApi, bus: bus});
     const feedbackController = new FeedbackController({controller: feedbackStore, bus: bus});
+
+    const menuHighlighter = createMenuHighlighter(registry);
 });

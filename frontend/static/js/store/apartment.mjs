@@ -1,4 +1,4 @@
-import { mediaUrl } from "../api/base-urls.mjs";
+import { mediaUrl, apartmentUrl } from "../api/base-urls.mjs";
 import { ApartmentEvents, ModelErrorType } from "../core/events.mjs";
 
 
@@ -33,6 +33,7 @@ function normalizeApartment(data) {
         type: data.type,
         totalFloors: data.total_floors,
         slug: data.slug,
+        url: `${apartmentUrl}/${data.slug}`,
         pdfId: data.pdf ? data.pdf.id : '',
         pdfUrl: data.pdf ? `${mediaUrl}/${data.pdf.id}` : '',
         images: [],

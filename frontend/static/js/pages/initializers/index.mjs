@@ -33,6 +33,8 @@ function createPromoCarousel(registry, bus) {
             console.log(err);
             bus.emit(PopupEvents.Message.Err.Show, 'Не удалось загрузить акции. Попробуйте обновить страницу или возвращайтесь позднее');
         });
+
+        return carousel;
     } catch (err) {
         console.log(err);
     }
@@ -49,6 +51,8 @@ function createProjectsPreviewContainer(registry, bus) {
             console.log(err);
             bus.emit(PopupEvents.Message.Err.Show, 'Не удалось загрузить список проектов. Попробуйте обновить страницу или возвращайтесь позднее');
         });
+
+        return previewContainer;
     } catch (err) {
         console.log(err);
     }

@@ -28,3 +28,21 @@ export function toggleOutlineRed(element, enabled) {
   else
     element.classList.remove('outline-red-400');
 }
+
+export function pretifyCost(value) {
+    const formats = [
+        { divider: 1_000_000_000, suffix: 'млрд' },
+        { divider: 1_000_000, suffix: 'млн' },
+        { divider: 1_000, suffix: 'тыс' },
+    ];
+
+    for (const { divider, suffix } of formats) {
+        if (value >= divider) {
+            const num = value / divider;
+            const rounded = Math.ceil(num * 1000) / 1000;
+            return `${Number(rounded.toFixed(3))} ${suffix}`;
+        }
+    }
+
+    return String(value);
+}

@@ -3,34 +3,56 @@ import { ApartmentsContainer } from "./apartments-container.mjs";
 
 
 export class ProjectGroup {
-    constructor({data, templates}) {
-        this.fragment = templates.group.content.cloneNode(true);
-        this.projectContainer = this.fragment.querySelector('[name="project-container"]');
-        this.moreButton = this.fragment.querySelector('[name="load-more-btn"]');
+    constructor({registry, bus}) {
+        this.element = registry.getTemplate('project-group-template');
+        this.moreButton = this.element.querySelector('[name="more-button"]');
+        this.apartments = null;
 
-        this.apartsContainer = new ApartmentsContainer({
-            container: this.fragment.querySelector('[name="apartments-container"]'),
-            baseTemplate: templates.apartment,
-            soldOutTemplate: templates.apartmentSoldOut
+        this.project = new ProjectItem(registry);
+        this.apartsContainer = new ApartmentsContainer({ 
+            container: this.element.querySelector('[name="apartments-container"]'),
+            registry: registry 
         });
+        
+        this.element.querySelector('[name="project-container"]').appendChild(this.project.element);
 
-        this.project = new ProjectItem({
-            data: data,
-            baseTemplate: templates.projectItem,
-            tagTemplate: templates.projectTag
-        });
-
-        this.projectContainer.appendChild(this.project.fragment);
-
-        this.update(data);
+        this.moreButton.onclick = () => this.showMoreAppartments();
     }
 
-    update(data) {
+    updateProject(data) {
         this.project.update(data);
+    }
 
-        if (data.apartments) {
-            this.apartsContainer.clear();
-            this.apartsContainer.add(data.apartments);
-        }
+    updateApartments(apartments) {
+        apartments.sort((a, b) => {
+            const aEmpty = a.floors.length === 0;
+            const bEmpty = b.floors.length === 0;
+
+            return aEmpty - bEmpty;
+        });
+
+        this.apartments = apartments;
+
+        const showAllItems = apartments.length < 4;
+
+        this.setMoreButtonVisible(!showAllItems);
+
+        if (showAllItems)
+            this.showApartments(apartments);
+        else
+            this.showApartments(apartments.slice(0, 3));
+    }
+
+    showApartments(apartments) {
+        this.apartsContainer.update(apartments);
+    }
+
+    showMoreAppartments() {
+        this.setMoreButtonVisible(false);
+        this.showApartments(this.apartments);
+    }
+
+    setMoreButtonVisible(visible) {
+        this.moreButton.classList.toggle('hidden', !visible);
     }
 }

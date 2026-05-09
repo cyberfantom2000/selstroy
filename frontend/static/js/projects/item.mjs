@@ -3,6 +3,7 @@ import { TagsContainer } from "./tags-container.mjs";
 
 export class ProjectItem {
     constructor(registry) {
+        this.id = null;
         this.element = registry.getTemplate('project-item-template');
         this.title = this.element.querySelector('[name="title"]');
         this.image = this.element.querySelector('img');
@@ -16,9 +17,10 @@ export class ProjectItem {
     }
 
     update(data) {
+        this.id = data.id;
         this.title.textContent = data.title ?? 'unknown';
         this.image.src = data.previewImage ? data.previewImage.url : '';
-        this.element.href = data.pageRef ?? '#';
+        this.element.href = data.url ?? '#';
 
         if (data.tags) {
             const tags = data.tags.split(',');

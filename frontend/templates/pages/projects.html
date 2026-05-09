@@ -5,8 +5,10 @@
         <div class="max-w-xl md:max-w-4xl lg:max-w-7xl py-4 mx-auto">
             <div class="flex flex-col gap-4 p-4">
                 <h1 class="text-black dark:text-gray-300 text-3xl md:text-4xl lg:text-4xl text-center lg:text-left">Новостройки в Великом Новгороде</h1>
+                <div id="project-group-container" class="flex flex-col gap-4">
+                </div>
                 <!-- dummy -->
-                <div class="flex flex-col gap-2">
+                <!-- <div class="flex flex-col gap-2">
                     <a href="" class="relative h-[200px]">
                         <div name="project-tags-container" class="absolute z-30 left-4 top-4 flex flex-wrap gap-2">
                             <div class="flex items-center bg-black/50 px-2 rounded-xl">
@@ -80,16 +82,18 @@
                     <div class="flex w-full justify-center">
                         <button class="bg-primary-600 hover:bg-primary-500 rounded-3xl text-gray-100 dark:text-gray-300 hover:text-white py-2 px-4 transition-all active:scale-95">Показать еще</button>
                     </div>
-                </div>
+                </div> -->
                 <!-- dummy end -->
             </div>
         </div>
     </div>
 
+    {% include 'components/templates/project-group.html' %}
     {% include 'components/templates/project-item.html' %}
+    {% include 'components/templates/apartment-item.html' %}
 
 {% endblock %}
 
 {% block include_js %}
-
+<script type="module" src="static/js/pages/initializers/projects.mjs"></script>
 {% endblock %}

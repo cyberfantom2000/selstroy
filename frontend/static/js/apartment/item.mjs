@@ -1,27 +1,28 @@
-import { mediaUrl } from "../api/base-urls.mjs";
-
+import { pretifyCost } from "../utils/utils.mjs"
 
 export class ApartmentItem {
-    constructor({data, template}) {
-        this.fragment = template.content.cloneNode(true);
-        this.element = this.fragment.firstElementChild;
+    constructor(registry) {
+        this.element = registry.getTemplate('apartment-item-template');
 
-        this.ref = this.fragment.querySelector('a');
-        this.image = this.fragment.querySelector('img');
-        this.type = this.fragment.querySelector('[name="type"]');
-        this.square = this.fragment.querySelector('[name="square"]');
-        this.itemsLeft = this.fragment.querySelector('[name="items-left"]');
-        this.minCost = this.fragment.querySelector('[name="min-cost"]');
-
-        this.update(data);
+        this.image = this.element.querySelector('img');
+        this.type = this.element.querySelector('[name="type"]');
+        this.square = this.element.querySelector('[name="square"]');
+        this.itemsLeft = this.element.querySelector('[name="items-left"]');
+        this.minCost = this.element.querySelector('[name="min-cost"]');
     }
 
     update(data) {
-        this.ref.href = data.href ?? '';
-        this.image.src = data.image_id ? `${mediaUrl}/${data.image_id}` : '';
-        this.type.textContent = data.type ?? 'unknown';
-        this.square.textContent = data.square ? `${data.square}  м²` : 'unknown';
-        this.itemsLeft.textContent = data.items_left ? `Осталось: ${data.items_left}` : 'unknown';
-        this.minCost.textContent = data.min_cost ? `От ${data.min_cost} ₽` : 'unknown';
+        this.element.href = data.url ?? '#';
+        this.image.src = data.images.length > 0 ? data.images[0].url : '';
+        this.type.textContent = data.type ?? '';
+        this.square.textContent = data.square ? `${data.square}  м²` : '';
+        this.itemsLeft.textContent = data.floors ? `Осталось: ${data.floors.length} кв.` : '';
+
+        if (data.floors.length > 0) {
+            const minCost = Math.min(...data.floors.map(item => item.cost));
+            this.minCost.textContent = `От ${pretifyCost(minCost)}`;
+        } else {
+            this.minCost.textContent = 'Распродано';
+        }
     }
 }
