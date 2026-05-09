@@ -4,9 +4,11 @@ import { isEmpty, toggleOutlineRed } from "../utils/utils.mjs";
 
 
 class SideModal extends Modal {
-    constructor(modal) {
+    constructor(modal, position) {
         super(modal);
+        this.position = position;
 
+        this.panel = this.element.querySelector('[name="panel"]');
         this.element.querySelector('[name="submit"]').onclick = () => this.submit();
     }
 
@@ -14,12 +16,36 @@ class SideModal extends Modal {
         for (const input of this.element.querySelectorAll('input, textarea'))
             toggleOutlineRed(input, false);
     }
+
+    show() {
+        super.show();
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                this.panel.classList.remove(this.position === 'left' ? '-translate-x-full' : 'translate-x-full');
+                this.panel.classList.add('translate-x-0');
+                this.background.classList.remove('opacity-0');
+                this.background.classList.add('opacity-100');
+            });
+        });
+    }
+
+    hide() {
+        this.panel.classList.remove('translate-x-0');
+        this.panel.classList.add(this.position === 'left' ? '-translate-x-full' : 'translate-x-full');
+
+        this.background.classList.remove('opacity-100');
+        this.background.classList.add('opacity-0');
+
+        setTimeout(() => {
+            super.hide();
+        }, 300);
+    }
 }
 
 
 export class LeftSideModal extends SideModal {
     constructor({registry, bus}) {
-        super(registry.get('left-side-modal'));
+        super(registry.get('left-side-modal'), 'left');
         this.bus = bus;
         this.phone = this.element.querySelector('[name="phone"]');
         this.name = this.element.querySelector('[name="name"]');
@@ -49,7 +75,7 @@ export class LeftSideModal extends SideModal {
 
 export class RightSideModal extends SideModal {
     constructor({registry, bus}) {
-        super(registry.get('right-side-modal'));
+        super(registry.get('right-side-modal'), 'right');
         this.bus = bus;
         this.email = this.element.querySelector('[name="email"]');
         this.name = this.element.querySelector('[name="name"]');
