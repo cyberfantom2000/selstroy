@@ -12,7 +12,8 @@ export class AdminPromoItem {
         this.draftButton = this.element.querySelector('[name="draft-button"]');
         this.deleteButton = this.element.querySelector('[name="delete-button"]');
 
-        this.baseItem = new PromoItem({ data: data, registry: registry });
+        this.baseItem = new PromoItem(registry);
+        this.baseItem.update(data);
         this.container.appendChild(this.baseItem.element);
 
         this.editButton.onclick = () => { this.bus.emit(PromoEvents.Request.Edit, this.data); };

@@ -7,39 +7,7 @@
                 <h1 class="text-black dark:text-gray-300 text-3xl md:text-4xl lg:text-4xl text-center lg:text-left">Акции и спецпредложения</h1>
 
                 <div class="flex flex-col gap-4" id="promo-container">
-                    <!-- dummy -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4 rounded-3xl bg-gray-240 dark:bg-gray-840">
-                        <div class="flex-1 w-full h-[300px] md:h-[400px]">{% include 'components/dynamic-image.html' %}</div>
-                        <div class="flex-1 w-full whitespace-pre-line text-black dark:text-gray-300">Удача в квадрате — это скидка на квартиру мечты с ограниченным сроком действия.
-
-                            Каждый месяц мы выбираем одну (или несколько) квартир в наших жилых комплексах и делаем на них специальную скидку.
-
-                            ◾️Предложение действует строго один месяц или до момента продажи квартиры.
-                            ◾️Следите за обновлениями — каждый месяц будут новые объекты и новые цены!
-
-                            В августе в акции участвуют:
-                            ▫️<a href="#" class="text-primary-600 dark:bg-primary-400">2-комнатная квартира в ЖК «Дом на набережной», №103, 64.9 м², 5 этаж</a> — со скидкой 345 000 ₽.
-
-                            Положение об акции «Удача в квадрате»
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4 rounded-3xl bg-gray-240 dark:bg-gray-840">
-                        <div class="flex-1 w-full h-[300px] md:h-[400px]">{% include 'components/dynamic-image.html' %}</div>
-                        <div class="flex-1 w-full whitespace-pre-line text-black dark:text-gray-300"><b>Решайтесь — и получайте выгоду!</b>
-
-                            С 14 по 25 апреля «Новгородсельстрой» дарит скидку 3% на квартиру тем, кто действует быстро.
-
-                            Только для тех, кто не откладывает на потом:
-                            Выбрали квартиру?
-                            Закрепляем за вами
-                            В течение 14 дней подписываете договор
-                            Получаете скидку 3% от полной стоимости — сразу при оформлении!
-                            Спешите — лучшие квартиры уходят первыми!
-                            <a href="#" class="text-primary-600 dark:bg-primary-400">Положение об акции «Скидка за Решительность»</a>
-                        </div>
-                    </div>
-                    <!-- dummy end -->
+                    
                 </div>
             </div>
         </div>
@@ -50,5 +18,5 @@
 {% endblock %}
 
 {% block include_js %}
-
+<script type="module" src="static/js/pages/initializers/promo.mjs"></script>
 {% endblock %}
