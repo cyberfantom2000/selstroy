@@ -1,5 +1,5 @@
-<template id="modal-image-template">
-    <div name="modal-main-container" class="fixed inset-0 z-50 hidden">
+
+    <div id="gallery-preview-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/80 z-30"></div>
 
         <div class="absolute flex top-4 w-full items-center justify-between px-4 z-40">
@@ -15,8 +15,8 @@
             </button>
         </div>
 
-        <div name="prev-button" class="absolute flex top-1/2 -translate-y-1/2 w-full items-center justify-between px-4 z-40">
-            <button class="flex bg-black/20 hover:bg-black/40 h-12 w-12 lg:h-20 lg:w-20 rounded-full items-center justify-center z-40 text-gray-400 hover:text-primary-500">
+        <div class="absolute flex top-1/2 -translate-y-1/2 w-full items-center justify-between px-4 z-40">
+            <button name="prev-button" class="flex bg-black/20 hover:bg-black/40 h-12 w-12 lg:h-20 lg:w-20 rounded-full items-center justify-center z-40 text-gray-400 hover:text-primary-500">
                 <svg class="h-24 w-24">
                     <use href="/static/svg/arrow-left.svg#arrow"></use>
                 </svg>
@@ -35,4 +35,3 @@
             </div>
         </div>
     </div>
-</template>

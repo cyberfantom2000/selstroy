@@ -204,6 +204,12 @@ export const ModalEvents = {
         Confirmed: 'modal:side:right:confirmed',
         Rejected: 'modal:side:right:rejected',
     },
+    ImageGallery: {
+        Open: 'modal:image:gallery:open',
+        Next: 'modal:image:gallery:next',
+        Previous: 'modal:image:gallery:previous',
+        Closed: 'modal:image:gallery:closed'
+    }
 };
 
 
