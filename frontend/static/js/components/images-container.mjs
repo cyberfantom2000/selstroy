@@ -33,7 +33,7 @@ export class ImagesContainer {
     }
 
     createImage() {
-        const image = new EditableImage(this.registry);
+        const image = new EditableImage(this.registry.getTemplate('editable-image-template'));
         image.clicked = (url) => { if (this.imageClicked) this.imageClicked(url); };
         image.editClicked = () => { if(this.imageEditClicked) this.imageEditClicked(image.data); };
         image.removeClicked = () => { if (this.imageRemoveClicked) this.imageRemoveClicked(image.data); };

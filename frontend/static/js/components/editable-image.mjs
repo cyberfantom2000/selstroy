@@ -1,8 +1,8 @@
 
 
 export class EditableImage {
-    constructor(registry) {
-        this.element = registry.getTemplate('editable-image-template');
+    constructor(element) {
+        this.element = element;
 
         this.image = this.element.querySelector('img');
         this.editBtn = this.element.querySelector('[name="edit-button"]');

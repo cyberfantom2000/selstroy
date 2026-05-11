@@ -11,10 +11,6 @@ export class ProjectApi {
         return await requestAllModels(this.requestProjects, fields);
     }
 
-    // export async function requestAllProjectsShortDescription() {
-    //     return await requestAllProjects(['id', 'title', 'square_min', 'square_max', 'preview_image', 'release_date', 'sale_status']);
-    // }
-
     async createProject(data) {
         return await createModel(projectUrl, data);
     }

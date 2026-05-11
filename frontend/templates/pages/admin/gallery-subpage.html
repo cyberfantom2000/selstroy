@@ -1,0 +1,81 @@
+<div id="gallery-subpage" class="flex flex-col w-full h-full p-4 hidden">
+    <div class="flex justify-start">
+        <button id="create-gallery-item-button" class="flex items-center justify-center py-2 text-gray-500 dark:text-gray-400 hover:text-primary-500 peer-checked:text-primary-500">
+            <svg class="h-8 w-8">
+                <use href="/static/svg/plus.svg#icon"></use>
+            </svg>
+            <span>Создать</span>
+        </button>
+    </div>
+    <div id="gallery-items-container" class="flex flex-wrap justify-center gap-4">
+    </div>
+</div>
+
+<div id="gallery-item-modal" class="fixed inset-0 z-50 hidden">
+    <div name="background" class="absolute inset-0 bg-black/50"></div>
+
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="relative w-full max-w-md bg-gray-200 dark:bg-gray-800 rounded-3xl shadow-xl max-h-[90vh] flex flex-col">
+            <div class="p-4 shrink-0">
+                <h2 name="title" class="text-lg font-semibold text-gray-800 dark:text-gray-300"></h2>
+            </div>
+
+            <div class="overflow-y-auto flex-1 p-4">
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">ID</span>
+                            <button role="tooltip" name="id-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <span name="id" class="text-gray-700 dark:text-gray-400 outline-2 outline outline-gray-100 dark:outline-gray-700 px-2 rounded-xl"></span>
+                    </div>
+                    <div class="flex flex-col w-full p-1">
+                        <div class="flex flex-row justify-between">
+                            <span class="text-sm text-gray-800 dark:text-gray-300">ID изображения *</span>
+                            <button role="tooltip" name="image-id-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500">
+                                <svg class="h-4 w-4">
+                                    <use href="/static/svg/question.svg#icon"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <input type="text" name="image-id-input" class="bg-gray-100 text-gray-700 dark:text-gray-400 dark:bg-gray-700 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none px-2 rounded-xl">
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 flex justify-end gap-3">
+                <button name="reject-button" class="bg-gray-300 hover:bg-gray-350  dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-300 rounded-xl p-2 transition-all active:scale-95">
+                    Отменить
+                </button>
+
+                <button name="submit-button" class="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white dark:text-gray-300 dark:hover:text-gray-100 rounded-xl p-2 transition-all active:scale-95">
+                    Подтвердить
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="gallery-item-template">
+    <div class="flex relative aspect-square h-[200px]">
+        <div class="absolute flex flex-row gap-2 p-2 top-2 right-2 bg-gray-700 rounded-3xl z-30">
+            <button name="edit-button" title="Изменить" class="flex items-center justify-center text-gray-400 hover:text-primary-500 active:scale-95">
+                <svg class="h-3 w-3">
+                    <use href="/static/svg/edit.svg#icon"></use>
+                </svg>
+            </button>
+
+            <button name="remove-button" title="Удалить" class="flex items-center justify-center text-gray-400 hover:text-red-500 active:scale-95">
+                <svg class="h-3 w-3">
+                    <use href="/static/svg/trash.svg#icon"></use>
+                </svg>
+            </button>
+        </div>
+
+        {% include 'components/covered-dynamic-image.html' %}
+    </div>
+</template>

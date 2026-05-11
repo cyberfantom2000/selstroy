@@ -1,13 +1,6 @@
 import { mediaUrl, projectUrl } from "../api/base-urls.mjs";
 import { ProjectEvents, ModelErrorType } from "../core/events.mjs";
-
-
-function normalizeImage(data) {
-    return {
-        id: data.id,
-        url: `${mediaUrl}/${data.id}`
-    };
-}
+import { normalizeFile, denormalize } from "./common.mjs";
 
 
 function normalizeProjectDetail(data) {
@@ -19,7 +12,7 @@ function normalizeProjectDetail(data) {
     };
 
     if (data.images)
-        result.images = data.images.map(normalizeImage);
+        result.images = data.images.map(normalizeFile);
 
     return result;
 }
@@ -43,27 +36,17 @@ function normalizeProject(data) {
     };
 
     if (data.preview_image)
-        result.previewImage = normalizeImage(data.preview_image);
+        result.previewImage = normalizeFile(data.preview_image);
 
     if (data.master_plan)
-        result.masterPlaneImage = normalizeImage(data.master_plan);
+        result.masterPlaneImage = normalizeFile(data.master_plan);
 
     if (data.details)
         result.details = data.details.map(normalizeProjectDetail);
 
     if (data.images)
-        result.images = data.images.map(normalizeImage);
+        result.images = data.images.map(normalizeFile);
     
-    return result;
-}
-
-
-function denormalize(data, bindings) {
-    let result = {};
-    for (const [from, to] of Object.entries(bindings)) {
-        if (from in data)
-            result[to] = data[from];
-    }
     return result;
 }
 

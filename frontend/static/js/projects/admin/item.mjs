@@ -77,7 +77,7 @@ export class AdminProjectItem {
             });
         }; 
 
-        this.previewImage = new EditableImage(registry);
+        this.previewImage = new EditableImage(registry.getTemplate('editable-image-template'));
         this.previewImage.setRemoveButtonVisible(false);
         this.element.querySelector('[name="preview-image-container"]').appendChild(this.previewImage.element);
 
@@ -89,7 +89,7 @@ export class AdminProjectItem {
             });
         }; 
 
-        this.masterPlane = new EditableImage(registry);
+        this.masterPlane = new EditableImage(registry.getTemplate('editable-image-template'));
         this.masterPlane.setRemoveButtonVisible(false);
         this.element.querySelector('[name="master-plane-image-container"]').appendChild(this.masterPlane.element);
 

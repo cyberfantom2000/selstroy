@@ -33,6 +33,12 @@ import { ApartmentModal } from "../../modals/apartment-modal.mjs";
 import { ApartmentImageModal } from "../../modals/apartment-image-modal.mjs";
 import { ApartmentFloorModal } from "../../modals/apartment-floor-modal.mjs";
 
+import { GalleryApi } from "../../api/gallery.mjs";
+import { GalleryStore } from "../../store/gallery.mjs";
+import { AdminGalleryController } from "../../gallery/admin/controller.mjs";
+import { AdminGallerySubpage } from "../../gallery/admin/subpage.mjs";
+import { GalleryItemModal } from "../../modals/gallery-item-modal.mjs";
+
 import { SubpageNavigator } from "../subpage-navigator.mjs";
 import { SubpageLoader } from "../subpage-loader.mjs";
 import { SubpageController } from "../subpage-controller.mjs";
@@ -212,7 +218,7 @@ function createProjectsSubpage(bus, registry) {
         registry.register('projects-subpage', '#projects-subpage');
         registry.register('projects-subpage-container', '#projects-container');
         registry.register('create-project-button', '#create-project-button');
-        registry.register('project-group-admintemplate', '#project-group-admintemplate');
+        registry.register('project-group-admin-template', '#project-group-admin-template');
         registry.register('project-item-template', '#project-item-template');
         registry.register('project-item-admin-template', '#admin-project-item-template');
         registry.register('project-tag-template', '#project-tag-template');
@@ -267,10 +273,38 @@ function createApartmentFloorModal(bus, registry) {
 }
 
 
+function createGallerySubpage(bus, registry) {
+    try {
+        registry.register('gallery-subpage', '#gallery-subpage');
+        registry.register('gallery-subpage-container', '#gallery-items-container');
+        registry.register('gallery-item-template', '#gallery-item-template');
+        registry.register('create-gallery-item-button', '#create-gallery-item-button');
+        return new AdminGallerySubpage({registry: registry, bus: bus});
+    } catch (err) {
+        bus.emit(PopupEvents.Message.Err.Show, err);
+        console.log(err);
+        return null;
+    }
+}
+
+
+function createGalleryItemModal(bus, registry) {
+    try {
+        registry.register('gallery-item-modal', '#gallery-item-modal');
+        return new GalleryItemModal({registry: registry, bus: bus});
+    } catch(err) {
+        bus.emit(PopupEvents.Message.Err.Show, err);
+        console.log(err);
+        return null;
+    }
+}
+
+
 function createSubpageNavigator(bus, registry) {
     try {
         registry.register('projects-subpage-button', '#projects-page-button');
         registry.register('promo-subpage-button', '#promo-page-button');
+        registry.register('gallery-subpage-button', '#gallery-page-button');
         registry.register('media-subpage-button', '#media-page-button');
         return new SubpageNavigator(bus);
     } catch (err) {
@@ -315,7 +349,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const projectsStore = new ProjectStore({api: projectsApi, bus: bus});
     const projectsController = new AdminProjectController({bus: bus, store: projectsStore});
 
-
     const apartmentModal = createApartmentModal(bus, registry);
     const apartmentImageModal = createApartmentImageModal(bus, registry);
     const floorModal = createApartmentFloorModal(bus, registry);
@@ -323,14 +356,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const apartmentStore = new ApartmentStore({api: apartmentApi, bus: bus});
     const apartmentController = new AdminApartmentController({bus: bus, store: apartmentStore});
 
+    const galleryItemModal = createGalleryItemModal(bus, registry);
+    const gallerySubpage = createGallerySubpage(bus, registry);
+    const galleryApi = new GalleryApi();
+    const galleryStore = new GalleryStore({api: galleryApi, bus: bus});
+    const galleryController = new AdminGalleryController({bus: bus, store: galleryStore});
+
     const pageNavigator = createSubpageNavigator(bus, registry);
     pageNavigator.bind(registry.get('projects-subpage-button'), projectsSubpage);
     pageNavigator.bind(registry.get('promo-subpage-button'), promoSubpage);
+    pageNavigator.bind(registry.get('gallery-subpage-button'), gallerySubpage);
     pageNavigator.bind(registry.get('media-subpage-button'), mediaSubpage);
 
     const pageLoader = new SubpageLoader(bus);
     pageLoader.bind(promoSubpage, async () => { await promoController.load(); });
     pageLoader.bind(mediaSubpage, async () => { await mediaController.load(); });
+    pageLoader.bind(gallerySubpage, async () => { await galleryController.load(); });
     pageLoader.bind(projectsSubpage, async () => { 
         await projectsController.load();
         await apartmentController.load();

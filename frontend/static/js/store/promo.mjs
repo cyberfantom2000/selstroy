@@ -1,8 +1,9 @@
 import { mediaUrl } from "../api/base-urls.mjs";
 import { PromoEvents, ModelErrorType } from "../core/events.mjs";
+import { denormalize } from "./common.mjs";
 
 
-function normalize(data) {
+function normalizePromo(data) {
     return {
         id: data.id,
         text: data.text,
@@ -13,14 +14,9 @@ function normalize(data) {
 }
 
 
-function denormalize(data) {
-    let result = {};
-    const mapping = {id: 'id', text: 'text', isDraft: 'is_draft', imageId: 'image_id'};
-    for (const [from, to] of Object.entries(mapping)) {
-        if (from in data)
-            result[to] = data[from];
-    }
-    return result;
+function denormalizePromo(data) {
+    const bindings = {id: 'id', text: 'text', isDraft: 'is_draft', imageId: 'image_id'};
+    return denormalize(data, bindings);
 }
 
 
@@ -38,7 +34,7 @@ export class PromoStore {
             const data = await this.api.requestAll();
             if (requestId !== this.requestId) return;
 
-            this.promos = data.map(normalize);
+            this.promos = data.map(normalizePromo);
             this.bus.emit(PromoEvents.Update, this.promos);
         } catch(err) {
             if (requestId !== this.requestId) return;
@@ -49,7 +45,7 @@ export class PromoStore {
 
     async create(data) {
         try {
-            const reply = normalize(await this.api.create(denormalize(data)));
+            const reply = normalizePromo(await this.api.create(denormalizePromo(data)));
             this.promos = [reply, ...this.promos];
             this.bus.emit(PromoEvents.Update, this.promos);
         } catch(err) {
@@ -60,7 +56,7 @@ export class PromoStore {
 
     async update(data) {
         try {
-            const reply = normalize(await this.api.update(denormalize(data)));
+            const reply = normalizePromo(await this.api.update(denormalizePromo(data)));
             const index = this.promos.findIndex(el => reply.id === el.id);
             this.promos[index] = reply;
             this.bus.emit(PromoEvents.Update, this.promos);

@@ -1,8 +1,9 @@
 import { mediaUrl, apartmentUrl } from "../api/base-urls.mjs";
 import { ApartmentEvents, ModelErrorType } from "../core/events.mjs";
+import { denormalize } from "./common.mjs";
 
 
-function normalizeImage(data) {
+function normalizeApartmentImage(data) {
     return {
         id: data.id,
         apartmentId: data.apartment_id,
@@ -41,7 +42,7 @@ function normalizeApartment(data) {
     };
 
     if (data.images)
-        result.images = data.images.map(normalizeImage);
+        result.images = data.images.map(normalizeApartmentImage);
 
     if (data.items)
         result.floors = data.items.map(normalizeFloor);
@@ -50,17 +51,7 @@ function normalizeApartment(data) {
 }
 
 
-function denormalize(data, bindings) {
-    let result = {};
-    for (const [from, to] of Object.entries(bindings)) {
-        if (from in data)
-            result[to] = data[from];
-    }
-    return result;
-}
-
-
-function denormalizeImage(data) {
+function denormalizeApartmentImage(data) {
     const bindings = {id: 'id',  apartmentId: 'apartment_id', category: 'category', imageId: 'image_id'};
     return denormalize(data, bindings);
 }
@@ -151,7 +142,7 @@ export class ApartmentStore {
 
     async createImage(data) {
         try {
-            const reply = normalizeImage(await this.api.createImage(denormalizeImage(data)));
+            const reply = normalizeApartmentImage(await this.api.createImage(denormalizeApartmentImage(data)));
             let apartment = this.findApartment(reply.apartmentId);
             apartment.images = [...apartment.images, reply];
             this.bus.emit(ApartmentEvents.Update, apartment.projectId, this.apartments.get(apartment.projectId));
@@ -163,7 +154,7 @@ export class ApartmentStore {
 
     async updateImage(data) {
         try {
-            const reply = normalizeImage(await this.api.updateImage(denormalizeImage(data)));
+            const reply = normalizeApartmentImage(await this.api.updateImage(denormalizeApartmentImage(data)));
             const apartment = this.findApartment(reply.apartmentId);
             const index = apartment.images.findIndex(el => el.id === reply.id);
             apartment.images[index] = reply;

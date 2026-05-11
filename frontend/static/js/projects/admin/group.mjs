@@ -7,7 +7,7 @@ export class AdminProjectGroup {
     constructor({ registry, bus }) {    
         this.registry = registry;
         this.bus = bus;
-        this.element = registry.getTemplate('project-group-admintemplate');
+        this.element = registry.getTemplate('project-group-admin-template');
 
         this.project = new AdminProjectItem({registry: registry, bus: bus});
         this.element.querySelector('[name="project-container"]').appendChild(this.project.element);

@@ -20,6 +20,7 @@ from .repository.models.apartment import *
 from .repository.managers import *
 from .repository.models.promotion import *
 from .repository.models.common import *
+from .repository.models.gallery import *
 from .repository.database import AsyncRepository
 from .repository.localstorage import LocalStorage
 from .repository.redis import RedisLocal, RedisRemote, RedisFacade
@@ -58,6 +59,9 @@ def register(app, lifespan) -> None:
                 (PromotionManager(Promotion, repo),
                  ModelCollection(public=PromotionPublic, create=PromotionCreate, update=PromotionUpdate),
                  {'prefix': '/api/promotion', 'tags': ['Promotion']}),
+                (ModelManager(GalleryItem, repo),
+                 ModelCollection(public=GalleryItemPublic, create=GalleryItemCreate, update=GalleryItemUpdate),
+                 {'prefix': '/api/gallery', 'tags': ['Gallery']}),
                 ]
 
     routers = [create_model_router(manager, collection, **kwargs) for manager, collection, kwargs in elements]

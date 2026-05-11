@@ -106,6 +106,19 @@ export const ApartmentEvents = {
 };
 
 
+export const GalleryEvents = {
+    Request: {
+        Open: 'gallery:item:open:request',
+        Create: 'gallery:item:create:request',
+        Edit: 'gallery:item:edit:request',
+        Remove: 'gallery:item:remove:request'
+    },
+    Update: 'gallery:update',
+    Clear: 'gallery:clear',
+    Error: 'gallery:error',
+};
+
+
 export const ModelErrorType = {
     Load: 'load',
     Create: 'create',
@@ -175,6 +188,11 @@ export const ModalEvents = {
         Confirmed: 'modal:apartment:image:confirmed',
         Rejected: 'modal:apartment:image:rejected',
     },
+    GalleryItem: {
+        Open: 'modal:gallery:item:open',
+        Confirmed: 'modal:gallery:item:confirmed',
+        Rejected: 'modal:gallery:item:rejected',
+    },
     SideLeft: {
         Open: 'modal:side:left:open',
         Confirmed: 'modal:side:left:confirmed',
@@ -209,6 +227,7 @@ export const PopupEvents = {
         Err: { Show: 'popup:message:err:show' },
     },
 };
+
 
 export const FeedbackEvents = {
     Message: {
