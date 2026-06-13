@@ -3,12 +3,14 @@ export class GalleryItem {
         this.element = registry.getTemplate('gallery-item-template');
         this.image = this.element.querySelector('img');
         this.url = null;
+        this.id = null;
 
         this.clicked = null;
         this.image.onclick = () => { if (this.clicked) { this.clicked(this.url); } };
     }
 
     update(data) {
+        this.id = data.id;
         this.url = data.image.url;
         this.image.src = this.url;
     }

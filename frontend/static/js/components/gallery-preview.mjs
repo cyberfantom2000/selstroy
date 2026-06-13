@@ -6,25 +6,27 @@ export class GalleryPreview extends Modal {
     constructor({registry, bus}) {
         super(registry.get('gallery-preview-modal'));
         this.bus = bus;
-        this.url = null;
+        this.payload = {};
 
         this.nextButton = this.element.querySelector('[name="next-button"]');
         this.prevButton = this.element.querySelector('[name="prev-button"]');
         this.image = this.element.querySelector('img');
 
-        this.bus.on(ModalEvents.ImageGallery.Open, (url) => {
-            this.update(url)
+        this.bus.on(ModalEvents.ImageGallery.Open, (url, payload) => {
+            this.update(url, payload)
             this.show();
         });
 
-        this.nextButton.onclick = () => this.bus.emit(ModalEvents.ImageGallery.Next, this.url);
-        this.nextButton.onclick = () => this.bus.emit(ModalEvents.ImageGallery.Previous, this.url);
+        this.nextButton.onclick = () => {
+            this.bus.emit(ModalEvents.ImageGallery.Next, this.payload)
+        };
+        this.prevButton.onclick = () => this.bus.emit(ModalEvents.ImageGallery.Previous, this.payload);
 
-        this.rejectClicked = () => this.update('');
+        this.rejectClicked = () => this.update('', {});
     }
 
-    update(url) {
-        this.url = url;
+    update(url, payload) {
+        this.payload = {url: url, ...payload}
         this.image.src = url;
     }
 }
