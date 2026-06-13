@@ -17,9 +17,7 @@ export class GalleryPreview extends Modal {
             this.show();
         });
 
-        this.nextButton.onclick = () => {
-            this.bus.emit(ModalEvents.ImageGallery.Next, this.payload)
-        };
+        this.nextButton.onclick = () => this.bus.emit(ModalEvents.ImageGallery.Next, this.payload);
         this.prevButton.onclick = () => this.bus.emit(ModalEvents.ImageGallery.Previous, this.payload);
 
         this.rejectClicked = () => this.update('', {});
