@@ -1,10 +1,10 @@
-import { feedbackUrl } from "./base-urls.mjs";
+import { ApiUrls } from "./base-urls.mjs";
 import { makeErrorMessage } from "./model.mjs";
 
 
 export class FeedbackApi {
     async sendMessage(data) {
-        const resp = await fetch(`${feedbackUrl}/message`, {
+        const resp = await fetch(`${ApiUrls.feedback}/message`, {
             method: "POST",
             body: JSON.stringify(data),
             headers: {
@@ -22,7 +22,7 @@ export class FeedbackApi {
     }
 
     async sendRecall(data) {
-        const resp = await fetch(`${feedbackUrl}/recall`, {
+        const resp = await fetch(`${ApiUrls.feedback}/recall`, {
             method: "POST",
             body: JSON.stringify(data),
             headers: {

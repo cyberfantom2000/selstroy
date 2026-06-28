@@ -1,10 +1,10 @@
 import { requestModels, requestAllModels, createModel, removeModel, updateModel } from "./model.mjs";
-import { projectUrl, projectDetailsUrl } from "./base-urls.mjs";
+import { ApiUrls } from "./base-urls.mjs";
 
 
 export class ProjectApi {
     async requestProjects(limit=100, offset=0, fields=[]) {
-        return await requestModels(projectUrl, limit, offset, fields);
+        return await requestModels(ApiUrls.project, limit, offset, fields);
     }
 
     async requestAllProjects(fields=[]) {
@@ -12,26 +12,26 @@ export class ProjectApi {
     }
 
     async createProject(data) {
-        return await createModel(projectUrl, data);
+        return await createModel(ApiUrls.project, data);
     }
 
     async removeProject(id) {
-        return await removeModel(projectUrl, id);
+        return await removeModel(ApiUrls.project, id);
     }
 
     async updateProject(data) {
-        return await updateModel(projectUrl, data);
+        return await updateModel(ApiUrls.project, data);
     }
 
     async createProjectDetail(data) {
-        return await createModel(projectDetailsUrl, data);
+        return await createModel(ApiUrls.projectDetails, data);
     }
 
     async updateProjectDetail(data) {
-        return await updateModel(projectDetailsUrl, data);
+        return await updateModel(ApiUrls.projectDetails, data);
     }
 
     async removeProjectDetail(id) {
-        return await removeModel(projectDetailsUrl, id);
+        return await removeModel(ApiUrls.projectDetails, id);
     }
 }

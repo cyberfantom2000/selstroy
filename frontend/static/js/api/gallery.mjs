@@ -1,10 +1,10 @@
 import { requestModels, requestAllModels, removeModel, createModel, updateModel } from "./model.mjs";
-import { galleryUrl } from "./base-urls.mjs";
+import { ApiUrls } from "./base-urls.mjs";
 
 
 export class GalleryApi {
     async requestItems(limit=100, offset=0, fields=[]) {
-        return await requestModels(galleryUrl, limit, offset, fields);
+        return await requestModels(ApiUrls.gallery, limit, offset, fields);
     }
 
     async requestAllItems(fields=[]) {
@@ -12,14 +12,14 @@ export class GalleryApi {
     }
 
     async createItem(data) {
-        return await createModel(galleryUrl, data);
+        return await createModel(ApiUrls.gallery, data);
     }
 
     async updateItem(data) {
-        return await updateModel(galleryUrl, data);
+        return await updateModel(ApiUrls.gallery, data);
     }
 
     async removeItem(id) {
-        return await removeModel(galleryUrl, id);
+        return await removeModel(ApiUrls.gallery, id);
     }
 }

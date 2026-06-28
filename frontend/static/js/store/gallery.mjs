@@ -1,4 +1,3 @@
-import { mediaUrl } from "../api/base-urls.mjs";
 import { GalleryEvents, ModelErrorType } from "../core/events.mjs";
 import { normalizeFile, denormalize } from "./common.mjs";
 

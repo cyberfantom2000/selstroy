@@ -1,10 +1,10 @@
-import { mediaUrl } from "../api/base-urls.mjs";
+import { ApiUrls } from "../api/base-urls.mjs";
 
 
 export function normalizeFile(data) {
     return {
         id: data.id,
-        url: `${mediaUrl}/${data.id}`
+        url: `${ApiUrls.media}/${data.id}`
     };
 }
 

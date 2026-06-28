@@ -1,4 +1,4 @@
-import { mediaUrl } from "../api/base-urls.mjs";
+import { ApiUrls } from "../api/base-urls.mjs";
 import { MediaEvents, MediaErrorType, PopupEvents, ModelErrorType } from "../core/events.mjs";
 
 
@@ -13,10 +13,10 @@ function normalize(data) {
         name: data.name,
         ext: data.ext,
         isImage: isImageExt(data.ext),
-        url: `${mediaUrl}/${data.id}`,
+        url: `${ApiUrls.media}/${data.id}`,
         size: data.size,
         fullName: `${data.name}.${data.ext}`,
-        absoluteUrl: window.location.origin + `${mediaUrl}/${data.id}`
+        absoluteUrl: window.location.origin + `${ApiUrls.media}/${data.id}`
     };
 }
 

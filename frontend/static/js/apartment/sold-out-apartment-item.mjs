@@ -1,4 +1,4 @@
-import { mediaUrl } from "../api/base-urls.mjs";
+import { ApiUrls } from "../api/base-urls.mjs";
 
 
 export class SoldOutApartmentItem {
@@ -14,6 +14,6 @@ export class SoldOutApartmentItem {
 
     update(data) {
         this.ref.href = data.href ?? '';
-        this.image.src = data.image_id ? `${mediaUrl}/${data.image_id}` : '';
+        this.image.src = data.image_id ? `${ApiUrls.media}/${data.image_id}` : '';
     }
 }

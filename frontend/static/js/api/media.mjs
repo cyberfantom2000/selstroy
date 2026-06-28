@@ -1,10 +1,10 @@
 import { requestModels, requestAllModels, removeModel } from "./model.mjs";
-import { mediaUrl } from "./base-urls.mjs";
+import { ApiUrls } from "./base-urls.mjs";
 
 
 export class MediaApi {
     async requestFilesDescriptors(limit=100, offset=0, fields=[]) {
-        return await requestModels(mediaUrl, limit, offset, fields);
+        return await requestModels(ApiUrls.media, limit, offset, fields);
     }
 
     async requestAllFilesDescriptors(fields=[]) {
@@ -15,7 +15,7 @@ export class MediaApi {
         const formData = new FormData();
         formData.append("file", file);
 
-        const resp = await fetch(mediaUrl, {
+        const resp = await fetch(ApiUrls.media, {
             method: 'POST',
             body: formData
         });
@@ -46,6 +46,6 @@ export class MediaApi {
     }
 
     async removeFile(id) {
-        return await removeModel(mediaUrl, id);
+        return await removeModel(ApiUrls.media, id);
     }
 }

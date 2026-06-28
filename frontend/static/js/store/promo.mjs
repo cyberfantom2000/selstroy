@@ -1,4 +1,4 @@
-import { mediaUrl } from "../api/base-urls.mjs";
+import { ApiUrls } from "../api/base-urls.mjs";
 import { PromoEvents, ModelErrorType } from "../core/events.mjs";
 import { denormalize } from "./common.mjs";
 
@@ -8,7 +8,7 @@ function normalizePromo(data) {
         id: data.id,
         text: data.text,
         isDraft: data.is_draft,
-        imageUrl: data.image ? `${mediaUrl}/${data.image.id}` : '',
+        imageUrl: data.image ? `${ApiUrls.media}/${data.image.id}` : '',
         imageId: data.image ? data.image.id : ''
     };
 }

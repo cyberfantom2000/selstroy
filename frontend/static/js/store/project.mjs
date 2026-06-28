@@ -1,4 +1,4 @@
-import { mediaUrl, projectUrl } from "../api/base-urls.mjs";
+import { BaseUrls } from "../api/base-urls.mjs";
 import { ProjectEvents, ModelErrorType } from "../core/events.mjs";
 import { normalizeFile, denormalize } from "./common.mjs";
 
@@ -29,7 +29,7 @@ function normalizeProject(data) {
         releaseDate: data.release_date,
         saleStatus: data.sale_status,
         slug: data.slug,
-        url: `${projectUrl}/${data.slug}`,
+        url: `${BaseUrls.project}/${data.slug}`,
         liveMap: data.live_map,
         details: [],
         images: [],

@@ -1,4 +1,4 @@
-import { mediaUrl, apartmentUrl } from "../api/base-urls.mjs";
+import { ApiUrls, BaseUrls } from "../api/base-urls.mjs";
 import { ApartmentEvents, ModelErrorType } from "../core/events.mjs";
 import { denormalize } from "./common.mjs";
 
@@ -9,7 +9,7 @@ function normalizeApartmentImage(data) {
         apartmentId: data.apartment_id,
         category: data.category,
         imageId: data.image ? data.image.id : '',
-        url: data.image ? `${mediaUrl}/${data.image.id}` : ''
+        url: data.image ? `${ApiUrls.media}/${data.image.id}` : ''
     };
 }
 
@@ -34,9 +34,9 @@ function normalizeApartment(data) {
         type: data.type,
         totalFloors: data.total_floors,
         slug: data.slug,
-        url: `${apartmentUrl}/${data.slug}`,
+        url: `${BaseUrls.apartment}/${data.slug}`,
         pdfId: data.pdf ? data.pdf.id : '',
-        pdfUrl: data.pdf ? `${mediaUrl}/${data.pdf.id}` : '',
+        pdfUrl: data.pdf ? `${ApiUrls.media}/${data.pdf.id}` : '',
         images: [],
         floors: []
     };

@@ -1,10 +1,10 @@
 import { requestModels, requestAllModels, updateModel, createModel, removeModel } from "./model.mjs";
-import { promoUrl } from "./base-urls.mjs";
+import { ApiUrls } from "./base-urls.mjs";
 
 
 export class PromoApi {
     async request(limit=100, offset=0, fields=[]) {
-        return await requestModels(promoUrl, limit, offset, fields);
+        return await requestModels(ApiUrls.promo, limit, offset, fields);
     }
 
     async requestAll(fields=[]) {
@@ -12,14 +12,14 @@ export class PromoApi {
     }
 
     async update(data) {
-        return await updateModel(promoUrl, data);
+        return await updateModel(ApiUrls.promo, data);
     }
 
     async create(data) {
-        return await createModel(promoUrl, data);
+        return await createModel(ApiUrls.promo, data);
     }
     
     async remove(id) {
-        return await removeModel(promoUrl, id);
+        return await removeModel(ApiUrls.promo, id);
     }
 }

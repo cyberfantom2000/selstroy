@@ -14,7 +14,7 @@ export class ProjectPreviewItem {
 
     update(data) {
         this.image.src = data.previewImage ? data.previewImage.url : '';
-        this.href.href = data.pageRef ?? '#';
+        this.href.href = data.url ?? 'unknown';
         this.title.textContent = data.title;
         this.extraTitle.textContent = `Сдача: ${data.releaseDate}`;
 
