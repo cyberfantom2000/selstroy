@@ -25,30 +25,31 @@ export class AdminProjectItem {
         this.description = new AdminProjectDescription(this.element.querySelector('[name="description-container"]'));
 
         this.description.editClicked = () => this.bus.emit(ProjectEvents.Request.Project.Edit, this.data);
-
-        this.carousel = new ImagesContainer({
-            container: this.element.querySelector('[name="carousel-container"]'),
+        
+        this.detailDescription = new AdminProjectDetailsContainer({
+            element: this.element.querySelector('[name="detail-description-container"]'),
             registry: registry
         });
 
-        this.carousel.imageClicked = (url) => this.bus.emit(ProjectEvents.Request.Image.Open, url);
-        this.carousel.imageAddClicked = () => {
+        this.detailDescription.detailEditClicked = (detailData) => this.bus.emit(ProjectEvents.Request.ProjectDetail.Edit, detailData);
+        this.detailDescription.detailImageClicked = (url) => this.bus.emit(ProjectEvents.Request.Image.Open, url);
+        this.detailDescription.detailImageAddClicked = (detailData) => {
             this.bus.emit(ProjectEvents.Request.Image.Create, {
-                context: {...this.data, type: ProjectImageType.Carousel, request: ProjectEvents.Request.Image.Create},
-            });
-        }; 
-        this.carousel.imageEditClicked = (imgData) => {
-            this.bus.emit(ProjectEvents.Request.Image.Edit, {
-                context: {...this.data, type: ProjectImageType.Carousel, request: ProjectEvents.Request.Image.Edit},
-                data: imgData
-            });
-        }; 
-        this.carousel.imageRemoveClicked = (imgData) => {
-            this.bus.emit(ProjectEvents.Request.Image.Remove, {
-                context: {...this.data, type: ProjectImageType.Carousel},
-                data: imgData
+                context: {...detailData, type: ProjectImageType.Description, request: ProjectEvents.Request.Image.Create}
             });
         };
+        this.detailDescription.detailImageEditClicked = (detailData, imgData) => {
+            this.bus.emit(ProjectEvents.Request.Image.Edit, {
+                context: {...detailData, type: ProjectImageType.Description, request: ProjectEvents.Request.Image.Edit},
+                data: imgData
+            });
+        }; 
+        this.detailDescription.detailImageRemoveClicked = (detailData, imgData) => {
+            this.bus.emit(ProjectEvents.Request.Image.Remove, {
+                context: {...detailData, type: ProjectImageType.Description},
+                data: imgData
+            });
+        }; 
 
         this.details = new AdminProjectDetailsContainer({
             element: this.element.querySelector('[name="details-container"]'),
@@ -114,11 +115,11 @@ export class AdminProjectItem {
         this.data = data;
         this.baseItem.update(data);
         this.description.update(data);
+        this.detailDescription.update([data.description]);
         this.details.update(data.details);
         this.previewImage.update(data.previewImage);
         this.masterPlane.update(data.masterPlaneImage);
         this.liveMap.update(data.liveMap);
-        this.carousel.update(data.images);
         this.setDraftButtonSelect(data.isDraft);
     }
 

@@ -8,9 +8,14 @@ from ..apartment.apartment import Apartment, ApartmentPublic
 from ..common import File, FilePublic
 
 
-class ProjectImageLink(SQLModel, table=True):
+class ProjectDescriptionLink(SQLModel, table=True):
     project_id: UUID | None = Field(default=None, foreign_key='project.id', primary_key=True, ondelete='CASCADE')
-    image_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True, ondelete='CASCADE')
+    detail_id: UUID | None = Field(default=None, foreign_key='projectdetails.id', primary_key=True, ondelete='CASCADE')
+
+
+class ProjectDetailsLink(SQLModel, table=True):
+    project_id: UUID | None = Field(default=None, foreign_key='project.id', primary_key=True, ondelete='CASCADE')
+    detail_id: UUID | None = Field(default=None, foreign_key='projectdetails.id', primary_key=True, ondelete='CASCADE')
 
 
 class ProjectMasterPlanLink(SQLModel, table=True):
@@ -38,16 +43,16 @@ class ProjectBase(SQLModel):
 
 
 class Project(ProjectBase, table=True):
-    images: list[File] = Relationship(back_populates=None, link_model=ProjectImageLink, sa_relationship_kwargs={"lazy": "selectin"})
+    description: ProjectDetails | None = Relationship(back_populates=None, link_model=ProjectDescriptionLink, sa_relationship_kwargs={"lazy": "selectin"})
     master_plan: File | None = Relationship(back_populates=None, link_model=ProjectMasterPlanLink, sa_relationship_kwargs={"lazy": "selectin"})
-    details: list[ProjectDetails] = Relationship(back_populates=None, cascade_delete=True, sa_relationship_kwargs={"lazy": "selectin"})
+    details: list[ProjectDetails] = Relationship(back_populates=None, link_model=ProjectDetailsLink, sa_relationship_kwargs={"lazy": "selectin"})
     apartments: list[Apartment] = Relationship(back_populates=None, cascade_delete=True, sa_relationship_kwargs={"lazy": "selectin"})
     preview_image: File | None = Relationship(back_populates=None, link_model=ProjectPreviewImageLink, sa_relationship_kwargs={"lazy": "selectin"})
 
 
 class ProjectPublic(ProjectBase):
     id: UUID
-    images: list[FilePublic]
+    description: ProjectDetailsPublic | None
     master_plan: FilePublic | None
     details: list[ProjectDetailsPublic]
     apartments: list[ApartmentPublic]
@@ -55,7 +60,6 @@ class ProjectPublic(ProjectBase):
 
 
 class ProjectCreate(ProjectBase):
-    images_ids: list[UUID] | None = None
     master_plan_id: UUID | None = None
     preview_image_id: UUID | None = None
 
@@ -72,6 +76,5 @@ class ProjectUpdate(ProjectBase):
     is_draft: bool | None = None
     floor_svg: str | None = None
     live_map: str | None = None
-    images_ids: list[UUID] | None = None
     master_plan_id: UUID | None = None
     preview_image_id: UUID | None = None

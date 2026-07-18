@@ -18,7 +18,8 @@ export class AdminProjectDetail {
         this.editClicked = null;
         this.removeClicked = null;
         this.editButton.onclick = () => { if (this.editClicked) this.editClicked(); };
-        this.removeButton.onclick = () => { if (this.removeClicked) this.removeClicked(); };
+        if (this.removeButton)
+            this.removeButton.onclick = () => { if (this.removeClicked) this.removeClicked(); };
 
         this.imageClicked = null;
         this.imageAddClicked = null;
@@ -32,8 +33,8 @@ export class AdminProjectDetail {
 
     update(data) {
         this.data = data;
-        this.title.textContent = data.title ?? 'undefined';
-        this.description.innerHTML = data.text ?? 'undefined';
+        this.title.textContent = data.title ?? '';
+        this.description.innerHTML = data.text ?? '';
         this.imagesContainer.update(data.images);
     }
 }

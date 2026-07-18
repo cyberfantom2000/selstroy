@@ -114,11 +114,18 @@ export async function updateModel(baseUrl, data){
     return reply;
 }
 
-export async function queryModels(baseUrl, data) {
-    const resp = await fetch(baseUrl + '/query', {
+export async function queryModels(baseUrl, filters, fields) {
+    let url = baseUrl + '/query';
+    if (fields)
+    {
+        const commaSepFields = fields.join(',');
+        url += '?fields=' + commaSepFields;
+    }
+    
+    const resp = await fetch(url, {
         method: "POST",
-        body: JSON.stringify(data),
-        headers:{
+        body: JSON.stringify(filters),
+        headers: {
             'accept': 'application/json',
             'Content-type': 'application/json'
         }

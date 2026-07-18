@@ -14,22 +14,19 @@ class ProjectDetailsFileLink(SQLModel, table=True):
 class ProjectDetailsBase(SQLModel):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     title: str | None = Field(default=None)
-    text: str
+    text: str | None = Field(default=None)
 
 
 class ProjectDetails(ProjectDetailsBase, table=True):
     images: list[File] = Relationship(back_populates=None, link_model=ProjectDetailsFileLink, sa_relationship_kwargs={"lazy": "selectin"})
-    project_id: UUID | None = Field(default=None, foreign_key='project.id', ondelete='CASCADE')
 
 
 class ProjectDetailsPublic(ProjectDetailsBase):
     images: list[FilePublic]
-    project_id: UUID
 
 
 class ProjectDetailsCreate(ProjectDetailsBase):
     images_ids: list[UUID] | None = None
-    project_id: UUID
 
 
 class ProjectDetailsUpdate(ProjectDetailsBase):

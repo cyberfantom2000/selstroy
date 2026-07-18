@@ -1,4 +1,4 @@
-import { requestModels, requestAllModels, createModel, removeModel, updateModel } from "./model.mjs";
+import { requestModels, requestAllModels, createModel, removeModel, updateModel, queryModels } from "./model.mjs";
 import { ApiUrls } from "./base-urls.mjs";
 
 
@@ -9,6 +9,10 @@ export class ProjectApi {
 
     async requestAllProjects(fields=[]) {
         return await requestAllModels(this.requestProjects, fields);
+    }
+
+    async queryProject(filters=[], fields=[]) {
+        return await queryModels(ApiUrls.project, filters, fields)
     }
 
     async createProject(data) {

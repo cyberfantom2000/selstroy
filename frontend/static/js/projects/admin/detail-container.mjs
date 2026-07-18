@@ -15,7 +15,8 @@ export class AdminProjectDetailsContainer {
         this.detailImageEditClicked = null;
         this.detailImageRemoveClicked = null;
 
-        this.addButton.onclick = () => { if (this.detailAddClicked) this.detailAddClicked(); };
+        if (this.addButton)
+            this.addButton.onclick = () => { if (this.detailAddClicked) this.detailAddClicked(); };
     }
 
     update(details) {

@@ -12,6 +12,6 @@ export const ApiUrls = {
 };
 
 export const BaseUrls = {
-    project: '/project',
-    apartment: '/apartment',
+    projects: '/projects',
+    apartments: '/apartments',
 };

@@ -29,11 +29,13 @@ function normalizeProject(data) {
         releaseDate: data.release_date,
         saleStatus: data.sale_status,
         slug: data.slug,
-        url: `${BaseUrls.project}/${data.slug}`,
+        url: `${BaseUrls.projects}/${data.slug}`,
         liveMap: data.live_map,
         details: [],
-        images: [],
     };
+
+    if (data.description)
+        result.description = normalizeProjectDetail(data.description);
 
     if (data.preview_image)
         result.previewImage = normalizeFile(data.preview_image);
@@ -43,9 +45,6 @@ function normalizeProject(data) {
 
     if (data.details)
         result.details = data.details.map(normalizeProjectDetail);
-
-    if (data.images)
-        result.images = data.images.map(normalizeFile);
     
     return result;
 }
@@ -67,9 +66,6 @@ function denormalizeProject(data) {
                       isDraft: 'is_draft', releaseDate: 'release_date', saleStatus: 'sale_status', slug: 'slug',
                       liveMap: 'live_map'};
     let result = denormalize(data, bindings);
-
-    if (data.images)
-        result.images_ids = data.images.map(el => el.id);
 
     if (data.previewImage)
         result.preview_image_id = data.previewImage.id;
@@ -96,6 +92,29 @@ export class ProjectStore {
             if (requestId !== this.requestId) return;
 
             this.projects = data.map(normalizeProject);
+            this.bus.emit(ProjectEvents.Update, this.projects);
+        } catch(err) {
+            if (requestId !== this.requestId) return;
+            this.bus.emit(ProjectEvents.Error, ModelErrorType.Load, err.toString());
+            console.log(err);
+        }
+    }
+
+    async loadBySlug(slug) {
+        const requestId = ++this.requestId;
+        try {
+            const data = await this.api.queryProject({slug: slug});
+            if (data.length === 0)
+                throw new Error(`Project not found for slug ${slug}`)
+
+            const projectData = normalizeProject(data[0]);
+
+            const index = this.projects.findIndex(el => projectData.id === el.id);
+            if (index === -1)
+                this.projects = [...this.projects, projectData];
+            else
+                this.projects[index] = projectData;
+            
             this.bus.emit(ProjectEvents.Update, this.projects);
         } catch(err) {
             if (requestId !== this.requestId) return;
@@ -176,6 +195,18 @@ export class ProjectStore {
             }
         } catch (err) {
             this.bus.emit(ProjectEvents.Error, ModelErrorType.Remove, err.toString());
+            console.log(err);
+        }
+    }
+
+    async updateDescription(data) {
+        try {
+            const reply = normalizeProjectDetail(await this.api.updateProjectDetail(denormalizeProjectDetail(data)));
+            const project = this.projects.find(el => el.id === reply.projectId);
+            project.description = reply;
+            this.bus.emit(ProjectEvents.Update, this.projects);
+        } catch (err) {
+            this.bus.emit(ProjectEvents.Error, ModelErrorType.Update, err.toString());
             console.log(err);
         }
     }

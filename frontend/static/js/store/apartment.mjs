@@ -34,7 +34,7 @@ function normalizeApartment(data) {
         type: data.type,
         totalFloors: data.total_floors,
         slug: data.slug,
-        url: `${BaseUrls.apartment}/${data.slug}`,
+        url: `${BaseUrls.apartments}/${data.slug}`,
         pdfId: data.pdf ? data.pdf.id : '',
         pdfUrl: data.pdf ? `${ApiUrls.media}/${data.pdf.id}` : '',
         images: [],

@@ -70,7 +70,7 @@ export const ProjectImageType = {
     Preview: 'preview',
     MasterPlan: 'master-plan',
     Detail: 'detail',
-    Carousel: 'carousel',
+    Description: 'description',
 };
 
 

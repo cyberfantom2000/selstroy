@@ -105,10 +105,7 @@ export class AdminProjectController {
 
         /* Modal events */
         this.bus.on(ModalEvents.Confirm.Confirmed, (payload) => {
-            if (payload.type === ProjectImageType.Carousel)
-                this.store.updateProject({id: payload.context.id, images: payload.context.images.filter(el => el.id !== payload.data.id)});
-
-            if (payload.type === ProjectImageType.Detail)
+            if (payload.type === ProjectImageType.Detail || payload.type === ProjectImageType.Description)
                 this.store.updateDetail({id: payload.context.id, images: payload.context.images.filter(el => el.id !== payload.data.id)});
             
             if (payload.type === ProjectEvents.Request.Project.Remove)
@@ -120,18 +117,6 @@ export class AdminProjectController {
 
         this.bus.on(ModalEvents.EditableImage.Confirmed, ({data, context}) => {
             const base = {id: context.id};
-            if (context.type === ProjectImageType.Carousel) {
-                let newImages = [];
-                if (context.request === ProjectEvents.Request.Image.Create)
-                    newImages = [...context.images, data];
-
-                if (context.request === ProjectEvents.Request.Image.Edit) {
-                    const index = context.images.findIndex(el => el.id === context.oldImageId);
-                    newImages = [...context.images.slice(0, index), data, ...context.images.slice(index + 1)];
-                }
-
-                this.store.updateProject({...base, images: newImages});
-            }
 
             if (context.type === ProjectImageType.Preview)
                 this.store.updateProject({...base, previewImage: data});
@@ -139,7 +124,7 @@ export class AdminProjectController {
             if (context.type === ProjectImageType.MasterPlan)
                 this.store.updateProject({...base, masterPlaneImage: data});
 
-            if (context.type === ProjectImageType.Detail) {
+            if (context.type === ProjectImageType.Detail || context.type === ProjectImageType.Description) {
                 let newImages = [];
                 if (context.request === ProjectEvents.Request.Image.Create)
                     newImages = [...context.images, data];
@@ -149,7 +134,10 @@ export class AdminProjectController {
                     newImages = [...context.images.slice(0, index), data, ...context.images.slice(index + 1)];
                 }
 
-                this.store.updateDetail({...base, images: newImages});
+                if (context.type === ProjectImageType.Detail)
+                    this.store.updateDetail({...base, images: newImages});
+                else
+                    this.store.updateDescription({...base, images: newImages});
             }
         });
 

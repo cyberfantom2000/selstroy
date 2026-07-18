@@ -20,7 +20,7 @@ export class ProjectItem {
         this.id = data.id;
         this.title.textContent = data.title ?? 'unknown';
         this.image.src = data.previewImage ? data.previewImage.url : '';
-        this.element.href = data.url ?? '#';
+        this.element.href = data.url ?? '';
 
         if (data.tags) {
             const tags = data.tags.split(',');
