@@ -15,6 +15,9 @@ export class PopupContainer {
     }
 
     addMessage(data) {
+        if (this.alreadyExists(data))
+            return;
+
         const message = new PopupMessage({data: data, registry: this.registry});
         message.closeClicked = () => this.removeMessage(data.context.id);
         message.hover = () => {
@@ -44,5 +47,11 @@ export class PopupContainer {
                 this.messages.delete(id);
             }, 300);
         }
+    }
+
+    alreadyExists(data) {
+        let a = [...this.messages];
+        let b = a.find(([key, value]) => { return key === data.context.id || value.isSameData(data); });
+        return [...this.messages].find(([key, value]) => { return key === data.context.id || value.isSameData(data); });
     }
 }

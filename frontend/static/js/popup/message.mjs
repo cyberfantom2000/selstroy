@@ -19,7 +19,12 @@ export class PopupMessage {
         this.update(data);
     }
 
+    isSameData(data) {
+        return this.data && data && this.data.text === data.text && this.data.title === this.data.title && this.data.context.type === data.context.type;
+    }
+
     update(data) {
+        this.data = data;
         this.title.textContent = data.title;
         this.text.textContent = data.text;
         this.setStyle(data.style);
