@@ -1,11 +1,13 @@
-import { AdminProjectDetail } from "./detail.mjs";
+import { AdminProjectDetail, DetaiItemButtons } from "./detail.mjs";
+
 
 export class AdminProjectDetailsContainer {
-    constructor({element ,registry}) {
+    constructor({element, registry}) {
         this.registry = registry;
         this.container = element.querySelector('[name="items-container"]');
         this.addButton = element.querySelector('[name="add-button"]');
         this.items = new Map();
+        this.removeDisabled = false;
 
         this.detailAddClicked = null;
         this.detailEditClicked = null;
@@ -32,6 +34,7 @@ export class AdminProjectDetailsContainer {
                 this.append(data.id, detail);
             }
             this.items.get(data.id).update(data);
+            this.items.get(data.id).setButtonVisible(DetaiItemButtons.Remove, this.removeDisabled);
         }
     }
 
@@ -54,5 +57,10 @@ export class AdminProjectDetailsContainer {
     remove(id) {
         this.items.get(id).element.remove();
         this.items.delete(id);
+    }
+
+    setRemoveDisable(value) {
+        this.removeHidden = value;
+        this.items.forEach((item) => item.setButtonVisible(DetaiItemButtons.Remove, !this.removeHidden)); 
     }
 }

@@ -30,6 +30,7 @@ export class AdminProjectItem {
             element: this.element.querySelector('[name="detail-description-container"]'),
             registry: registry
         });
+        this.detailDescription.setRemoveDisable(true);
 
         this.detailDescription.detailEditClicked = (detailData) => this.bus.emit(ProjectEvents.Request.ProjectDetail.Edit, detailData);
         this.detailDescription.detailImageClicked = (url) => this.bus.emit(ProjectEvents.Request.Image.Open, url);

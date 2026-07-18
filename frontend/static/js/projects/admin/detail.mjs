@@ -1,5 +1,10 @@
 import { ImagesContainer } from "../../components/images-container.mjs";
 
+export const DetaiItemButtons = {
+    Edit: 'edit',
+    Remove: 'remove'
+};
+
 
 export class AdminProjectDetail {
     constructor(registry) {
@@ -18,8 +23,7 @@ export class AdminProjectDetail {
         this.editClicked = null;
         this.removeClicked = null;
         this.editButton.onclick = () => { if (this.editClicked) this.editClicked(); };
-        if (this.removeButton)
-            this.removeButton.onclick = () => { if (this.removeClicked) this.removeClicked(); };
+        this.removeButton.onclick = () => { if (this.removeClicked) this.removeClicked(); };
 
         this.imageClicked = null;
         this.imageAddClicked = null;
@@ -36,5 +40,14 @@ export class AdminProjectDetail {
         this.title.textContent = data.title ?? '';
         this.description.innerHTML = data.text ?? '';
         this.imagesContainer.update(data.images);
+    }
+
+    setButtonVisible(button, visible) {
+        const buttons = {
+            [DetaiItemButtons.Edit]: this.editButton,
+            [DetaiItemButtons.Remove]: this.removeButton
+        };
+
+        buttons[button].classList.toggle('hidden', !visible);
     }
 }
