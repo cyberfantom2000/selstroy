@@ -1,5 +1,5 @@
 import { ApiUrls } from "./base-urls.mjs";
-import { makeErrorMessage } from "./model.mjs";
+import { extractErrorMessage } from "./model.mjs";
 
 
 export class FeedbackApi {
@@ -13,12 +13,17 @@ export class FeedbackApi {
             }
         });
 
-        const reply = await resp.json();
+        if (!resp.ok) {
+            const error = await extractErrorMessage(resp);
+            throw new Error(error);
+        }
 
-        if (!resp.ok)
-            throw new Error(makeErrorMessage(resp, reply));
-
-        return reply;
+        try {
+            return await resp.json();
+        } catch (err) {
+            console.error('Failed to parse server response:', err);
+            throw new Error('Failed to parse server response');
+        }
     }
 
     async sendRecall(data) {
@@ -31,11 +36,16 @@ export class FeedbackApi {
             }
         });
 
-        const reply = await resp.json();
+        if (!resp.ok) {
+            const error = await extractErrorMessage(resp);
+            throw new Error(error);
+        }
 
-        if (!resp.ok)
-            throw new Error(makeErrorMessage(resp, reply));
-
-        return reply;
+        try {
+            return await resp.json();
+        } catch (err) {
+            console.error('Failed to parse server response:', err);
+            throw new Error('Failed to parse server response');
+        }
     }
 }

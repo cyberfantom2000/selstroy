@@ -1,25 +1,40 @@
-export function makeErrorMessage(resp, reply) {
+export async function extractErrorMessage(resp) {
     const base = `HTTP Error: ${resp.status} ${resp.statusText}`;
 
-    if (reply?.detail) {
-        if (Array.isArray(reply.detail)) {
-            const details = reply.detail
-                .map(err => {
-                    const loc = err.loc ? err.loc.join('.') : 'unknown';
-                    return `Message: ${err.msg}, Type: ${err.type}, Field: ${loc}`;
-                })
-                .join(' | ');
+    if (isJsonContent(resp)) {
+        try {
+            const reply = await resp.json();
 
-            return `${base}, ${details}`;
+            if (reply?.detail) {
+                if (Array.isArray(reply.detail)) {
+                    const details = reply.detail
+                        .map(err => {
+                            const loc = err.loc ? err.loc.join('.') : 'unknown';
+                            return `Message: ${err.msg}, Type: ${err.type}, Field: ${loc}`;
+                        })
+                        .join(' | ');
+
+                    return `${base}, ${details}`;
+                }
+
+                if (typeof reply.detail === 'string')
+                    return `${base}, Message: ${reply.detail}`;
+
+                return `${base}, Details: ${JSON.stringify(reply.detail)}`;
+            }
+        } catch (err) {
+            console.log(err);
         }
-
-        if (typeof reply.detail === 'string')
-            return `${base}, Message: ${reply.detail}`;
-
-        return `${base}, Details: ${JSON.stringify(reply.detail)}`;
     }
 
     return `${base}, Unknown error`;
+    
+}
+
+
+export function isJsonContent(resp) {
+    const contentType = resp.headers.get('content-type');
+    return contentType && contentType.includes('application/json');
 }
 
 
@@ -33,20 +48,17 @@ export async function requestModels(baseUrl, limit=100, offset=0, fields=[]){
         headers: {'accept': 'application/json'}
     });
 
+    if (!resp.ok) {
+        const error = await extractErrorMessage(resp);
+        throw new Error(error);
+    }
+
     try {
-        const reply = await resp.json();
-
-        if (!resp.ok)
-            throw new Error(makeErrorMessage(resp, reply));
-
-       return reply;
+        return await resp.json();
     } catch (err) {
         console.error('Failed to parse server response:', err);
-        if (resp.ok)
-            throw new Error('Failed to parse server response');
-        else
-            throw new Error('Server error: ' + resp.status + '; ' + resp.statusText);
-     }
+        throw new Error('Failed to parse server response');
+    }
 }
 
 export async function requestAllModels(requestFunction, fields=[]){
@@ -72,10 +84,17 @@ export async function removeModel(baseUrl, id){
         headers: { 'accept': 'application/json' }
     });
 
-    const reply = await resp.json();
+    if (!resp.ok) {
+        const error = await extractErrorMessage(resp);
+        throw new Error(error);
+    }
 
-    if (!resp.ok)
-        throw new Error(makeErrorMessage(resp, reply));
+    try {
+        return await resp.json();
+    } catch (err) {
+        console.error('Failed to parse server response:', err);
+        throw new Error('Failed to parse server response');
+    }
 }
 
 export async function createModel(baseUrl, data){
@@ -88,12 +107,17 @@ export async function createModel(baseUrl, data){
         }
     });
 
-    const reply = await resp.json();
+    if (!resp.ok) {
+        const error = await extractErrorMessage(resp);
+        throw new Error(error);
+    }
 
-    if (!resp.ok)
-        throw new Error(makeErrorMessage(resp, reply));
-
-    return reply;
+    try {
+        return await resp.json();
+    } catch (err) {
+        console.error('Failed to parse server response:', err);
+        throw new Error('Failed to parse server response');
+    }
 }
 
 export async function updateModel(baseUrl, data){
@@ -106,12 +130,17 @@ export async function updateModel(baseUrl, data){
         }
     });
 
-    const reply = await resp.json();
+    if (!resp.ok) {
+        const error = await extractErrorMessage(resp);
+        throw new Error(error);
+    }
 
-    if (!resp.ok)
-        throw new Error(makeErrorMessage(resp, reply));
-
-    return reply;
+    try {
+        return await resp.json();
+    } catch (err) {
+        console.error('Failed to parse server response:', err);
+        throw new Error('Failed to parse server response');
+    }
 }
 
 export async function queryModels(baseUrl, filters, fields) {
@@ -131,10 +160,15 @@ export async function queryModels(baseUrl, filters, fields) {
         }
     });
 
-    const reply = await resp.json();
+    if (!resp.ok) {
+        const error = await extractErrorMessage(resp);
+        throw new Error(error);
+    }
 
-    if(!resp.ok)
-        throw new Error(makeErrorMessage(resp, reply));
-
-    return reply;
+    try {
+        return await resp.json();
+    } catch (err) {
+        console.error('Failed to parse server response:', err);
+        throw new Error('Failed to parse server response');
+    }
 }
