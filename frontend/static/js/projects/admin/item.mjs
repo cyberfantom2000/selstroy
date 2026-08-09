@@ -3,8 +3,8 @@ import { ImagesContainer } from "../../components/images-container.mjs";
 import { AdminProjectDetailsContainer } from "./detail-container.mjs";
 import { EditableImage } from "../../components/editable-image.mjs";
 import { EditableIFrame } from "../../components/editable-iframe.mjs";
-import { AdminProjectDescription } from "./description.mjs";
-import { ProjectEvents, ProjectImageType} from "../../core/events.mjs";
+import { AdminProjectParameters } from "./description.mjs";
+import { ProjectEvents, ProjectImageType, ProjectDetailType } from "../../core/events.mjs";
 
 
 export class AdminProjectItem {
@@ -22,30 +22,32 @@ export class AdminProjectItem {
 
         this.baseItem = new ProjectItem(registry);
 
-        this.description = new AdminProjectDescription(this.element.querySelector('[name="description-container"]'));
+        this.parameters = new AdminProjectParameters(this.element.querySelector('[name="description-container"]'));
 
-        this.description.editClicked = () => this.bus.emit(ProjectEvents.Request.Project.Edit, this.data);
+        this.parameters.editClicked = () => this.bus.emit(ProjectEvents.Request.Project.Edit, this.data);
         
-        this.detailDescription = new AdminProjectDetailsContainer({
+        this.description = new AdminProjectDetailsContainer({
             element: this.element.querySelector('[name="detail-description-container"]'),
             registry: registry
         });
-        this.detailDescription.setRemoveDisable(true);
+        this.description.setRemoveDisable(true);
 
-        this.detailDescription.detailEditClicked = (detailData) => this.bus.emit(ProjectEvents.Request.ProjectDetail.Edit, detailData);
-        this.detailDescription.detailImageClicked = (url) => this.bus.emit(ProjectEvents.Request.Image.Open, url);
-        this.detailDescription.detailImageAddClicked = (detailData) => {
+        this.description.detailEditClicked = (detailData) => {
+            this.bus.emit(ProjectEvents.Request.ProjectDetail.Edit, {...detailData, type: ProjectDetailType.Description});
+        };
+        this.description.detailImageClicked = (url) => this.bus.emit(ProjectEvents.Request.Image.Open, url);
+        this.description.detailImageAddClicked = (detailData) => {
             this.bus.emit(ProjectEvents.Request.Image.Create, {
                 context: {...detailData, type: ProjectImageType.Description, request: ProjectEvents.Request.Image.Create}
             });
         };
-        this.detailDescription.detailImageEditClicked = (detailData, imgData) => {
+        this.description.detailImageEditClicked = (detailData, imgData) => {
             this.bus.emit(ProjectEvents.Request.Image.Edit, {
                 context: {...detailData, type: ProjectImageType.Description, request: ProjectEvents.Request.Image.Edit},
                 data: imgData
             });
         }; 
-        this.detailDescription.detailImageRemoveClicked = (detailData, imgData) => {
+        this.description.detailImageRemoveClicked = (detailData, imgData) => {
             this.bus.emit(ProjectEvents.Request.Image.Remove, {
                 context: {...detailData, type: ProjectImageType.Description},
                 data: imgData
@@ -58,7 +60,9 @@ export class AdminProjectItem {
         });
 
         this.details.detailAddClicked = () => this.bus.emit(ProjectEvents.Request.ProjectDetail.Create, {projectId: this.data.id});
-        this.details.detailEditClicked = (detailData) => this.bus.emit(ProjectEvents.Request.ProjectDetail.Edit, detailData);
+        this.details.detailEditClicked = (detailData) => {
+            this.bus.emit(ProjectEvents.Request.ProjectDetail.Edit, {...detailData, type: ProjectDetailType.Detail});
+        };
         this.details.detailRemoveClicked = (detailData) => this.bus.emit(ProjectEvents.Request.ProjectDetail.Remove, detailData);
         this.details.detailImageClicked = (url) => this.bus.emit(ProjectEvents.Request.Image.Open, url);
         this.details.detailImageAddClicked = (detailData) => {
@@ -115,8 +119,8 @@ export class AdminProjectItem {
     update(data) {
         this.data = data;
         this.baseItem.update(data);
-        this.description.update(data);
-        this.detailDescription.update([data.description]);
+        this.parameters.update(data);
+        this.description.update([data.description]);
         this.details.update(data.details);
         this.previewImage.update(data.previewImage);
         this.masterPlane.update(data.masterPlaneImage);

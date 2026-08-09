@@ -2,7 +2,7 @@ from sqlmodel import SQLModel
 
 from .base import ModelManager
 
-from ..models.project import ProjectUpdate, ProjectDetails, ProjectDetailsCreate, ProjectCreate
+from ..models.project import ProjectUpdate, ProjectDetails, ProjectCreate, ProjectDetailsType
 from ..models.common import File
 from ..utils import raise_for_invalid_slug
 
@@ -21,9 +21,12 @@ class ProjectManager(ModelManager):
         if new_model.preview_image_id:
             new_item.preview_image = await self._get_image(session, new_model.preview_image_id)
 
-        new_item.description = await self._create_description(session)
+        if new_model.master_plan_id or new_model.preview_image_id:
+            await self.commit(session)
 
-        await self.commit(session)
+        await self._create_description(session, new_item.id)
+
+        await self.repo.refresh(session, [new_item])
 
         return new_item
 
@@ -34,9 +37,9 @@ class ProjectManager(ModelManager):
         updated_item = await super().update(session, update_model)
 
         if update_model.master_plan_id is not None:
-            updated_item.master_plan = await self._get_image(session, updated_item.master_plan_id)
+            updated_item.master_plan = await self._get_image(session, update_model.master_plan_id)
         if update_model.preview_image_id is not None:
-            updated_item.preview_image = await self._get_image(session, updated_item.preview_image_id)
+            updated_item.preview_image = await self._get_image(session, update_model.preview_image_id)
 
         if update_model.master_plan_id is not None or update_model.preview_image_id is not None:
             updated_item = await super().update(session, updated_item)
@@ -48,8 +51,8 @@ class ProjectManager(ModelManager):
         tmp_manager = ModelManager(File, self.repo)
         return await tmp_manager.get_by_id(session, img_id)
 
-    async def _create_description(self, session) -> SQLModel:
+    async def _create_description(self, session, project_id) -> None:
         """ Create required project description """
         tmp_manager = ModelManager(ProjectDetails, self.repo)
-        description = ProjectDetailsCreate()
-        return await tmp_manager.create(session, description)
+        description = ProjectDetails(project_id=project_id, type=ProjectDetailsType.DESCRIPTION)
+        await tmp_manager.create(session, description)

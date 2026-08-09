@@ -73,6 +73,10 @@ export const ProjectImageType = {
     Description: 'description',
 };
 
+export const ProjectDetailType = {
+    Description: 'description',
+    Detail: 'detail',
+};
 
 export const ProjectIFrameType = {
     LiveMap: 'live-map',

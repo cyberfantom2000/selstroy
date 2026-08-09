@@ -34,7 +34,7 @@ export class AdminProjectDetailsContainer {
                 this.append(data.id, detail);
             }
             this.items.get(data.id).update(data);
-            this.items.get(data.id).setButtonVisible(DetaiItemButtons.Remove, this.removeDisabled);
+            this.items.get(data.id).setButtonVisible(DetaiItemButtons.Remove, !this.removeDisabled);
         }
     }
 
@@ -60,7 +60,7 @@ export class AdminProjectDetailsContainer {
     }
 
     setRemoveDisable(value) {
-        this.removeHidden = value;
-        this.items.forEach((item) => item.setButtonVisible(DetaiItemButtons.Remove, !this.removeHidden)); 
+        this.removeDisabled = value;
+        this.items.forEach((item) => item.setButtonVisible(DetaiItemButtons.Remove, !this.removeDisabled)); 
     }
 }

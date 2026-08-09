@@ -2,20 +2,11 @@
 
 from uuid import UUID, uuid4
 from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import and_
 
-from .details import ProjectDetails, ProjectDetailsPublic
+from .details import ProjectDetails, ProjectDetailsPublic, ProjectDetailsType
 from ..apartment.apartment import Apartment, ApartmentPublic
 from ..common import File, FilePublic
-
-
-class ProjectDescriptionLink(SQLModel, table=True):
-    project_id: UUID | None = Field(default=None, foreign_key='project.id', primary_key=True, ondelete='CASCADE')
-    detail_id: UUID | None = Field(default=None, foreign_key='projectdetails.id', primary_key=True, ondelete='CASCADE')
-
-
-class ProjectDetailsLink(SQLModel, table=True):
-    project_id: UUID | None = Field(default=None, foreign_key='project.id', primary_key=True, ondelete='CASCADE')
-    detail_id: UUID | None = Field(default=None, foreign_key='projectdetails.id', primary_key=True, ondelete='CASCADE')
 
 
 class ProjectMasterPlanLink(SQLModel, table=True):
@@ -43,11 +34,30 @@ class ProjectBase(SQLModel):
 
 
 class Project(ProjectBase, table=True):
-    description: ProjectDetails | None = Relationship(back_populates=None, link_model=ProjectDescriptionLink, sa_relationship_kwargs={"lazy": "selectin"})
-    master_plan: File | None = Relationship(back_populates=None, link_model=ProjectMasterPlanLink, sa_relationship_kwargs={"lazy": "selectin"})
-    details: list[ProjectDetails] = Relationship(back_populates=None, link_model=ProjectDetailsLink, sa_relationship_kwargs={"lazy": "selectin"})
-    apartments: list[Apartment] = Relationship(back_populates=None, cascade_delete=True, sa_relationship_kwargs={"lazy": "selectin"})
-    preview_image: File | None = Relationship(back_populates=None, link_model=ProjectPreviewImageLink, sa_relationship_kwargs={"lazy": "selectin"})
+    description: ProjectDetails | None = Relationship(back_populates=None,
+                                                      cascade_delete=True,
+                                                      sa_relationship_kwargs={
+                                                          'primaryjoin': lambda: and_(
+                                                              Project.id == ProjectDetails.project_id,
+                                                              ProjectDetails.type == ProjectDetailsType.DESCRIPTION
+                                                          ),
+                                                          'lazy': 'selectin',
+                                                          'uselist': False,
+                                                          'overlaps': 'details,project'
+                                                      })
+    details: list[ProjectDetails] = Relationship(back_populates=None,
+                                                 cascade_delete=True,
+                                                 sa_relationship_kwargs={
+                                                     'primaryjoin': lambda: and_(
+                                                         Project.id == ProjectDetails.project_id,
+                                                         ProjectDetails.type == ProjectDetailsType.DETAIL
+                                                     ),
+                                                     'lazy': 'selectin',
+                                                     'overlaps': 'description,project'
+                                                 })
+    master_plan: File | None = Relationship(back_populates=None, link_model=ProjectMasterPlanLink, sa_relationship_kwargs={'lazy': 'selectin'})
+    apartments: list[Apartment] = Relationship(back_populates=None, cascade_delete=True, sa_relationship_kwargs={'lazy': 'selectin'})
+    preview_image: File | None = Relationship(back_populates=None, link_model=ProjectPreviewImageLink, sa_relationship_kwargs={'lazy': 'selectin'})
 
 
 class ProjectPublic(ProjectBase):

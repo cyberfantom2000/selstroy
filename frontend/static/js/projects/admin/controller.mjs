@@ -1,5 +1,5 @@
 import { Timer } from "../../utils/timer.mjs";
-import { ProjectEvents, ModalEvents, PopupEvents, ModelErrorType, ProjectImageType } from "../../core/events.mjs";
+import { ProjectEvents, ModalEvents, PopupEvents, ModelErrorType, ProjectImageType, ProjectDetailType } from "../../core/events.mjs";
 
 
 export class AdminProjectController {
@@ -54,7 +54,7 @@ export class AdminProjectController {
 
         this.bus.on(ProjectEvents.Request.Image.Edit, ({context, data}) => {
             this.bus.emit(ModalEvents.EditableImage.Open, {
-                context: {...context, oldImageId: data.id},
+                context: {...context, oldImageId: data ? data.id : null},
                 data: data
             });
         });
@@ -72,14 +72,14 @@ export class AdminProjectController {
         /* Project details events */
         this.bus.on(ProjectEvents.Request.ProjectDetail.Create, ({projectId}) => {
             this.bus.emit(ModalEvents.ProjectDetail.Open, {
-                title: 'Создать доп. описание проекта',
+                title: 'Создать описание проекта',
                 data: { projectId: projectId }
             });
         });
 
         this.bus.on(ProjectEvents.Request.ProjectDetail.Edit, (data) => {
             this.bus.emit(ModalEvents.ProjectDetail.Open, {
-                title: 'Изменить доп. описание проекта',
+                title: 'Изменить описание проекта',
                 data: data
             });
         });
@@ -88,7 +88,7 @@ export class AdminProjectController {
             this.bus.emit(ModalEvents.Confirm.Open, {
                 type: ProjectEvents.Request.ProjectDetail.Remove,
                 style: 'danger',
-                text: `Вы уверены что хотите удалить доп. описание проекта?`,
+                text: `Вы уверены что хотите удалить описание проекта?`,
                 data: data
             });
         });
@@ -154,10 +154,14 @@ export class AdminProjectController {
         });
 
         this.bus.on(ModalEvents.ProjectDetail.Confirmed, (data) => {
-            if (data.id)
-                this.store.updateDetail(data);
-            else
+            if (data.id) {
+                if (data.type === ProjectDetailType.Description)
+                    this.store.updateDescription(data);
+                else
+                    this.store.updateDetail(data);
+            } else {
                 this.store.createDetail(data);
+            }
         });
     }
 

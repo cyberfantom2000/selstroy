@@ -1,4 +1,4 @@
-export class AdminProjectDescription {
+export class AdminProjectParameters {
     constructor(element) {
         this.title = element.querySelector('[name="title"]');
         this.squareMin = element.querySelector('[name="square-min"]');

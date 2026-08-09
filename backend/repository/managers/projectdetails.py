@@ -2,15 +2,18 @@ from sqlmodel import SQLModel
 
 from .base import ModelManager
 
-from ..models.project import ProjectDetailsUpdate, ProjectDetailsCreate
+from ..models.project import ProjectDetails, ProjectDetailsUpdate, ProjectDetailsCreate, ProjectDetailsType
 from ..models.common import File
+
 
 class ProjectDetailsManager(ModelManager):
     """ ProjectDetails model manager. Override create and update methods for creating links
     to File models from an id
     """
     async def create(self, session, new_model: ProjectDetailsCreate):
-        new_item = await super().create(session, new_model)
+        dump = new_model.model_dump()
+        dump['type'] = ProjectDetailsType.DETAIL
+        new_item = await super().create(session, ProjectDetails(**dump))
 
         if new_model.images_ids:
             new_item = await self._update_images(session, new_item, new_model.images_ids)

@@ -1,7 +1,6 @@
 import uuid
 from uuid import UUID
-from sqlmodel import SQLModel, select
-from sqlalchemy.orm import selectinload, relationship
+from sqlmodel import SQLModel
 
 from ..models.auth import RefreshToken
 from ..models.common.user import User
