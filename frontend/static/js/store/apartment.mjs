@@ -100,7 +100,7 @@ export class ApartmentStore {
     async createApartment(data) {
         try {
             const reply = normalizeApartment(await this.api.createApartment(denormalizeApartment(data)));
-            const projectApartments = [reply, ...(this.apartments.get(reply.projectId))];
+            const projectApartments = [reply, ...(this.apartments.get(reply.projectId) ?? [])];
             this.apartments.set(reply.projectId, projectApartments);
             this.bus.emit(ApartmentEvents.Update, reply.projectId, projectApartments);
         } catch(err) {

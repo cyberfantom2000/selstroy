@@ -26,7 +26,7 @@ class ApartmentManager(ModelManager):
 
         updated_item = await super().update(session, update_model)
 
-        if update_model.pdf_id:
+        if update_model.pdf_id is not None:
             updated_item = await self._update_pdf_field(session, updated_item, update_model.pdf_id)
 
         return updated_item

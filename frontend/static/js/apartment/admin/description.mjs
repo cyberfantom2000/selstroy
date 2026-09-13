@@ -5,7 +5,7 @@ export class AdminApartmentDescription {
         this.type = element.querySelector('[name="type"]');
         this.totalFloors = element.querySelector('[name="total-floors"]');
         this.slug = element.querySelector('[name="slug"]');
-        this.pdfId = element.querySelector('[name="pdf-id"]');
+        this.pdfUrl = element.querySelector('[name="pdf-url"]');
         this.editButton = element.querySelector('[name="edit-button"]');
 
         this.editClicked = null;
@@ -17,6 +17,8 @@ export class AdminApartmentDescription {
         this.type.textContent = data.type ?? '';
         this.totalFloors.textContent = data.totalFloors ?? '';
         this.slug.textContent = data.slug ?? '';
-        this.pdfId.textContent = data.pdf ? data.pdfId : '';
+
+        this.pdfUrl.href = data.pdfUrl ?? '';
+        this.pdfUrl.textContent = data.pdfUrl ? "Карточка PDF" : "Карточка PDF (Не задана)"
     }
 }
