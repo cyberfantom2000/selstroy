@@ -31,6 +31,7 @@ function normalizeProject(data) {
         slug: data.slug,
         url: `${BaseUrls.projects}/${data.slug}`,
         liveMap: data.live_map,
+        floorSvg: data.floor_svg,
         details: [],
     };
 

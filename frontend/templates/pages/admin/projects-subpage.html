@@ -49,24 +49,7 @@
     </div>
 </div>
 
-<div id="image-view-modal" class="fixed inset-0 z-50 hidden">
-    <div name="background" class="absolute inset-0 bg-black/50"></div>
-
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="relative w-full max-w-6xl bg-gray-200 dark:bg-gray-800 rounded-3xl shadow-xl max-h-[90vh] flex flex-col">
-            <div class="flex justify-end p-4 shrink-0">
-                <button name="close-button" class="flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-primary-500 active:scale-95">
-                    <svg class="h-6 w-6">
-                        <use href="/static/svg/x-mark.svg#x"></use>
-                    </svg>
-                </button>
-            </div>
-            <div class="flex justify-center items-center w-full overflow-hidden aspect-video p-4">
-                {% include  'components/dynamic-image.html' %}
-            </div>
-        </div>
-    </div>
-</div>
+{% include 'components/templates/image-view-modal.html' %}
 
 <div id="editable-iframe-modal" class="fixed inset-0 z-50 hidden">
     <div name="background" class="absolute inset-0 bg-black/50"></div>

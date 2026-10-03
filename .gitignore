@@ -211,3 +211,7 @@ __marimo__/
 
 frontend/tailwind/node_modules
 package-lock.json
+
+AGENTS.md
+CLAUDE.md
+.paiw

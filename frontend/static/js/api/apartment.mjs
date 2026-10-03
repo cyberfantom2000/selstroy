@@ -6,7 +6,7 @@ export class ApartmentApi {
     async requestApartments(limit=100, offset=0, fields=[]) {
             return await requestModels(ApiUrls.apartment, limit, offset, fields);
     }
-    
+
     async requestAllApartments(fields=[]) {
         return await requestAllModels(this.requestApartments, fields);
     }

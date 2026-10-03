@@ -1,11 +1,19 @@
 import { Timer } from "../utils/timer.mjs";
+import { ModalEvents } from "../core/events.mjs";
 
 
 class Slide {
     constructor({registry, data}) {
         this.element = registry.getTemplate('carousel-slide-template');
+        this.url = data.url;
         this.element.querySelector('img').src = data.url;
-        this.element.querySelector('[name="img-ref"]').href = data.href;
+
+        const imgRef = this.element.querySelector('[name="img-ref"]');
+        if (data.href)
+            imgRef.href = data.href;
+        else
+            imgRef.removeAttribute('href');
+
         if (data.btnLink) {
             const button = this.element.querySelector('[name="button"]');
             button.classList.remove('hidden');
@@ -34,18 +42,29 @@ class DotButton {
 }
 
 
+let carouselCounter = 0;
+
+
 export class ImageCarousel {
-    constructor({container, registry}) {
+    constructor({container, registry, bus = null, enlarge = false}) {
         this.container = container;
         this.registry = registry;
+        this.bus = bus;
+        this.enlarge = enlarge;
+        this.carouselId = ++carouselCounter;
 
         this.slidesTrack = container.querySelector('[name="slides-track"]');
         this.dotsContainer = container.querySelector('[name="dots-container"]');
-        
+
         this.slides = [];
         this.dots = [];
         this.activeSlideIndex = [];
         this.timer = null;
+
+        if (this.enlarge && this.bus) {
+            this.bus.on(ModalEvents.ImageGallery.Next, (payload) => this.galleryStep(payload, 1));
+            this.bus.on(ModalEvents.ImageGallery.Previous, (payload) => this.galleryStep(payload, -1));
+        }
     }
 
     showFirst() {
@@ -71,6 +90,15 @@ export class ImageCarousel {
 
             const slideIndex = this.slides.length - 1;
             dot.onclick = () => { this.swap(slideIndex); };
+
+            if (this.enlarge && this.bus) {
+                const img = slide.element.querySelector('img');
+                img.classList.add('cursor-pointer');
+                img.onclick = (event) => {
+                    event.preventDefault();
+                    this.bus.emit(ModalEvents.ImageGallery.Open, slide.url, {carousel: this.carouselId, index: slideIndex});
+                };
+            }
         }
     }
 
@@ -86,6 +114,14 @@ export class ImageCarousel {
         this.slidesTrack.style.transform = `translateX(-${this.activeSlideIndex * 100}%)`;
     }
 
+    galleryStep(payload, delta) {
+        if (!payload || payload.carousel !== this.carouselId || this.slides.length === 0)
+            return;
+
+        const next = (payload.index + delta + this.slides.length) % this.slides.length;
+        this.bus.emit(ModalEvents.ImageGallery.Open, this.slides[next].url, {carousel: this.carouselId, index: next});
+    }
+
     clear() {
         if (this.timer)
             this.timer.stop();
@@ -93,7 +129,7 @@ export class ImageCarousel {
         this.activeSlideIndex = null;
         this.slides = [];
         this.dots = [];
-        
+
         while (this.slidesTrack.firstChild)
             this.slidesTrack.removeChild(this.slidesTrack.firstChild);
 
