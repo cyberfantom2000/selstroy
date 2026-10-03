@@ -26,5 +26,9 @@ export class GalleryPreview extends Modal {
     update(url, payload) {
         this.payload = {url: url, ...payload}
         this.image.src = url;
+
+        const navigable = this.payload.navigable !== false;
+        this.nextButton.classList.toggle('hidden', !navigable);
+        this.prevButton.classList.toggle('hidden', !navigable);
     }
 }

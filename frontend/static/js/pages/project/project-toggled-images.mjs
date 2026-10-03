@@ -92,7 +92,7 @@ export class ProjectToggledImages {
         const img = document.createElement('img');
         img.className = 'w-full h-full object-cover cursor-pointer';
         img.src = url ?? '';
-        img.onclick = () => this.bus.emit(ModalEvents.ImageView.Open, url);
+        img.onclick = () => this.bus.emit(ModalEvents.ImageGallery.Open, url, {navigable: false});
 
         content.appendChild(img);
         return panel;

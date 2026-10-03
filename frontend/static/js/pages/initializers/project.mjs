@@ -8,7 +8,6 @@ import { ProjectStore } from "../../store/project.mjs";
 import { ApartmentApi } from "../../api/apartment.mjs";
 import { ApartmentStore } from "../../store/apartment.mjs";
 
-import { ImageViewModal } from "../../modals/image-modal.mjs";
 import { GalleryPreview } from "../../components/gallery-preview.mjs";
 
 import { Project } from "../project/project.mjs";
@@ -70,17 +69,6 @@ function createFilter(registry) {
 }
 
 
-function createImageViewModal(registry, bus) {
-    try {
-        registry.register('image-view-modal', '#image-view-modal');
-        return new ImageViewModal({registry: registry, bus: bus});
-    } catch (err) {
-        console.log(err);
-        return null;
-    }
-}
-
-
 function createGalleryPreview(registry, bus) {
     try {
         registry.register('gallery-preview-modal', '#gallery-preview-modal');
@@ -105,7 +93,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const project = createProject(registry, bus, slug);
     createFilter(registry);
-    createImageViewModal(registry, bus);
     createGalleryPreview(registry, bus);
 
     projectStore.loadBySlug(slug).then(() => {
