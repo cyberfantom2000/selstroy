@@ -4,7 +4,7 @@ from common import settings
 
 
 def custom_openapi(app, exclude_auth_routes: list[str]):
-    """  """
+    """ Customized openapi scheme """
     def generator() -> dict:
         if app.openapi_schema:
             return app.openapi_schema

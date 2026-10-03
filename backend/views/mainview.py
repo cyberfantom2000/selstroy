@@ -8,17 +8,17 @@ class MainViewRouter:
     def __init__(self, *args, **kwargs):
         self.router = APIRouter(*args, **kwargs)
 
-        self.router.add_api_route('/', self.index)
-        self.router.add_api_route('/projects', self.projects)
-        self.router.add_api_route('/projects/{slug}', self.project)
-        self.router.add_api_route('/flats/{slug}', self.flats)
-        self.router.add_api_route('/promo', self.promo)
-        self.router.add_api_route('/gallery', self.gallery)
-        self.router.add_api_route('/contacts', self.contacts)
-        self.router.add_api_route('/about', self.about)
-        self.router.add_api_route('/renovation', self.renovation)
-        self.router.add_api_route('/admin', self.admin)
-        self.router.add_api_route('/{fullpath:path}', self.not_found)
+        self.router.add_api_route('/', self.index, include_in_schema=False)
+        self.router.add_api_route('/projects', self.projects, include_in_schema=False)
+        self.router.add_api_route('/projects/{slug}', self.project, include_in_schema=False)
+        self.router.add_api_route('/flats/{slug}', self.flats, include_in_schema=False)
+        self.router.add_api_route('/promo', self.promo, include_in_schema=False)
+        self.router.add_api_route('/gallery', self.gallery, include_in_schema=False)
+        self.router.add_api_route('/contacts', self.contacts, include_in_schema=False)
+        self.router.add_api_route('/about', self.about, include_in_schema=False)
+        self.router.add_api_route('/renovation', self.renovation, include_in_schema=False)
+        self.router.add_api_route('/admin', self.admin, include_in_schema=False)
+        self.router.add_api_route('/{fullpath:path}', self.not_found, include_in_schema=False)
 
     async def index(self, request: Request) -> HTMLResponse:
         return templates.TemplateResponse(
