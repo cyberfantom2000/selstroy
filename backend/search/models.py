@@ -15,11 +15,11 @@ class ApartmentFiltersRequest(SQLModel):
 class ApartmentFilters(SQLModel):
     projects: list[ProjectDescriptor] = list()
     types: list[str] = list()
-    cost_from: int | None = None
-    cost_to: int | None = None
-    square_from: float | None = None
-    square_to: float | None = None
-    release_years: list[str] = list()
+    cost_min: int | None = None
+    cost_max: int | None = None
+    square_min: float | None = None
+    square_max: float | None = None
+    release_dates: list[str] = list()
     sale_statuses: list[str] = list()
 
 
