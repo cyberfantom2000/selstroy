@@ -8,6 +8,7 @@ from .models import Recall, Message
 
 log = get_logger(settings, 'SMTP')
 
+# TODO: перенсти в файлы
 simple_recall_template = 'Пользователь {name} оставил заявку на обратный звонок. Номер: {phone}'
 html_recall_template = '<html><body><p>Пользователь <b>{name}</b> оставил заявку на обратный звонок. <b>Номер</b>: {phone}</p></body></html>'
 
@@ -29,8 +30,6 @@ html_message_template = """
     </body>
 </html>
 """
-
-
 
 class SmtpClient:
     async def send_recall_request(self, recall: Recall):

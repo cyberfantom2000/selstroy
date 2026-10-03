@@ -56,7 +56,7 @@ class Project(ProjectBase, table=True):
                                                      'overlaps': 'description,project'
                                                  })
     master_plan: File | None = Relationship(back_populates=None, link_model=ProjectMasterPlanLink, sa_relationship_kwargs={'lazy': 'selectin'})
-    apartments: list[Apartment] = Relationship(back_populates=None, cascade_delete=True, sa_relationship_kwargs={'lazy': 'selectin'})
+    apartments: list[Apartment] = Relationship(back_populates='project', cascade_delete=True, sa_relationship_kwargs={'lazy': 'selectin'})
     preview_image: File | None = Relationship(back_populates=None, link_model=ProjectPreviewImageLink, sa_relationship_kwargs={'lazy': 'selectin'})
 
 
