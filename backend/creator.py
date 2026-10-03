@@ -9,7 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from common import settings, get_logger, DatabaseDSN
 
-from .api import create_model_router, ModelCollection, FileRouter, AuthRouter, FeedbackRouter
+from .api import create_model_router, ModelCollection, FileRouter, AuthRouter, FeedbackRouter, SearchRouter
 from .api.middlewares import HttpExceptionMapper, DatabaseSessionMiddleware, OAuthMiddleware
 from .api.openapi import custom_openapi
 from .auth import AuthSystem, Hasher, TokenManager, AuthSecrets, TokenConfig
@@ -25,6 +25,7 @@ from .repository.database import AsyncRepository
 from .repository.localstorage import LocalStorage
 from .repository.redis import RedisLocal, RedisRemote, RedisFacade
 from .feedback import SmtpClient
+from .search import Searcher
 
 from .views import MainViewRouter
 from .views.templates import static_files
@@ -41,19 +42,22 @@ def register(app, lifespan) -> None:
     log.info(f'creating async repository')
     repo = AsyncRepository()
 
+    apartment_manager = ApartmentManager(Apartment, repo)
+    project_manager = ProjectManager(Project, repo)
+
     elements = [(ApartImageManager(ApartImage, repo),
                  ModelCollection(public=ApartImagePublic, create=ApartImageCreate, update=ApartImageUpdate),
                  {'prefix': '/api/apartment/image', 'tags': ['Apartment Image']}),
                 (ModelManager(ApartElement, repo),
                  ModelCollection(public=ApartElementPublic, create=ApartElementCreate, update=ApartElementUpdate),
                  {'prefix': '/api/apartment/element', 'tags': ['Apartment Element']}),
-                (ApartmentManager(Apartment, repo),
+                (apartment_manager,
                  ModelCollection(public=ApartmentPublic, create=ApartmentCreate, update=ApartmentUpdate),
                  {'prefix': '/api/apartment', 'tags': ['Apartment']}),
                 (ProjectDetailsManager(ProjectDetails, repo),
                  ModelCollection(public=ProjectDetailsPublic, create=ProjectDetailsCreate, update=ProjectDetailsUpdate),
                  {'prefix': '/api/project/details', 'tags': ['Project Details']}),
-                (ProjectManager(Project, repo),
+                (project_manager,
                  ModelCollection(public=ProjectPublic, create=ProjectCreate, update=ProjectUpdate),
                  {'prefix': '/api/project', 'tags': ['Project']}),
                 (PromotionManager(Promotion, repo),
@@ -69,6 +73,10 @@ def register(app, lifespan) -> None:
     smtp = SmtpClient()
     feedback_router = FeedbackRouter(smtp, prefix='/api/feedback', tags=['Feedback'])
     routers.append(feedback_router)
+
+    searcher = Searcher(project_manager, apartment_manager)
+    search_router = SearchRouter(searcher, prefix='/api/search', tags=['Search'])
+    routers.append(search_router)
 
     log.info('creating local storage')
     local_storage = LocalStorage(Path(settings.upload_dir))
