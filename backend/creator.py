@@ -119,7 +119,7 @@ def register(app, lifespan) -> None:
     exclude_auth_routes = []
     if settings.with_auth:
         allowed_methods = ['post', 'put', 'patch', 'delete']
-        skip_routers = [feedback_router, auth_router]
+        skip_routers = [feedback_router, auth_router, search_router]
         oauth_allowed_routes = {router.router.prefix: allowed_methods for router in routers if router not in skip_routers}
         log.info('adding oauth middleware')
         app.add_middleware(OAuthMiddleware, auth_system=auth_system, allowed_routes=oauth_allowed_routes)

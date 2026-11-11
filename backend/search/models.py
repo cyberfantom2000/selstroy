@@ -3,17 +3,13 @@ from sqlmodel import SQLModel
 
 from backend.repository.models.apartment import ApartmentPublic
 
-class ProjectDescriptor(SQLModel):
-    id: UUID
-    title: str
-
 
 class ApartmentFiltersRequest(SQLModel):
     projects: list[UUID] | None = None
 
 
 class ApartmentFilters(SQLModel):
-    projects: list[ProjectDescriptor] = list()
+    projects: list[UUID] = list()
     types: list[str] = list()
     cost_min: int | None = None
     cost_max: int | None = None
