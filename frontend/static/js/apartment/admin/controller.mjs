@@ -127,7 +127,7 @@ export class AdminApartmentController {
     }
 
     async load() {
-        await this.store.load();
+        await this.store.load({includeDrafts: true});
     }
 
     onError(type, error) {

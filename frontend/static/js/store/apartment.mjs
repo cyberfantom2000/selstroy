@@ -77,10 +77,12 @@ export class ApartmentStore {
         this.requestId = 0;
     }
 
-    async load() {
+    async load({includeDrafts = false} = {}) {
         const requestId = ++this.requestId;
         try {
-            const data = await this.api.requestAllApartments();
+            const data = includeDrafts
+                ? await this.api.requestAllApartments()
+                : await this.api.queryApartments({is_draft: false});
             if (requestId !== this.requestId) return;
 
             const apartments = data.map(normalizeApartment);

@@ -86,10 +86,12 @@ export class ProjectStore {
         this.requestId = 0;
     }
 
-    async load() {
+    async load({includeDrafts = false} = {}) {
         const requestId = ++this.requestId;
         try {
-            const data = await this.api.requestAllProjects();
+            const data = includeDrafts
+                ? await this.api.requestAllProjects()
+                : await this.api.queryProject({is_draft: false});
             if (requestId !== this.requestId) return;
 
             this.projects = data.map(normalizeProject);

@@ -1,4 +1,4 @@
-import { createModel, removeModel, updateModel, requestModels, requestAllModels } from "./model.mjs";
+import { createModel, removeModel, updateModel, requestModels, requestAllModels, queryModels } from "./model.mjs";
 import { ApiUrls } from "./base-urls.mjs";
 
 
@@ -9,6 +9,10 @@ export class ApartmentApi {
 
     async requestAllApartments(fields=[]) {
         return await requestAllModels(this.requestApartments, fields);
+    }
+
+    async queryApartments(filters={}) {
+        return await queryModels(ApiUrls.apartment, filters);
     }
 
     async createApartment(data) {
