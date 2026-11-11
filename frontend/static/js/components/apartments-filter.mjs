@@ -16,6 +16,20 @@ function clamp(value, min, max) {
 }
 
 
+function apartmentsWord(count) {
+    const mod10 = count % 10;
+    const mod100 = count % 100;
+
+    if (mod10 === 1 && mod100 !== 11)
+        return 'квартиру';
+
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14))
+        return 'квартиры';
+
+    return 'квартир';
+}
+
+
 export class ApartmentsFilter {
     constructor({container, registry, bus}) {
         this.registry = registry;
@@ -29,16 +43,24 @@ export class ApartmentsFilter {
         this.costMaxInput = this.element.querySelector('[name="cost-max-input"]');
         this.costMinRange = this.element.querySelector('[name="cost-min-range"]');
         this.costMaxRange = this.element.querySelector('[name="cost-max-range"]');
+        this.applyButton = this.element.querySelector('[name="apply-button"]');
+        this.resetButton = this.element.querySelector('[name="reset-button"]');
 
         this.costLimitMinM = null;
         this.costLimitMaxM = null;
+        this.resultCount = null;
+        this.loading = false;
 
         this.bindCostControls();
+        this.bindActions();
 
         this.bus.on(SearchEvents.Filters, (projectId, filters) => this.update(filters));
+        this.bus.on(SearchEvents.Result, (projectId, apartments) => this.setResultCount(apartments.length));
+        this.bus.on(SearchEvents.Loading, (loading) => this.setLoading(loading));
 
         this.container = container;
         this.container.appendChild(this.element);
+        this.updateButtonText();
     }
 
     update(filters = {}) {
@@ -123,6 +145,11 @@ export class ApartmentsFilter {
         };
     }
 
+    bindActions() {
+        this.applyButton.onclick = () => this.bus.emit(SearchEvents.Request, this.activeFilters());
+        this.resetButton.onclick = () => this.reset();
+    }
+
     readCostInput(input) {
         const raw = input.value.trim();
         if (raw === '')
@@ -166,5 +193,52 @@ export class ApartmentsFilter {
 
         const clamped = clamp(value, this.costLimitMinM, this.costLimitMaxM);
         return Math.round(clamped * MILLION);
+    }
+
+    setResultCount(count) {
+        this.resultCount = count;
+
+        if (!this.loading)
+            this.updateButtonText();
+    }
+
+    setLoading(loading) {
+        this.loading = loading;
+        this.applyButton.disabled = loading;
+        this.resetButton.disabled = loading;
+        this.applyButton.style.opacity = loading ? '0.5' : '';
+        this.resetButton.style.opacity = loading ? '0.5' : '';
+        this.updateButtonText();
+    }
+
+    updateButtonText() {
+        if (this.loading) {
+            this.applyButton.textContent = 'Ищем...';
+            return;
+        }
+
+        if (this.resultCount === null) {
+            this.applyButton.textContent = 'Показать квартиры';
+            return;
+        }
+
+        this.applyButton.textContent = `Показать ${this.resultCount} ${apartmentsWord(this.resultCount)}`;
+    }
+
+    reset() {
+        for (const input of this.typesContainer.querySelectorAll('input'))
+            input.checked = false;
+
+        this.costMinInput.value = '';
+        this.costMaxInput.value = '';
+
+        if (this.costLimitMinM !== null) {
+            this.costMinRange.value = this.costLimitMinM;
+            this.costMaxRange.value = this.costLimitMaxM;
+        }
+
+        this.resultCount = null;
+        this.updateButtonText();
+        this.bus.emit(SearchEvents.Request, {});
     }
 }

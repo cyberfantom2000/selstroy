@@ -97,11 +97,19 @@ document.addEventListener("DOMContentLoaded", () => {
     createFilter(registry, bus);
     createGalleryPreview(registry, bus);
 
+    let projectId = null;
+
+    bus.on(SearchEvents.Request, (filters) => {
+        if (projectId)
+            apartmentStore.search(projectId, filters);
+    });
+
     projectStore.loadBySlug(slug).then((project) => {
         if (!project)
             return;
 
-        apartmentStore.loadFilters(project.id);
-        apartmentStore.search(project.id, {});
+        projectId = project.id;
+        apartmentStore.loadFilters(projectId);
+        apartmentStore.search(projectId, {});
     });
 });
