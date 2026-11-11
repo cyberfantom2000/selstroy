@@ -20,8 +20,11 @@
                             <input type="number" name="cost-max-input" step="0.1" class="w-14 outline-none bg-transparent no-spin text-black dark:text-gray-300">
                         </div>
                     </div>
-                    <input type="range" name="cost-min-range" step="0.1" class="w-full range-slider bg-transparent appearance-none"/>
-                    <input type="range" name="cost-max-range" step="0.1" class="w-full range-slider bg-transparent appearance-none"/>
+                    <div class="relative h-3 mx-1.5">
+                        <div name="cost-track" style="left: 0; width: 100%" class="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-primary-400"></div>
+                        <input type="range" name="cost-min-range" step="0.1" class="absolute left-0 top-0 h-full w-1/2 range-slider range-slider--bare bg-transparent appearance-none"/>
+                        <input type="range" name="cost-max-range" step="0.1" class="absolute right-0 top-0 h-full w-1/2 range-slider range-slider--bare bg-transparent appearance-none"/>
+                    </div>
                 </div>
             </div>
         </div>

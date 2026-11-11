@@ -152,6 +152,11 @@ export class ApartmentStore {
             return;
         }
 
+        if (!projectId) {
+            this.bus.emit(SearchEvents.Error, ModelErrorType.Load, 'Project id is required for apartment filters');
+            return;
+        }
+
         try {
             const data = await this.searchApi.requestFilters([projectId]);
             const filters = normalizeApartmentFilters(data);
@@ -165,6 +170,11 @@ export class ApartmentStore {
     async search(projectId, filters = {}) {
         if (!this.searchApi) {
             this.bus.emit(SearchEvents.Error, ModelErrorType.Load, 'Search API is not configured');
+            return;
+        }
+
+        if (!projectId) {
+            this.bus.emit(SearchEvents.Error, ModelErrorType.Load, 'Project id is required for apartment search');
             return;
         }
 
