@@ -10,10 +10,9 @@ import { ApartmentStore } from "../../store/apartment.mjs";
 import { SearchApi } from "../../api/search.mjs";
 
 import { GalleryPreview } from "../../components/gallery-preview.mjs";
+import { ApartmentsFilter } from "../../components/apartments-filter.mjs";
 
 import { Project } from "../project/project.mjs";
-import { ApartmentsSearchFilter } from "../project/apartments-filter.mjs";
-import { APARTMENT_TYPES } from "../../apartment/type.mjs";
 
 
 function createProject(registry, bus, slug) {
@@ -54,19 +53,17 @@ function createProject(registry, bus, slug) {
 }
 
 
-function createFilter(registry) {
+function createFilter(registry, bus) {
     try {
         registry.register('apartments-filter-container', '#apartments-filter-container');
         registry.register('apartments-filter-template', '#apartments-filter-template');
         registry.register('apartments-filter-type-template', '#apartments-filter-type-template');
 
-        const filter = new ApartmentsSearchFilter({
+        return new ApartmentsFilter({
+            container: registry.get('apartments-filter-container'),
             registry: registry,
-            types: APARTMENT_TYPES
+            bus: bus,
         });
-
-        registry.get('apartments-filter-container').appendChild(filter.element);
-        return filter;
     } catch (err) {
         console.log(err);
     }
@@ -97,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const slug = segments[segments.length - 1];
 
     const project = createProject(registry, bus, slug);
-    createFilter(registry);
+    createFilter(registry, bus);
     createGalleryPreview(registry, bus);
 
     projectStore.loadBySlug(slug).then((project) => {

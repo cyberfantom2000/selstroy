@@ -1,56 +1,33 @@
 <template id="apartments-filter-template">
     <div class="flex flex-1 flex-col gap-4 py-4 px-2">
         <div class="flex flex-col lg:flex-row gap-2">
-            <div class="flex flex-col gap-1 w-full">
+            <div name="types-block" class="hidden flex flex-col gap-1 w-full">
                 <span class="text-xs text-gray-600 dark:text-gray-500">Количество комнат</span>
                 <div name="types" class="flex flex-row flex-wrap gap-1"></div>
             </div>
 
-            <div class="relative flex flex-col gap-1 w-full">
+            <div name="cost-block" class="hidden flex flex-col gap-1 w-full">
                 <span class="text-xs text-gray-600 dark:text-gray-500">Стоимость, млн ₽</span>
-                <div class="relative flex flex-col bg-gray-300 dark:bg-gray-600 rounded-2xl gap-2 p-2">
+                <div class="flex flex-col bg-gray-300 dark:bg-gray-600 rounded-2xl gap-2 p-2">
                     <div class="flex items-center justify-between gap-2 px-2">
                         <div class="flex items-center gap-1">
                             <span class="text-gray-500 dark:text-gray-400">от</span>
-                            <input type="number" class="w-14 outline-none bg-transparent no-spin text-black dark:text-gray-300">
+                            <input type="number" name="cost-min-input" step="0.1" class="w-14 outline-none bg-transparent no-spin text-black dark:text-gray-300">
                         </div>
                         <span class="text-gray-500 dark:text-gray-400">-</span>
                         <div class="flex items-center gap-1">
                             <span class="text-gray-500 dark:text-gray-400">до</span>
-                            <input type="number" class="w-14 outline-none bg-transparent no-spin text-black dark:text-gray-300">
+                            <input type="number" name="cost-max-input" step="0.1" class="w-14 outline-none bg-transparent no-spin text-black dark:text-gray-300">
                         </div>
                     </div>
-                    <div class="absolute -bottom-2 flex flex-row px-2">
-                        <input type="range" min="0" max="7" step="0.1" class="flex-1 w-full range-slider bg-transparent appearance-none"/>
-                        <input type="range" min="7" max="15" step="0.1" class="flex-1 w-full range-slider bg-transparent appearance-none"/>
-                    </div>
+                    <input type="range" name="cost-min-range" step="0.1" class="w-full range-slider bg-transparent appearance-none"/>
+                    <input type="range" name="cost-max-range" step="0.1" class="w-full range-slider bg-transparent appearance-none"/>
                 </div>
             </div>
         </div>
 
         <div class="flex flex-row flex-wrap gap-1">
-            <label class="inline-flex items-center cursor-pointer">
-                <input type="checkbox" class="peer hidden" />
-                <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
-                    <span>Балкон</span>
-                </div>
-            </label>
-            <label class="inline-flex items-center cursor-pointer">
-                <input type="checkbox" class="peer hidden" />
-                <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
-                    <span>Линейная планировка</span>
-                </div>
-            </label>
-            <label class="inline-flex items-center cursor-pointer">
-                <input type="checkbox" class="peer hidden" />
-                <div class="min-w-16 flex items-center justify-center rounded-2xl py-1 px-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 transition peer-checked:bg-primary-500 text-black dark:text-gray-300 hover:text-gray-200 peer-checked:text-gray-200">
-                    <span>Линейная планировка</span>
-                </div>
-            </label>
-        </div>
-
-        <div class="flex flex-row flex-wrap gap-1">
-            <button class="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white dark:text-gray-300 dark:hover:text-gray-100 rounded-3xl text-sm px-4 py-2 transition-all active:scale-95">Показать 5 квартир</button>
+            <button name="apply-button" class="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white dark:text-gray-300 dark:hover:text-gray-100 rounded-3xl text-sm px-4 py-2 transition-all active:scale-95">Показать квартиры</button>
         </div>
     </div>
 </template>
