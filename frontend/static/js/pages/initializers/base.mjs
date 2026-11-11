@@ -12,6 +12,7 @@ import { LeftSideModal, RightSideModal } from "../../modals/side-modal.mjs"
 import { FooterButtons } from "../../elements/base/footer-buttons.mjs";
 
 import { MenuHighlighter } from "../base/menu-highlighter.mjs";
+import { NotFoundController } from "../base/not-found-controller.mjs";
 
 
 function createPopupContainer(bus, registry) {
@@ -90,4 +91,5 @@ document.addEventListener("DOMContentLoaded", () => {
     const feedbackController = new FeedbackController({controller: feedbackStore, bus: bus});
 
     const menuHighlighter = createMenuHighlighter(registry);
+    const notFoundController = new NotFoundController({bus: bus});
 });

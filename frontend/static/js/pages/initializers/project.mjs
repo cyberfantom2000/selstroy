@@ -1,6 +1,6 @@
 import { registry, bus } from "./base.mjs";
 
-import { PopupEvents, ProjectEvents, ApartmentEvents, ModelErrorType } from "../../core/events.mjs";
+import { PopupEvents, ProjectEvents, ApartmentEvents } from "../../core/events.mjs";
 
 import { ProjectApi } from "../../api/project.mjs";
 import { ProjectStore } from "../../store/project.mjs";
@@ -34,11 +34,6 @@ function createProject(registry, bus, slug) {
         const project = new Project({registry: registry, bus: bus, slug: slug});
 
         bus.on(ProjectEvents.Error, (type, err) => {
-            if (type === ModelErrorType.NotFound) {
-                window.location.replace('/404');
-                return;
-            }
-
             console.log(err);
             bus.emit(PopupEvents.Message.Err.Show, 'Не удалось загрузить проект. Попробуйте обновить страницу или возвращайтесь позднее');
         });

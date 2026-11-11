@@ -1,5 +1,5 @@
 import { BaseUrls } from "../api/base-urls.mjs";
-import { ProjectEvents, ModelErrorType } from "../core/events.mjs";
+import { ProjectEvents, ModelErrorType, NavigationEvents } from "../core/events.mjs";
 import { normalizeFile, denormalize } from "./common.mjs";
 
 
@@ -110,14 +110,14 @@ export class ProjectStore {
             if (requestId !== this.requestId) return null;
 
             if (data.length === 0) {
-                this.bus.emit(ProjectEvents.Error, ModelErrorType.NotFound, `Project not found for slug ${slug}`);
+                this.bus.emit(NavigationEvents.NotFound, `Project not found for slug ${slug}`);
                 return null;
             }
 
             const projectData = normalizeProject(data[0]);
 
             if (projectData.isDraft) {
-                this.bus.emit(ProjectEvents.Error, ModelErrorType.NotFound, `Project ${slug} is a draft`);
+                this.bus.emit(NavigationEvents.NotFound, `Project ${slug} is a draft`);
                 return null;
             }
 
