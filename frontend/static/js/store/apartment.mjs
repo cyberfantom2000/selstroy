@@ -117,7 +117,6 @@ export class ApartmentStore {
         this.searchApi = searchApi;
         this.bus = bus;
         this.apartments = new Map();
-        this.searchResults = new Map();
         this.requestId = 0;
         this.searchRequestId = 0;
     }
@@ -182,17 +181,9 @@ export class ApartmentStore {
         this.bus.emit(SearchEvents.Loading, true);
 
         try {
-            const payload = {
-                ...denormalizeApartmentFilters(filters),
-                projects: [projectId],
-            };
-            const data = await this.searchApi.searchApartments(payload);
-
+            const apartments = await this.requestApartments(projectId, filters);
             if (requestId !== this.searchRequestId) return;
 
-            const apartments = (data.apartments ?? []).map(normalizeApartment);
-
-            this.searchResults.set(projectId, apartments);
             this.bus.emit(SearchEvents.Result, projectId, apartments);
         } catch (err) {
             if (requestId !== this.searchRequestId) return;
@@ -205,8 +196,13 @@ export class ApartmentStore {
         }
     }
 
-    getSearchResults(projectId) {
-        return this.searchResults.get(projectId) ?? [];
+    async requestApartments(projectId, filters) {
+        const payload = {
+            ...denormalizeApartmentFilters(filters),
+            projects: [projectId],
+        };
+        const data = await this.searchApi.searchApartments(payload);
+        return (data.apartments ?? []).map(normalizeApartment);
     }
 
     async createApartment(data) {

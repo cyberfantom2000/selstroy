@@ -1,9 +1,11 @@
 import { SearchEvents } from "../core/events.mjs";
 import { apartmentTypeLabel } from "../apartment/type.mjs";
+import { Timer } from "../utils/timer.mjs";
 
 
 const MILLION = 1_000_000;
 const COST_STEP = 0.1;
+const LIVE_SEARCH_DELAY_MS = 500;
 
 
 function toMillions(value) {
@@ -51,18 +53,27 @@ export class ApartmentsFilter {
         this.costLimitMaxM = null;
         this.costMidM = null;
         this.resultCount = null;
+        this.searchTimer = new Timer({delay: LIVE_SEARCH_DELAY_MS, singleshot: true});
         this.loading = false;
 
         this.bindCostControls();
         this.bindActions();
+        this.typesContainer.addEventListener('change', () => this.scheduleSearch());
 
         this.bus.on(SearchEvents.Filters, (projectId, filters) => this.update(filters));
-        this.bus.on(SearchEvents.Result, (projectId, apartments) => this.setResultCount(apartments.length));
+        this.bus.on(SearchEvents.Result, (projectId, apartments) => this.handleResult(projectId, apartments));
         this.bus.on(SearchEvents.Loading, (loading) => this.setLoading(loading));
 
         this.container = container;
         this.container.appendChild(this.element);
         this.updateButtonText();
+        this.updateActionsState();
+    }
+
+    handleResult(projectId, apartments) {
+        this.setResultCount(apartments.length);
+
+        this.applyButton.onclick = () => this.bus.emit(SearchEvents.Apply, projectId, apartments);
     }
 
     update(filters = {}) {
@@ -129,12 +140,14 @@ export class ApartmentsFilter {
             const value = Number(this.costMinRange.value);
             this.costMinInput.value = value <= this.costLimitMinM ? '' : value;
             this.updateCostTrack();
+            this.scheduleSearch();
         };
 
         this.costMaxRange.oninput = () => {
             const value = Number(this.costMaxRange.value);
             this.costMaxInput.value = value >= this.costLimitMaxM ? '' : value;
             this.updateCostTrack();
+            this.scheduleSearch();
         };
 
         this.costMinInput.oninput = () => {
@@ -143,6 +156,7 @@ export class ApartmentsFilter {
                 ? this.costLimitMinM
                 : clamp(value, this.costLimitMinM, this.costMidM);
             this.updateCostTrack();
+            this.scheduleSearch();
         };
 
         this.costMaxInput.oninput = () => {
@@ -151,6 +165,7 @@ export class ApartmentsFilter {
                 ? this.costLimitMaxM
                 : clamp(value, this.costMidM, this.costLimitMaxM);
             this.updateCostTrack();
+            this.scheduleSearch();
         };
 
         this.costMinInput.onblur = () => this.normalizeCostInput(this.costMinInput, true);
@@ -210,8 +225,14 @@ export class ApartmentsFilter {
     }
 
     bindActions() {
-        this.applyButton.onclick = () => this.bus.emit(SearchEvents.Request, this.activeFilters());
         this.resetButton.onclick = () => this.reset();
+    }
+
+    scheduleSearch() {
+        this.searchTimer.stop();
+        this.searchTimer.start(() => {
+            this.bus.emit(SearchEvents.Request, this.activeFilters());
+        });
     }
 
     readCostInput(input) {
@@ -266,6 +287,7 @@ export class ApartmentsFilter {
 
     setResultCount(count) {
         this.resultCount = count;
+        this.updateActionsState();
 
         if (!this.loading)
             this.updateButtonText();
@@ -273,11 +295,15 @@ export class ApartmentsFilter {
 
     setLoading(loading) {
         this.loading = loading;
-        this.applyButton.disabled = loading;
-        this.resetButton.disabled = loading;
-        this.applyButton.style.opacity = loading ? '0.5' : '';
-        this.resetButton.style.opacity = loading ? '0.5' : '';
+        this.updateActionsState();
         this.updateButtonText();
+    }
+
+    updateActionsState() {
+        const empty = this.resultCount === null || this.resultCount === 0;
+
+        this.applyButton.disabled = this.loading || empty;
+        this.resetButton.disabled = this.loading;
     }
 
     updateButtonText() {
@@ -295,6 +321,8 @@ export class ApartmentsFilter {
     }
 
     reset() {
+        this.searchTimer.stop();
+
         for (const input of this.typesContainer.querySelectorAll('input'))
             input.checked = false;
 
@@ -308,6 +336,7 @@ export class ApartmentsFilter {
 
         this.updateCostTrack();
         this.resultCount = null;
+        this.updateActionsState();
         this.updateButtonText();
         this.bus.emit(SearchEvents.Request, {});
     }

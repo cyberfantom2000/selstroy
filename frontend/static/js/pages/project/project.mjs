@@ -11,6 +11,7 @@ export class Project {
         this.registry = registry;
         this.slug = slug;
         this.id = null;
+        this.initialResultApplied = false;
 
         this.title = registry.get('project-title');
 
@@ -42,9 +43,28 @@ export class Project {
         });
 
         this.bus.on(SearchEvents.Result, (projectId, apartments) => {
-            if (projectId === this.id)
-                this.apartments.update(apartments);
+            if (projectId !== this.id || this.initialResultApplied)
+                return;
+
+            this.initialResultApplied = true;
+            this.apartments.update(apartments);
         });
+
+        this.bus.on(SearchEvents.Apply, (projectId, apartments) => {
+            if (projectId !== this.id)
+                return;
+
+            this.apartments.update(apartments);
+            this.scrollToApartments();
+        });
+
+        this.bus.on(SearchEvents.Error, () => {
+            this.initialResultApplied = true;
+        });
+    }
+
+    scrollToApartments() {
+        document.getElementById('apartments-section')?.scrollIntoView({behavior: 'smooth', block: 'start'});
     }
 
     update(project) {

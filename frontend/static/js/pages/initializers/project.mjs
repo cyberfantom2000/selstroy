@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const segments = path.split('/').filter(seg => seg !== '');
     const slug = segments[segments.length - 1];
 
-    const project = createProject(registry, bus, slug);
+    createProject(registry, bus, slug);
     createFilter(registry, bus);
     createGalleryPreview(registry, bus);
 
@@ -104,11 +104,11 @@ document.addEventListener("DOMContentLoaded", () => {
             apartmentStore.search(projectId, filters);
     });
 
-    projectStore.loadBySlug(slug).then((project) => {
-        if (!project)
+    projectStore.loadBySlug(slug).then((loadedProject) => {
+        if (!loadedProject)
             return;
 
-        projectId = project.id;
+        projectId = loadedProject.id;
         apartmentStore.loadFilters(projectId);
         apartmentStore.search(projectId, {});
     });

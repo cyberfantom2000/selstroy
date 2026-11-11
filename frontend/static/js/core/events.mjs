@@ -115,6 +115,7 @@ export const SearchEvents = {
     Loading: 'search:loading',
     Filters: 'search:filters',
     Result: 'search:result',
+    Apply: 'search:apply',
     Error: 'search:error',
 };
 
