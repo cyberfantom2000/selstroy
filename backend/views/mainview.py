@@ -11,7 +11,7 @@ class MainViewRouter:
         self.router.add_api_route('/', self.index, include_in_schema=False)
         self.router.add_api_route('/projects', self.projects, include_in_schema=False)
         self.router.add_api_route('/projects/{slug}', self.project, include_in_schema=False)
-        self.router.add_api_route('/flats/{slug}', self.flats, include_in_schema=False)
+        self.router.add_api_route('/apartments/{slug}', self.apartment, include_in_schema=False)
         self.router.add_api_route('/promo', self.promo, include_in_schema=False)
         self.router.add_api_route('/gallery', self.gallery, include_in_schema=False)
         self.router.add_api_route('/contacts', self.contacts, include_in_schema=False)
@@ -38,7 +38,7 @@ class MainViewRouter:
             name='pages/project.html',
         )
 
-    async def flats(self, slug: str, request: Request) -> HTMLResponse:
+    async def apartment(self, slug: str, request: Request) -> HTMLResponse:
         return templates.TemplateResponse(
             request=request,
             name='pages/apartment.html',
