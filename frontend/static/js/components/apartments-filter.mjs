@@ -47,6 +47,8 @@ export class ApartmentsFilter {
         this.costMaxRange = this.element.querySelector('[name="cost-max-range"]');
         this.costTrack = this.element.querySelector('[name="cost-track"]');
         this.applyButton = this.element.querySelector('[name="apply-button"]');
+        this.applyLabel = this.element.querySelector('[name="apply-label"]');
+        this.applySpinner = this.element.querySelector('[name="apply-spinner"]');
         this.resetButton = this.element.querySelector('[name="reset-button"]');
 
         this.costLimitMinM = null;
@@ -307,17 +309,19 @@ export class ApartmentsFilter {
     }
 
     updateButtonText() {
+        this.applySpinner.classList.toggle('hidden', !this.loading);
+
         if (this.loading) {
-            this.applyButton.textContent = 'Ищем...';
+            this.applyLabel.textContent = 'Ищем...';
             return;
         }
 
         if (this.resultCount === null) {
-            this.applyButton.textContent = 'Показать квартиры';
+            this.applyLabel.textContent = 'Показать квартиры';
             return;
         }
 
-        this.applyButton.textContent = `Показать ${this.resultCount} ${apartmentsWord(this.resultCount)}`;
+        this.applyLabel.textContent = `Показать ${this.resultCount} ${apartmentsWord(this.resultCount)}`;
     }
 
     reset() {
