@@ -1,11 +1,21 @@
 """ An apartment represents. The basic model for building an apartment page """
 
+from enum import IntEnum
 from uuid import UUID, uuid4
 from sqlmodel import SQLModel, Field, Relationship
 
 from .apartimage import ApartImage, ApartImagePublic
 from .apartelement import ApartElement, ApartElementPublic
 from ..common import File, FilePublic
+
+
+class ApartmentType(IntEnum):
+    """ Numeric apartment type. Human-readable labels are defined on the frontend """
+    STUDIO = 0
+    ONE_ROOM = 1
+    TWO_ROOM = 2
+    THREE_ROOM = 3
+    FOUR_ROOM = 4
 
 
 class ApartmentPdfLink(SQLModel, table=True):
@@ -16,7 +26,7 @@ class ApartmentPdfLink(SQLModel, table=True):
 class ApartmentBase(SQLModel):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     square: float
-    type: str
+    type: int = Field(ge=ApartmentType.STUDIO.value, le=ApartmentType.FOUR_ROOM.value)
     total_floors: int
     is_draft: bool
     slug: str = Field(unique=True, index=True)
@@ -46,7 +56,7 @@ class ApartmentCreate(ApartmentBase):
 class ApartmentUpdate(ApartmentBase):
     id: UUID
     square: float | None = None
-    type: str | None = None
+    type: int | None = Field(default=None, ge=ApartmentType.STUDIO.value, le=ApartmentType.FOUR_ROOM.value)
     total_floors: int = None
     pdf_id: UUID | None = None
     is_draft: bool | None = None

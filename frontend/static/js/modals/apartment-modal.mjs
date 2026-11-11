@@ -1,6 +1,7 @@
 import { ModalWithTwoButtons} from "./modal.mjs";
 import { isEmpty, isIntegerNumber, toggleOutlineRed } from "../utils/utils.mjs";
 import { ModalEvents } from "../core/events.mjs";
+import { ApartmentType } from "../apartment/type.mjs";
 
 
 const tooltips = {
@@ -65,7 +66,7 @@ export class ApartmentModal extends ModalWithTwoButtons {
         this.projectId.textContent = data.projectId ?? '';
         this.draftCheckbox.checked = data.isDraft ?? true;
         this.square.value = data.square ?? '';
-        this.typeSelect.value = data.type ?? this.typeSelect.options[0].value;
+        this.typeSelect.value = data.type ?? ApartmentType.Studio;
         this.totalFloors.value = data.totalFloors ?? '';
         this.slug.value = data.slug ?? '';
         this.pdfId.value = data.pdfId ?? '';
@@ -76,7 +77,7 @@ export class ApartmentModal extends ModalWithTwoButtons {
             projectId: this.projectId.textContent,
             isDraft: this.draftCheckbox.checked,
             square: this.square.value,
-            type: this.typeSelect.value,
+            type: Number(this.typeSelect.value),
             totalFloors: this.totalFloors.value,
             slug: this.slug.value
         };

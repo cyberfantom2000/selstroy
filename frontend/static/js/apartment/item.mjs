@@ -1,4 +1,5 @@
 import { pretifyCost } from "../utils/utils.mjs"
+import { apartmentTypeLabel } from "./type.mjs"
 
 export class ApartmentItem {
     constructor(registry) {
@@ -14,7 +15,7 @@ export class ApartmentItem {
     update(data) {
         this.element.href = data.url ?? '#';
         this.image.src = data.images.length > 0 ? data.images[0].url : '';
-        this.type.textContent = data.type ?? '';
+        this.type.textContent = apartmentTypeLabel(data.type);
         this.square.textContent = data.square ? `${data.square}  м²` : '';
         this.itemsLeft.textContent = data.floors ? `Осталось: ${data.floors.length} кв.` : '';
 

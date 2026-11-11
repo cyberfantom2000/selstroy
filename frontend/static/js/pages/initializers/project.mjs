@@ -12,9 +12,7 @@ import { GalleryPreview } from "../../components/gallery-preview.mjs";
 
 import { Project } from "../project/project.mjs";
 import { ApartmentsSearchFilter } from "../project/apartments-filter.mjs";
-
-
-const APARTMENT_TYPES = ['Студия', '1', '2', '3+'];
+import { APARTMENT_TYPES } from "../../apartment/type.mjs";
 
 
 function createProject(registry, bus, slug) {

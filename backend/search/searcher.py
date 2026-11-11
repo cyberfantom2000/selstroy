@@ -1,4 +1,3 @@
-import re
 from uuid import UUID
 
 from backend.repository.managers import ModelManager
@@ -44,7 +43,7 @@ class Searcher:
                 accumulated_filters.square_max = project.square_max if accumulated_filters.square_max is None else max(project.square_max, accumulated_filters.square_max)
 
         accumulated_filters.projects = [project.id for project in projects]
-        accumulated_filters.types = sorted(set(accumulated_filters.types), key=self._type_sort_key)
+        accumulated_filters.types = sorted(set(accumulated_filters.types))
         accumulated_filters.release_dates = sorted(set(accumulated_filters.release_dates))
         accumulated_filters.sale_statuses = sorted(set(accumulated_filters.sale_statuses))
 
@@ -96,19 +95,6 @@ class Searcher:
         # Available apartments first, sold-out ones at the end
         result.sort(key=lambda item: not item.items)
         return result
-
-    @staticmethod
-    def _type_sort_key(value: str) -> tuple:
-        """ Sort apartment types: studio first, then numeric types, then the rest """
-        normalized = (value or '').strip().lower()
-        if 'студ' in normalized:
-            return 0, 0, normalized
-
-        match = re.search(r'\d+', normalized)
-        if match:
-            return 1, int(match.group()), normalized
-
-        return 2, 0, normalized
 
     @staticmethod
     def _normalize_apartments_filters(filters: ApartmentFilters) -> dict:

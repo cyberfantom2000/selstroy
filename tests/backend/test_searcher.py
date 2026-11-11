@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+from backend.repository.models.apartment import ApartmentType
 from backend.search import Searcher
 from backend.search.models import ApartmentFilters
 
@@ -12,7 +13,7 @@ def make_item(cost: int) -> SimpleNamespace:
     return SimpleNamespace(cost=cost)
 
 
-def make_apartment(type_: str, is_draft: bool = False, square: float = 50.0,
+def make_apartment(type_: int, is_draft: bool = False, square: float = 50.0,
                    costs: tuple = ()) -> SimpleNamespace:
     return SimpleNamespace(type=type_, is_draft=is_draft, square=square,
                            items=[make_item(cost) for cost in costs])
@@ -53,12 +54,12 @@ async def test_apartments_filters_excludes_drafts_and_sorts(searcher: Searcher):
     second_project = make_project(release_date='2025', sale_status='sold')
 
     first_project.apartments = [
-        make_apartment('2-комн.', costs=(5_000_000, 6_000_000)),
-        make_apartment('1-комн.', costs=(4_000_000,)),
-        make_apartment('3-комн.', is_draft=True, costs=(1_000_000,)),
+        make_apartment(ApartmentType.TWO_ROOM, costs=(5_000_000, 6_000_000)),
+        make_apartment(ApartmentType.ONE_ROOM, costs=(4_000_000,)),
+        make_apartment(ApartmentType.THREE_ROOM, is_draft=True, costs=(1_000_000,)),
     ]
     second_project.apartments = [
-        make_apartment('Студия', costs=(3_000_000,)),
+        make_apartment(ApartmentType.STUDIO, costs=(3_000_000,)),
     ]
 
     searcher.project_manager.get.return_value = [first_project, second_project]
@@ -70,7 +71,7 @@ async def test_apartments_filters_excludes_drafts_and_sorts(searcher: Searcher):
         session=None, filters={'is_draft': False, 'id': project_ids})
 
     assert result.projects == project_ids
-    assert result.types == ['Студия', '1-комн.', '2-комн.']
+    assert result.types == [ApartmentType.STUDIO, ApartmentType.ONE_ROOM, ApartmentType.TWO_ROOM]
     assert result.cost_min == 3_000_000
     assert result.cost_max == 6_000_000
     assert result.release_dates == ['2025', '2026']
@@ -97,15 +98,15 @@ async def test_apartments_excludes_drafts_and_sorts_sold_out_last(searcher: Sear
     draft_project = make_project(is_draft=True)
 
     available = attach_project(
-        make_apartment('1-комн.', square=40.0, costs=(4_000_000,)), published_project)
+        make_apartment(ApartmentType.ONE_ROOM, square=40.0, costs=(4_000_000,)), published_project)
     draft_apartment = attach_project(
-        make_apartment('2-комн.', is_draft=True, square=60.0, costs=(5_000_000,)), published_project)
+        make_apartment(ApartmentType.TWO_ROOM, is_draft=True, square=60.0, costs=(5_000_000,)), published_project)
     apartment_of_draft_project = attach_project(
-        make_apartment('1-комн.', square=50.0, costs=(3_000_000,)), draft_project)
+        make_apartment(ApartmentType.ONE_ROOM, square=50.0, costs=(3_000_000,)), draft_project)
     sold_out = attach_project(
-        make_apartment('3-комн.', square=80.0, costs=()), published_project)
+        make_apartment(ApartmentType.THREE_ROOM, square=80.0, costs=()), published_project)
     expensive = attach_project(
-        make_apartment('2-комн.', square=70.0, costs=(8_000_000,)), published_project)
+        make_apartment(ApartmentType.TWO_ROOM, square=70.0, costs=(8_000_000,)), published_project)
 
     searcher.apartment_manager.get.return_value = [
         available, draft_apartment, apartment_of_draft_project, sold_out, expensive,
@@ -120,21 +121,21 @@ async def test_apartments_excludes_drafts_and_sorts_sold_out_last(searcher: Sear
 @pytest.mark.asyncio
 async def test_apartments_normalizes_type_and_project_filters(searcher: Searcher):
     project = make_project()
-    apartment = attach_project(make_apartment('1-комн.', costs=(4_000_000,)), project)
+    apartment = attach_project(make_apartment(ApartmentType.ONE_ROOM, costs=(4_000_000,)), project)
     searcher.apartment_manager.get.return_value = [apartment]
 
-    await searcher.apartments(None, ApartmentFilters(types=['1-комн.'], projects=[project.id]))
+    await searcher.apartments(None, ApartmentFilters(types=[ApartmentType.ONE_ROOM], projects=[project.id]))
 
     searcher.apartment_manager.get.assert_awaited_once_with(
-        session=None, filters={'type': ['1-комн.'], 'project_id': [project.id]})
+        session=None, filters={'type': [ApartmentType.ONE_ROOM], 'project_id': [project.id]})
 
 
 @pytest.mark.asyncio
 async def test_apartments_cost_filters_exclude_sold_out(searcher: Searcher):
     project = make_project()
-    cheap = attach_project(make_apartment('1-комн.', costs=(4_000_000,)), project)
-    expensive = attach_project(make_apartment('2-комн.', costs=(8_000_000,)), project)
-    sold_out = attach_project(make_apartment('3-комн.', costs=()), project)
+    cheap = attach_project(make_apartment(ApartmentType.ONE_ROOM, costs=(4_000_000,)), project)
+    expensive = attach_project(make_apartment(ApartmentType.TWO_ROOM, costs=(8_000_000,)), project)
+    sold_out = attach_project(make_apartment(ApartmentType.THREE_ROOM, costs=()), project)
     searcher.apartment_manager.get.return_value = [cheap, expensive, sold_out]
 
     no_filter = await searcher.apartments(None, ApartmentFilters())
@@ -156,8 +157,8 @@ async def test_apartments_release_sale_and_square_filters(searcher: Searcher):
     first_project = make_project(release_date='2026', sale_status='open')
     second_project = make_project(release_date='2025', sale_status='sold')
 
-    first = attach_project(make_apartment('1-комн.', square=40.0, costs=(4_000_000,)), first_project)
-    second = attach_project(make_apartment('2-комн.', square=70.0, costs=(5_000_000,)), second_project)
+    first = attach_project(make_apartment(ApartmentType.ONE_ROOM, square=40.0, costs=(4_000_000,)), first_project)
+    second = attach_project(make_apartment(ApartmentType.TWO_ROOM, square=70.0, costs=(5_000_000,)), second_project)
     searcher.apartment_manager.get.return_value = [first, second]
 
     assert await searcher.apartments(None, ApartmentFilters(release_dates=['2025'])) == [second]
@@ -168,7 +169,7 @@ async def test_apartments_release_sale_and_square_filters(searcher: Searcher):
 
 @pytest.mark.asyncio
 async def test_apartments_excludes_apartment_without_project(searcher: Searcher):
-    orphan = make_apartment('1-комн.', costs=(4_000_000,))
+    orphan = make_apartment(ApartmentType.ONE_ROOM, costs=(4_000_000,))
     orphan.project = None
     searcher.apartment_manager.get.return_value = [orphan]
 

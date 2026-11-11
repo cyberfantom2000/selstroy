@@ -10,7 +10,7 @@ class ApartmentFiltersRequest(SQLModel):
 
 class ApartmentFilters(SQLModel):
     projects: list[UUID] = list()
-    types: list[str] = list()
+    types: list[int] = list()
     cost_min: int | None = None
     cost_max: int | None = None
     square_min: float | None = None

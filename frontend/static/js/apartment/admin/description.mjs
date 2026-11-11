@@ -1,4 +1,7 @@
 
+import { apartmentTypeLabel } from "../type.mjs";
+
+
 export class AdminApartmentDescription {
     constructor(element) {
         this.square = element.querySelector('[name="square"]');
@@ -14,7 +17,7 @@ export class AdminApartmentDescription {
 
     update(data) {
         this.square.textContent = data.square ?? '';
-        this.type.textContent = data.type ?? '';
+        this.type.textContent = apartmentTypeLabel(data.type);
         this.totalFloors.textContent = data.totalFloors ?? '';
         this.slug.textContent = data.slug ?? '';
 

@@ -1,3 +1,6 @@
+import { apartmentTypeLabel } from "../../apartment/type.mjs";
+
+
 export class ApartmentsSearchFilter {
     constructor({registry, types}) {
         this.registry = registry;
@@ -6,7 +9,8 @@ export class ApartmentsSearchFilter {
 
         for (const type of types) {
             const chip = registry.getTemplate('apartments-filter-type-template');
-            chip.querySelector('span').textContent = type;
+            chip.querySelector('span').textContent = apartmentTypeLabel(type);
+            chip.querySelector('input').value = type;
             this.typesContainer.appendChild(chip);
         }
     }
