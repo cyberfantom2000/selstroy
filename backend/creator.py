@@ -112,6 +112,7 @@ def register(app, lifespan) -> None:
     async_session = sessionmaker(bind=async_engine, class_=AsyncSession, expire_on_commit=False)
 
     db_allowed_routes = [router.router.prefix for router in routers]
+    db_allowed_routes.extend(['/projects/', '/apartments/'])
     log.info('adding session middleware')
     app.add_middleware(DatabaseSessionMiddleware, session=async_session, allowed_routes=db_allowed_routes)
 
@@ -142,7 +143,7 @@ def register(app, lifespan) -> None:
     lifespan.add_shutdown_task(scheduler.shutdown)
 
     app.mount('/static', static_files, name='static')
-    view_routers = [MainViewRouter()]
+    view_routers = [MainViewRouter(project_manager=project_manager, apartment_manager=apartment_manager)]
     for router in view_routers:
         log.debug(f'register view router: {router}')
         app.include_router(router.router)

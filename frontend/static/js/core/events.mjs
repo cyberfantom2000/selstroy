@@ -125,6 +125,7 @@ export const GalleryEvents = {
 
 export const ModelErrorType = {
     Load: 'load',
+    NotFound: 'not-found',
     Create: 'create',
     Edit: 'download',
     Remove: 'remove',

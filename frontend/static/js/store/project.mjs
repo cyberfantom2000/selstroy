@@ -105,22 +105,33 @@ export class ProjectStore {
         const requestId = ++this.requestId;
         try {
             const data = await this.api.queryProject({slug: slug});
-            if (data.length === 0)
-                throw new Error(`Project not found for slug ${slug}`)
+            if (requestId !== this.requestId) return null;
+
+            if (data.length === 0) {
+                this.bus.emit(ProjectEvents.Error, ModelErrorType.NotFound, `Project not found for slug ${slug}`);
+                return null;
+            }
 
             const projectData = normalizeProject(data[0]);
+
+            if (projectData.isDraft) {
+                this.bus.emit(ProjectEvents.Error, ModelErrorType.NotFound, `Project ${slug} is a draft`);
+                return null;
+            }
 
             const index = this.projects.findIndex(el => projectData.id === el.id);
             if (index === -1)
                 this.projects = [...this.projects, projectData];
             else
                 this.projects[index] = projectData;
-            
+
             this.bus.emit(ProjectEvents.Update, this.projects);
+            return projectData;
         } catch(err) {
-            if (requestId !== this.requestId) return;
+            if (requestId !== this.requestId) return null;
             this.bus.emit(ProjectEvents.Error, ModelErrorType.Load, err.toString());
             console.log(err);
+            return null;
         }
     }
 
