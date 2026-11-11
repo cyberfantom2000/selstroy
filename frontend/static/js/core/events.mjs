@@ -110,6 +110,15 @@ export const ApartmentEvents = {
 };
 
 
+export const SearchEvents = {
+    Request: 'search:request',
+    Loading: 'search:loading',
+    Filters: 'search:filters',
+    Result: 'search:result',
+    Error: 'search:error',
+};
+
+
 export const GalleryEvents = {
     Request: {
         Open: 'gallery:item:open:request',

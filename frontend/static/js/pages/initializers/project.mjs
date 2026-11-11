@@ -1,12 +1,13 @@
 import { registry, bus } from "./base.mjs";
 
-import { PopupEvents, ProjectEvents, ApartmentEvents } from "../../core/events.mjs";
+import { PopupEvents, ProjectEvents, ApartmentEvents, SearchEvents } from "../../core/events.mjs";
 
 import { ProjectApi } from "../../api/project.mjs";
 import { ProjectStore } from "../../store/project.mjs";
 
 import { ApartmentApi } from "../../api/apartment.mjs";
 import { ApartmentStore } from "../../store/apartment.mjs";
+import { SearchApi } from "../../api/search.mjs";
 
 import { GalleryPreview } from "../../components/gallery-preview.mjs";
 
@@ -36,9 +37,14 @@ function createProject(registry, bus, slug) {
             bus.emit(PopupEvents.Message.Err.Show, 'Не удалось загрузить проект. Попробуйте обновить страницу или возвращайтесь позднее');
         });
 
-        bus.on(ApartmentEvents.Error, (err) => {
+        bus.on(ApartmentEvents.Error, (type, err) => {
             console.log(err);
             bus.emit(PopupEvents.Message.Err.Show, 'Не удалось загрузить квартиры. Попробуйте обновить страницу или возвращайтесь позднее');
+        });
+
+        bus.on(SearchEvents.Error, (type, err) => {
+            console.log(err);
+            bus.emit(PopupEvents.Message.Err.Show, 'Не удалось выполнить поиск квартир. Попробуйте обновить страницу или возвращайтесь позднее');
         });
 
         return project;
@@ -83,7 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const projectStore = new ProjectStore({api: projectApi, bus: bus});
 
     const apartmentApi = new ApartmentApi();
-    const apartmentStore = new ApartmentStore({api: apartmentApi, bus: bus});
+    const searchApi = new SearchApi();
+    const apartmentStore = new ApartmentStore({api: apartmentApi, searchApi: searchApi, bus: bus});
 
     const path = window.location.pathname;
     const segments = path.split('/').filter(seg => seg !== '');
@@ -94,7 +101,10 @@ document.addEventListener("DOMContentLoaded", () => {
     createGalleryPreview(registry, bus);
 
     projectStore.loadBySlug(slug).then((project) => {
-        if (project)
-            apartmentStore.load();
+        if (!project)
+            return;
+
+        apartmentStore.loadFilters(project.id);
+        apartmentStore.search(project.id, {});
     });
 });

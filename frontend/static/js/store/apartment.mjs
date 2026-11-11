@@ -1,5 +1,5 @@
 import { ApiUrls, BaseUrls } from "../api/base-urls.mjs";
-import { ApartmentEvents, ModelErrorType } from "../core/events.mjs";
+import { ApartmentEvents, SearchEvents, ModelErrorType } from "../core/events.mjs";
 import { denormalize } from "./common.mjs";
 
 
@@ -46,7 +46,49 @@ function normalizeApartment(data) {
 
     if (data.items)
         result.floors = data.items.map(normalizeFloor);
-    
+
+    return result;
+}
+
+
+function normalizeApartmentFilters(data) {
+    return {
+        projects: data.projects ?? [],
+        types: data.types ?? [],
+        costMin: data.cost_min ?? null,
+        costMax: data.cost_max ?? null,
+        squareMin: data.square_min ?? null,
+        squareMax: data.square_max ?? null,
+        releaseDates: data.release_dates ?? [],
+        saleStatuses: data.sale_statuses ?? [],
+    };
+}
+
+
+function denormalizeApartmentFilters(filters = {}) {
+    const result = {};
+
+    if (filters.types?.length)
+        result.types = filters.types;
+
+    if (filters.costMin !== undefined && filters.costMin !== null)
+        result.cost_min = filters.costMin;
+
+    if (filters.costMax !== undefined && filters.costMax !== null)
+        result.cost_max = filters.costMax;
+
+    if (filters.squareMin !== undefined && filters.squareMin !== null)
+        result.square_min = filters.squareMin;
+
+    if (filters.squareMax !== undefined && filters.squareMax !== null)
+        result.square_max = filters.squareMax;
+
+    if (filters.releaseDates?.length)
+        result.release_dates = filters.releaseDates;
+
+    if (filters.saleStatuses?.length)
+        result.sale_statuses = filters.saleStatuses;
+
     return result;
 }
 
@@ -70,11 +112,14 @@ function denormalizeApartment(data) {
 
 
 export class ApartmentStore {
-    constructor({api, bus}) {
+    constructor({api, searchApi = null, bus}) {
         this.api = api;
+        this.searchApi = searchApi;
         this.bus = bus;
         this.apartments = new Map();
+        this.searchResults = new Map();
         this.requestId = 0;
+        this.searchRequestId = 0;
     }
 
     async load({includeDrafts = false} = {}) {
@@ -83,6 +128,7 @@ export class ApartmentStore {
             const data = includeDrafts
                 ? await this.api.requestAllApartments()
                 : await this.api.queryApartments({is_draft: false});
+
             if (requestId !== this.requestId) return;
 
             const apartments = data.map(normalizeApartment);
@@ -94,9 +140,63 @@ export class ApartmentStore {
             }
         } catch(err) {
             if (requestId !== this.requestId) return;
+
             this.bus.emit(ApartmentEvents.Error, ModelErrorType.Load, err.toString());
             console.log(err);
         }
+    }
+
+    async loadFilters(projectId) {
+        if (!this.searchApi) {
+            this.bus.emit(SearchEvents.Error, ModelErrorType.Load, 'Search API is not configured');
+            return;
+        }
+
+        try {
+            const data = await this.searchApi.requestFilters([projectId]);
+            const filters = normalizeApartmentFilters(data);
+            this.bus.emit(SearchEvents.Filters, projectId, filters);
+        } catch (err) {
+            this.bus.emit(SearchEvents.Error, ModelErrorType.Load, err.toString());
+            console.log(err);
+        }
+    }
+
+    async search(projectId, filters = {}) {
+        if (!this.searchApi) {
+            this.bus.emit(SearchEvents.Error, ModelErrorType.Load, 'Search API is not configured');
+            return;
+        }
+
+        const requestId = ++this.searchRequestId;
+        this.bus.emit(SearchEvents.Loading, true);
+
+        try {
+            const payload = {
+                ...denormalizeApartmentFilters(filters),
+                projects: [projectId],
+            };
+            const data = await this.searchApi.searchApartments(payload);
+
+            if (requestId !== this.searchRequestId) return;
+
+            const apartments = (data.apartments ?? []).map(normalizeApartment);
+
+            this.searchResults.set(projectId, apartments);
+            this.bus.emit(SearchEvents.Result, projectId, apartments);
+        } catch (err) {
+            if (requestId !== this.searchRequestId) return;
+
+            this.bus.emit(SearchEvents.Error, ModelErrorType.Load, err.toString());
+            console.log(err);
+        } finally {
+            if (requestId === this.searchRequestId)
+                this.bus.emit(SearchEvents.Loading, false);
+        }
+    }
+
+    getSearchResults(projectId) {
+        return this.searchResults.get(projectId) ?? [];
     }
 
     async createApartment(data) {

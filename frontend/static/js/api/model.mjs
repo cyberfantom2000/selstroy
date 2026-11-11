@@ -97,8 +97,8 @@ export async function removeModel(baseUrl, id){
     }
 }
 
-export async function createModel(baseUrl, data){
-    const resp = await fetch(baseUrl, {
+export async function postJson(url, data){
+    const resp = await fetch(url, {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
@@ -118,6 +118,10 @@ export async function createModel(baseUrl, data){
         console.error('Failed to parse server response:', err);
         throw new Error('Failed to parse server response');
     }
+}
+
+export async function createModel(baseUrl, data){
+    return await postJson(baseUrl, data);
 }
 
 export async function updateModel(baseUrl, data){
@@ -150,25 +154,6 @@ export async function queryModels(baseUrl, filters, fields) {
         const commaSepFields = fields.join(',');
         url += '?fields=' + commaSepFields;
     }
-    
-    const resp = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(filters),
-        headers: {
-            'accept': 'application/json',
-            'Content-type': 'application/json'
-        }
-    });
 
-    if (!resp.ok) {
-        const error = await extractErrorMessage(resp);
-        throw new Error(error);
-    }
-
-    try {
-        return await resp.json();
-    } catch (err) {
-        console.error('Failed to parse server response:', err);
-        throw new Error('Failed to parse server response');
-    }
+    return await postJson(url, filters);
 }

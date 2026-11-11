@@ -1,4 +1,4 @@
-import { ProjectEvents, ApartmentEvents } from "../../core/events.mjs";
+import { ProjectEvents, SearchEvents } from "../../core/events.mjs";
 import { ImageCarousel } from "../../components/carousel.mjs";
 import { ApartmentsContainer } from "../../projects/apartments-container.mjs";
 import { ProjectDescription } from "./project-description.mjs";
@@ -41,7 +41,7 @@ export class Project {
                 this.update(projects[index]);
         });
 
-        this.bus.on(ApartmentEvents.Update, (projectId, apartments) => {
+        this.bus.on(SearchEvents.Result, (projectId, apartments) => {
             if (projectId === this.id)
                 this.apartments.update(apartments);
         });
