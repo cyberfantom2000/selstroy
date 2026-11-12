@@ -1,4 +1,4 @@
-import { BaseUrls } from "../api/base-urls.mjs";
+import { ApiUrls, BaseUrls } from "../api/base-urls.mjs";
 import { ProjectEvents, ModelErrorType, NavigationEvents } from "../core/events.mjs";
 import { normalizeFile, denormalize } from "./common.mjs";
 
@@ -31,7 +31,7 @@ function normalizeProject(data) {
         slug: data.slug,
         url: `${BaseUrls.projects}/${data.slug}`,
         liveMap: data.live_map,
-        floorSvg: data.floor_svg,
+        floorPlanUrl: data.floor_plan ? `${ApiUrls.media}/${data.floor_plan.id}` : '',
         details: [],
     };
 
@@ -43,6 +43,9 @@ function normalizeProject(data) {
 
     if (data.master_plan)
         result.masterPlaneImage = normalizeFile(data.master_plan);
+
+    if (data.floor_plan)
+        result.floorPlan = normalizeFile(data.floor_plan);
 
     if (data.details)
         result.details = data.details.map(normalizeProjectDetail);
@@ -73,6 +76,9 @@ function denormalizeProject(data) {
 
     if (data.masterPlaneImage)
         result.master_plan_id = data.masterPlaneImage.id;
+
+    if (data.floorPlan !== undefined)
+        result.floor_plan_id = data.floorPlan ? data.floorPlan.id : null;
 
     return result;
 }
