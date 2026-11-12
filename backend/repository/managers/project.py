@@ -17,13 +17,16 @@ class ProjectManager(ModelManager):
         new_item = await super().create(session, new_model)
 
         if new_model.master_plan_id:
-            new_item.master_plan = await self._get_image(session, new_model.master_plan_id)
+            new_item.master_plan = await self._get_file(session, new_model.master_plan_id)
         if new_model.floor_plan_id:
-            new_item.floor_plan = await self._get_image(session, new_model.floor_plan_id)
+            new_item.floor_plan = await self._get_file(session, new_model.floor_plan_id)
+        if new_model.live_map_id:
+            new_item.live_map = await self._get_file(session, new_model.live_map_id)
         if new_model.preview_image_id:
-            new_item.preview_image = await self._get_image(session, new_model.preview_image_id)
+            new_item.preview_image = await self._get_file(session, new_model.preview_image_id)
 
-        if new_model.master_plan_id or new_model.floor_plan_id or new_model.preview_image_id:
+        if (new_model.master_plan_id or new_model.floor_plan_id
+                or new_model.live_map_id or new_model.preview_image_id):
             await self.commit(session)
 
         await self._create_description(session, new_item.id)
@@ -38,29 +41,33 @@ class ProjectManager(ModelManager):
 
         updated_item = await super().update(session, update_model)
 
-        if update_model.master_plan_id is not None:
-            updated_item.master_plan = await self._get_image(session, update_model.master_plan_id)
-        if update_model.preview_image_id is not None:
-            updated_item.preview_image = await self._get_image(session, update_model.preview_image_id)
+        relationships = {
+            'master_plan_id': 'master_plan',
+            'preview_image_id': 'preview_image',
+            'floor_plan_id': 'floor_plan',
+            'live_map_id': 'live_map',
+        }
+        changed = False
+        for field, relationship in relationships.items():
+            if field not in update_model.model_fields_set:
+                continue
 
-        floor_plan_provided = 'floor_plan_id' in update_model.model_fields_set
-        if floor_plan_provided:
-            if update_model.floor_plan_id is not None:
-                updated_item.floor_plan = await self._get_image(session, update_model.floor_plan_id)
+            changed = True
+            file_id = getattr(update_model, field)
+            if file_id is not None:
+                setattr(updated_item, relationship, await self._get_file(session, file_id))
             else:
-                updated_item.floor_plan = None
+                setattr(updated_item, relationship, None)
 
-        if (update_model.master_plan_id is not None
-                or update_model.preview_image_id is not None
-                or floor_plan_provided):
+        if changed:
             updated_item = await super().update(session, updated_item)
 
         return updated_item
 
-    async def _get_image(self, session, img_id) -> SQLModel | None:
-        """ Return image by id """
+    async def _get_file(self, session, file_id) -> SQLModel | None:
+        """ Return file by id """
         tmp_manager = ModelManager(File, self.repo)
-        return await tmp_manager.get_by_id(session, img_id)
+        return await tmp_manager.get_by_id(session, file_id)
 
     async def _create_description(self, session, project_id) -> None:
         """ Create required project description """
