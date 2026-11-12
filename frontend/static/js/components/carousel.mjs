@@ -58,7 +58,7 @@ export class ImageCarousel {
 
         this.slides = [];
         this.dots = [];
-        this.activeSlideIndex = [];
+        this.activeSlideIndex = null;
         this.timer = null;
 
         if (this.enlarge && this.bus) {

@@ -75,7 +75,7 @@ export class Project {
         const images = project.description?.images ?? [];
         this.slides.clear();
         this.slides.append(images.map(el => ({url: el.url})));
-        this.slides.play(60);
+        this.slides.play(20);
 
         this.mainDescription.update({
             title: project.description?.title,
