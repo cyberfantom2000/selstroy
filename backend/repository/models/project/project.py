@@ -19,6 +19,11 @@ class ProjectPreviewImageLink(SQLModel, table=True):
     image_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True, ondelete='CASCADE')
 
 
+class ProjectFloorPlanLink(SQLModel, table=True):
+    project_id: UUID | None = Field(default=None, foreign_key='project.id', primary_key=True, ondelete='CASCADE')
+    floor_plan_id: UUID | None = Field(default=None, foreign_key='file.id', primary_key=True, ondelete='CASCADE')
+
+
 class ProjectBase(SQLModel):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     title: str
@@ -28,7 +33,6 @@ class ProjectBase(SQLModel):
     release_date: str
     is_draft: bool
     slug: str = Field(unique=True, index=True)
-    floor_svg: str | None = Field(default=None)
     live_map: str | None = Field(default=None)
     sale_status: str | None = Field(default=None)
 
@@ -56,6 +60,7 @@ class Project(ProjectBase, table=True):
                                                      'overlaps': 'description,project'
                                                  })
     master_plan: File | None = Relationship(back_populates=None, link_model=ProjectMasterPlanLink, sa_relationship_kwargs={'lazy': 'selectin'})
+    floor_plan: File | None = Relationship(back_populates=None, link_model=ProjectFloorPlanLink, sa_relationship_kwargs={'lazy': 'selectin'})
     apartments: list[Apartment] = Relationship(back_populates='project', cascade_delete=True, sa_relationship_kwargs={'lazy': 'selectin'})
     preview_image: File | None = Relationship(back_populates=None, link_model=ProjectPreviewImageLink, sa_relationship_kwargs={'lazy': 'selectin'})
 
@@ -64,6 +69,7 @@ class ProjectPublic(ProjectBase):
     id: UUID
     description: ProjectDetailsPublic | None
     master_plan: FilePublic | None
+    floor_plan: FilePublic | None
     details: list[ProjectDetailsPublic]
     apartments: list[ApartmentPublic]
     preview_image: FilePublic | None
@@ -71,6 +77,7 @@ class ProjectPublic(ProjectBase):
 
 class ProjectCreate(ProjectBase):
     master_plan_id: UUID | None = None
+    floor_plan_id: UUID | None = None
     preview_image_id: UUID | None = None
 
 
@@ -84,7 +91,7 @@ class ProjectUpdate(ProjectBase):
     release_date: str | None = None
     sale_status: str | None = None
     is_draft: bool | None = None
-    floor_svg: str | None = None
     live_map: str | None = None
     master_plan_id: UUID | None = None
+    floor_plan_id: UUID | None = None
     preview_image_id: UUID | None = None

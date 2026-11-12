@@ -18,10 +18,12 @@ class ProjectManager(ModelManager):
 
         if new_model.master_plan_id:
             new_item.master_plan = await self._get_image(session, new_model.master_plan_id)
+        if new_model.floor_plan_id:
+            new_item.floor_plan = await self._get_image(session, new_model.floor_plan_id)
         if new_model.preview_image_id:
             new_item.preview_image = await self._get_image(session, new_model.preview_image_id)
 
-        if new_model.master_plan_id or new_model.preview_image_id:
+        if new_model.master_plan_id or new_model.floor_plan_id or new_model.preview_image_id:
             await self.commit(session)
 
         await self._create_description(session, new_item.id)
@@ -41,7 +43,16 @@ class ProjectManager(ModelManager):
         if update_model.preview_image_id is not None:
             updated_item.preview_image = await self._get_image(session, update_model.preview_image_id)
 
-        if update_model.master_plan_id is not None or update_model.preview_image_id is not None:
+        floor_plan_provided = 'floor_plan_id' in update_model.model_fields_set
+        if floor_plan_provided:
+            if update_model.floor_plan_id is not None:
+                updated_item.floor_plan = await self._get_image(session, update_model.floor_plan_id)
+            else:
+                updated_item.floor_plan = None
+
+        if (update_model.master_plan_id is not None
+                or update_model.preview_image_id is not None
+                or floor_plan_provided):
             updated_item = await super().update(session, updated_item)
 
         return updated_item
