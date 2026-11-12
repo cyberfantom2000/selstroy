@@ -176,6 +176,10 @@ export const ModalEvents = {
         Open: 'modal:html:view:open',
         Rejected: 'modal:html:view:rejected',
     },
+    FloorPlan: {
+        Open: 'modal:floor:plan:open',
+        Rejected: 'modal:floor:plan:rejected',
+    },
     EditableFile: {
         Open: 'modal:file:edit:open',
         Confirmed: 'modal:file:edit:confirmed',

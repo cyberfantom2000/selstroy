@@ -39,6 +39,25 @@
 
     {% include 'components/templates/gallery-preview.html' %}
 
+    <div id="floor-plan-modal" class="fixed inset-0 z-50 hidden">
+        <div name="background" class="absolute inset-0 bg-black/80"></div>
+
+        <div class="relative flex items-center justify-center w-full h-full p-4 pointer-events-none">
+            <div class="relative w-full h-full bg-gray-200 dark:bg-gray-800 rounded-3xl shadow-xl flex flex-col overflow-hidden pointer-events-auto">
+                <div class="flex justify-end p-2 shrink-0">
+                    <button name="close-button" class="flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-primary-500 active:scale-95">
+                        <svg class="h-6 w-6">
+                            <use href="/static/svg/x-mark.svg#x"></use>
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex-1 p-2 pt-0 min-h-0">
+                    <iframe title="План этажа" class="w-full h-full border-0 rounded-2xl bg-white"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% include 'components/templates/carousel.html' %}
     {% include 'components/templates/project-description.html' %}
     {% include 'components/templates/apartment-item.html' %}

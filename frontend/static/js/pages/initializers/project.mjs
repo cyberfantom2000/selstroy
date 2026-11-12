@@ -13,6 +13,7 @@ import { GalleryPreview } from "../../components/gallery-preview.mjs";
 import { ApartmentsFilter } from "../../components/apartments-filter.mjs";
 
 import { Project } from "../project/project.mjs";
+import { FloorPlanModal } from "../project/floor-plan-modal.mjs";
 
 
 function createProject(registry, bus, slug) {
@@ -70,6 +71,17 @@ function createFilter(registry, bus, containerName, selector) {
 }
 
 
+function createFloorPlanModal(registry, bus) {
+    try {
+        registry.register('floor-plan-modal', '#floor-plan-modal');
+        return new FloorPlanModal({registry: registry, bus: bus});
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
+
+
 function createGalleryPreview(registry, bus) {
     try {
         registry.register('gallery-preview-modal', '#gallery-preview-modal');
@@ -97,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     createFilter(registry, bus, 'apartments-filter-container', '#apartments-filter-container');
     createFilter(registry, bus, 'apartments-filter-bottom-container', '#apartments-filter-bottom-container');
     createGalleryPreview(registry, bus);
+    createFloorPlanModal(registry, bus);
 
     let projectId = null;
 

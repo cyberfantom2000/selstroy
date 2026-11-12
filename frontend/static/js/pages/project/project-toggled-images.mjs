@@ -1,4 +1,5 @@
 import { ModalEvents } from "../../core/events.mjs";
+import { fitFrameContent } from "../../utils/iframe.mjs";
 
 
 const PANEL_CLASS = 'w-full h-[300px] md:h-[400px] bg-gray-300 dark:bg-gray-600 rounded-3xl rounded-tl-none p-2';
@@ -34,11 +35,19 @@ export class ProjectToggledImages {
     update(project) {
         this.clear();
 
-        this.addTab('Этаж', this.createSvgPanel(project.floorSvg));
-        this.addTab('Генплан', this.createImagePanel(project.masterPlaneImage?.url));
-        this.addTab('На карте', this.createMapPanel(project.liveMap));
+        if (project.floorPlanUrl)
+            this.addTab('Этаж', this.createFloorPanel(project.floorPlanUrl));
 
-        this.select(0);
+        if (project.masterPlaneImage?.url)
+            this.addTab('Генплан', this.createImagePanel(project.masterPlaneImage.url));
+
+        if (project.liveMapUrl)
+            this.addTab('На карте', this.createMapPanel(project.liveMapUrl));
+
+        this.container.classList.toggle('hidden', this.tabs.length === 0);
+
+        if (this.tabs.length)
+            this.select(0);
     }
 
     addTab(label, panel) {
@@ -73,15 +82,21 @@ export class ProjectToggledImages {
         return {panel, content};
     }
 
-    createSvgPanel(svg) {
+    createFloorPanel(url) {
         const {panel, content} = this.createPanel();
-        content.innerHTML = svg ?? '';
+        panel.classList.add('cursor-pointer');
+        panel.onclick = () => this.bus.emit(ModalEvents.FloorPlan.Open, url);
 
-        const svgEl = content.querySelector('svg');
-        if (svgEl) {
-            svgEl.style.width = '100%';
-            svgEl.style.height = '100%';
-        }
+        const frame = document.createElement('iframe');
+        frame.className = 'w-full h-full border-0 rounded-2xl bg-white pointer-events-none';
+        frame.src = url;
+        fitFrameContent(frame);
+        content.appendChild(frame);
+
+        const overlay = document.createElement('div');
+        overlay.className = 'absolute bottom-3 right-3 z-10 rounded-full bg-black/60 px-3 py-1 text-sm text-white pointer-events-none';
+        overlay.textContent = 'Развернуть';
+        content.appendChild(overlay);
 
         return panel;
     }
@@ -91,24 +106,21 @@ export class ProjectToggledImages {
 
         const img = document.createElement('img');
         img.className = 'w-full h-full object-cover cursor-pointer';
-        img.src = url ?? '';
+        img.src = url;
         img.onclick = () => this.bus.emit(ModalEvents.ImageGallery.Open, url, {navigable: false});
 
         content.appendChild(img);
         return panel;
     }
 
-    createMapPanel(html) {
+    createMapPanel(url) {
         const {panel, content} = this.createPanel();
-        content.innerHTML = html ?? '';
 
-        const iframe = content.querySelector('iframe');
-        if (iframe) {
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
-            iframe.classList.add('rounded-xl');
-        }
+        const frame = document.createElement('iframe');
+        frame.className = 'w-full h-full border-0 rounded-2xl bg-white';
+        frame.src = url;
 
+        content.appendChild(frame);
         return panel;
     }
 
