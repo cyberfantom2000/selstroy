@@ -18,13 +18,15 @@ export class ApartmentsContainer {
         }
 
         for (const data of apartments) {
-            if (!this.items.has(data.id)) {
-                const item = new ApartmentItem(this.registry);
+            let item = this.items.get(data.id);
+
+            if (!item) {
+                item = new ApartmentItem(this.registry);
                 this.items.set(data.id, item);
-                this.container.appendChild(item.element)
             }
 
-            this.items.get(data.id).update(data);
+            item.update(data);
+            this.container.appendChild(item.element);
         }
     }
 }
