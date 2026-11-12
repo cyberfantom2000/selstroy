@@ -1,5 +1,15 @@
 import { Timer } from "../../utils/timer.mjs";
-import { ProjectEvents, ModalEvents, PopupEvents, ModelErrorType, ProjectImageType, ProjectDetailType } from "../../core/events.mjs";
+import { ProjectEvents, ModalEvents, PopupEvents, ModelErrorType, ProjectFileType, ProjectDetailType } from "../../core/events.mjs";
+
+
+const fileModalTitles = {
+    [ProjectFileType.Preview]: 'Изменить превью',
+    [ProjectFileType.MasterPlan]: 'Изменить генплан',
+    [ProjectFileType.FloorPlan]: 'Изменить файл этажа',
+    [ProjectFileType.LiveMap]: 'Изменить файл карты',
+    [ProjectFileType.Detail]: 'Изменить изображение',
+    [ProjectFileType.Description]: 'Изменить изображение',
+};
 
 
 export class AdminProjectController {
@@ -42,29 +52,34 @@ export class AdminProjectController {
             this.bus.emit(PopupEvents.Message.Inf.Show, "Эта функция пока не реализована");
         });
 
-        /* Project image events */
-        this.bus.on(ProjectEvents.Request.Image.Open, (url) => this.bus.emit(ModalEvents.ImageView.Open, url));
+        /* Project file events */
+        this.bus.on(ProjectEvents.Request.File.Open, ({url, type}) => {
+            const isHtml = type === ProjectFileType.FloorPlan || type === ProjectFileType.LiveMap;
+            this.bus.emit(isHtml ? ModalEvents.HtmlView.Open : ModalEvents.ImageView.Open, url);
+        });
 
-        this.bus.on(ProjectEvents.Request.Image.Create, ({context}) => {
-            this.bus.emit(ModalEvents.EditableImage.Open, {
+        this.bus.on(ProjectEvents.Request.File.Create, ({context}) => {
+            this.bus.emit(ModalEvents.EditableFile.Open, {
+                title: 'Добавить изображение',
                 context: context,
                 data: {}
             });
         });
 
-        this.bus.on(ProjectEvents.Request.Image.Edit, ({context, data}) => {
-            this.bus.emit(ModalEvents.EditableImage.Open, {
+        this.bus.on(ProjectEvents.Request.File.Edit, ({context, data}) => {
+            this.bus.emit(ModalEvents.EditableFile.Open, {
+                title: fileModalTitles[context.type] ?? 'Изменить файл',
                 context: {...context, oldImageId: data ? data.id : null},
                 data: data
             });
         });
 
-        this.bus.on(ProjectEvents.Request.Image.Remove, ({context, data}) => {
+        this.bus.on(ProjectEvents.Request.File.Remove, ({context, data}) => {
             this.bus.emit(ModalEvents.Confirm.Open, {
                 type: context.type,
                 context: context,
                 style: 'danger',
-                text: 'Вы уверены что хотите удалить изображение?',
+                text: 'Вы уверены что хотите удалить файл?',
                 data: data
             });
         });
@@ -93,57 +108,65 @@ export class AdminProjectController {
             });
         });
 
-        /* Project iframe events */
-        this.bus.on(ProjectEvents.Request.IFrame.Open, (data) => this.bus.emit(ModalEvents.IFrameView.Open, data));
-
-        this.bus.on(ProjectEvents.Request.IFrame.Edit, ({context, data}) =>  {
-            this.bus.emit(ModalEvents.EditableIFrame.Open, {
-                context: { ...context, type: ProjectEvents.Request.IFrame.Edit },
-                data: data
-            });
-        });
-
         /* Modal events */
         this.bus.on(ModalEvents.Confirm.Confirmed, (payload) => {
-            if (payload.type === ProjectImageType.Detail || payload.type === ProjectImageType.Description)
-                this.store.updateDetail({id: payload.context.id, images: payload.context.images.filter(el => el.id !== payload.data.id)});
-            
+            if (payload.type === ProjectFileType.Detail || payload.type === ProjectFileType.Description) {
+                const images = payload.context.images.filter(el => el.id !== payload.data.id);
+                if (payload.type === ProjectFileType.Detail)
+                    this.store.updateDetail({id: payload.context.id, images: images});
+                else
+                    this.store.updateDescription({id: payload.context.id, images: images});
+            }
+
+            if (payload.type === ProjectFileType.Preview)
+                this.store.updateProject({id: payload.context.id, previewImage: null});
+
+            if (payload.type === ProjectFileType.MasterPlan)
+                this.store.updateProject({id: payload.context.id, masterPlaneImage: null});
+
+            if (payload.type === ProjectFileType.FloorPlan)
+                this.store.updateProject({id: payload.context.id, floorPlan: null});
+
+            if (payload.type === ProjectFileType.LiveMap)
+                this.store.updateProject({id: payload.context.id, liveMap: null});
+
             if (payload.type === ProjectEvents.Request.Project.Remove)
                 this.store.removeProject(payload.data.id);
-            
+
             if (payload.type === ProjectEvents.Request.ProjectDetail.Remove)
                 this.store.removeDetail(payload.data.id);
         });
 
-        this.bus.on(ModalEvents.EditableImage.Confirmed, ({data, context}) => {
+        this.bus.on(ModalEvents.EditableFile.Confirmed, ({data, context}) => {
             const base = {id: context.id};
 
-            if (context.type === ProjectImageType.Preview)
+            if (context.type === ProjectFileType.Preview)
                 this.store.updateProject({...base, previewImage: data});
 
-            if (context.type === ProjectImageType.MasterPlan)
+            if (context.type === ProjectFileType.MasterPlan)
                 this.store.updateProject({...base, masterPlaneImage: data});
 
-            if (context.type === ProjectImageType.Detail || context.type === ProjectImageType.Description) {
+            if (context.type === ProjectFileType.FloorPlan)
+                this.store.updateProject({...base, floorPlan: data});
+
+            if (context.type === ProjectFileType.LiveMap)
+                this.store.updateProject({...base, liveMap: data});
+
+            if (context.type === ProjectFileType.Detail || context.type === ProjectFileType.Description) {
                 let newImages = [];
-                if (context.request === ProjectEvents.Request.Image.Create)
+                if (context.request === ProjectEvents.Request.File.Create)
                     newImages = [...context.images, data];
 
-                if (context.request === ProjectEvents.Request.Image.Edit) {
+                if (context.request === ProjectEvents.Request.File.Edit) {
                     const index = context.images.findIndex(el => el.id === context.oldImageId);
                     newImages = [...context.images.slice(0, index), data, ...context.images.slice(index + 1)];
                 }
 
-                if (context.type === ProjectImageType.Detail)
+                if (context.type === ProjectFileType.Detail)
                     this.store.updateDetail({...base, images: newImages});
                 else
                     this.store.updateDescription({...base, images: newImages});
             }
-        });
-
-        this.bus.on(ModalEvents.EditableIFrame.Confirmed, ({data, context}) => {
-            if (context.type === ProjectEvents.Request.IFrame.Edit)
-                this.store.updateProject({id: context.id, liveMap: data});
         });
 
         this.bus.on(ModalEvents.Project.Confirmed, (data) => {

@@ -4,8 +4,9 @@ import { DomRegistry } from "../../core/dom-registry.mjs";
 
 import { TooltipModal } from "../../modals/tooltip-modal.mjs";
 import { ConfirmModal } from "../../modals/confirm-modal.mjs";
-import { ImageViewModal, EditableImageModal } from "../../modals/image-modal.mjs";
-import { IFrameViewModal, EditableIFrameModal } from "../../modals/iframe-modal.mjs";
+import { ImageViewModal } from "../../modals/image-modal.mjs";
+import { HtmlViewModal } from "../../modals/html-view-modal.mjs";
+import { EditableFileModal } from "../../modals/file-modal.mjs";
 
 import { MediaApi } from "../../api/media.mjs";
 import { MediaStore } from "../../store/media.mjs";
@@ -83,10 +84,10 @@ function createConfirmModal(bus, registry) {
 }
 
 
-function createEditableImageModal(bus, registry) {
+function createEditableFileModal(bus, registry) {
     try {
-        registry.register('editable-image-modal', '#editable-image-modal');
-        return new EditableImageModal({registry: registry, bus: bus});
+        registry.register('editable-file-modal', '#editable-file-modal');
+        return new EditableFileModal({registry: registry, bus: bus});
     } catch (err) {
         bus.emit(PopupEvents.Message.Err.Show, err);
         console.log(err);
@@ -107,22 +108,10 @@ function createImageViewModal(bus, registry) {
 }
 
 
-function createEditableIFrameModal(bus, registry) {
+function createHtmlViewModal(bus, registry) {
     try {
-        registry.register('editable-iframe-modal', '#editable-iframe-modal');
-        return new EditableIFrameModal({registry: registry, bus: bus});
-    } catch (err) {
-        bus.emit(PopupEvents.Message.Err.Show, err);
-        console.log(err);
-        return null;
-    }
-}
-
-
-function createIFrameViewModal(bus, registry) {
-    try {
-        registry.register('iframe-view-modal', '#iframe-view-modal');
-        return new IFrameViewModal({registry: registry, bus: bus});
+        registry.register('html-view-modal', '#html-view-modal');
+        return new HtmlViewModal({registry: registry, bus: bus});
     } catch (err) {
         bus.emit(PopupEvents.Message.Err.Show, err);
         console.log(err);
@@ -224,7 +213,7 @@ function createProjectsSubpage(bus, registry) {
         registry.register('project-tag-template', '#project-tag-template');
         registry.register('project-detail-admin-template', '#project-detail-admin-template');
         registry.register('editable-image-template', '#editable-image-template');
-        registry.register('editable-iframe-template', '#editable-iframe-template');
+        registry.register('editable-html-template', '#editable-html-template');
         registry.register('apartment-item-template', '#apartment-item-template');
         registry.register('apartment-item-admin-template', '#apartment-item-admin-template');
         registry.register('apartment-floor-template', '#apartment-floor-admin-template');
@@ -324,10 +313,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const tooltipModal = createTooltipModal(bus, registry);
     const confirmModal = createConfirmModal(bus, registry);
-    const editableImageModal = createEditableImageModal(bus, registry);
-    const editableIFrameModal = createEditableIFrameModal(bus, registry);
+    const editableFileModal = createEditableFileModal(bus, registry);
     const imageModal = createImageViewModal(bus, registry);
-    const iframeModal = createIFrameViewModal(bus, registry);
+    const htmlModal = createHtmlViewModal(bus, registry);
 
     // TODO Перенести в отложенную инициализацию и создавать это все когда SubpageManager открывает страницу
     const mediaModal = createMediaModal(bus, registry);

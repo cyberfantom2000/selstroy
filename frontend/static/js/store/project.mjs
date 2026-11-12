@@ -30,7 +30,7 @@ function normalizeProject(data) {
         saleStatus: data.sale_status,
         slug: data.slug,
         url: `${BaseUrls.projects}/${data.slug}`,
-        liveMap: data.live_map,
+        liveMapUrl: data.live_map ? `${ApiUrls.media}/${data.live_map.id}` : '',
         floorPlanUrl: data.floor_plan ? `${ApiUrls.media}/${data.floor_plan.id}` : '',
         details: [],
     };
@@ -46,6 +46,9 @@ function normalizeProject(data) {
 
     if (data.floor_plan)
         result.floorPlan = normalizeFile(data.floor_plan);
+
+    if (data.live_map)
+        result.liveMap = normalizeFile(data.live_map);
 
     if (data.details)
         result.details = data.details.map(normalizeProjectDetail);
@@ -67,18 +70,20 @@ function denormalizeProjectDetail(data) {
 
 function denormalizeProject(data) {
     const bindings = {id: 'id', title: 'title', squareMax: 'square_max', squareMin: 'square_min', tags: 'tags',
-                      isDraft: 'is_draft', releaseDate: 'release_date', saleStatus: 'sale_status', slug: 'slug',
-                      liveMap: 'live_map'};
+                      isDraft: 'is_draft', releaseDate: 'release_date', saleStatus: 'sale_status', slug: 'slug'};
     let result = denormalize(data, bindings);
 
-    if (data.previewImage)
-        result.preview_image_id = data.previewImage.id;
+    if (data.previewImage !== undefined)
+        result.preview_image_id = data.previewImage ? data.previewImage.id : null;
 
-    if (data.masterPlaneImage)
-        result.master_plan_id = data.masterPlaneImage.id;
+    if (data.masterPlaneImage !== undefined)
+        result.master_plan_id = data.masterPlaneImage ? data.masterPlaneImage.id : null;
 
     if (data.floorPlan !== undefined)
         result.floor_plan_id = data.floorPlan ? data.floorPlan.id : null;
+
+    if (data.liveMap !== undefined)
+        result.live_map_id = data.liveMap ? data.liveMap.id : null;
 
     return result;
 }

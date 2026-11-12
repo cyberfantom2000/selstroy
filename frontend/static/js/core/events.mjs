@@ -36,16 +36,11 @@ export const PromoEvents = {
 
 export const ProjectEvents = {
     Request: {
-        Image: {
-            Open: 'project:image:open:request',
-            Create: 'project:image:add:request',
-            Edit: 'project:image:edit:request',
-            Remove: 'project:image:remove:request',
-        },
-        IFrame: {
-            Open: 'project:iframe:open:request',
-            Edit: 'project:iframe:edit:request',
-            Remove: 'project:iframe:remove:request'
+        File: {
+            Open: 'project:file:open:request',
+            Create: 'project:file:add:request',
+            Edit: 'project:file:edit:request',
+            Remove: 'project:file:remove:request',
         },
         ProjectDetail: {
             Create: 'project:detail:create:request',
@@ -66,9 +61,11 @@ export const ProjectEvents = {
 };
 
 
-export const ProjectImageType = {
+export const ProjectFileType = {
     Preview: 'preview',
     MasterPlan: 'master-plan',
+    FloorPlan: 'floor-plan',
+    LiveMap: 'live-map',
     Detail: 'detail',
     Description: 'description',
 };
@@ -76,10 +73,6 @@ export const ProjectImageType = {
 export const ProjectDetailType = {
     Description: 'description',
     Detail: 'detail',
-};
-
-export const ProjectIFrameType = {
-    LiveMap: 'live-map',
 };
 
 
@@ -179,19 +172,14 @@ export const ModalEvents = {
         Open: 'modal:image:view:open',
         Rejected: 'modal:image:view:rejected',
     },
-    IFrameView: {
-        Open: 'modal:iframe:view:open',
-        Rejected: 'modal:iframe:view:rejected',
+    HtmlView: {
+        Open: 'modal:html:view:open',
+        Rejected: 'modal:html:view:rejected',
     },
-    EditableImage: {
-        Open: 'modal:image:edit:open',
-        Confirmed: 'modal:image:edit:confirmed',
-        Rejected: 'modal:image:edit:rejected',
-    },
-    EditableIFrame: {
-        Open: 'modal:iframe:edit:open',
-        Confirmed: 'modal:iframe:edit:confirmed',
-        Rejected: 'modal:iframe:edit:rejected',
+    EditableFile: {
+        Open: 'modal:file:edit:open',
+        Confirmed: 'modal:file:edit:confirmed',
+        Rejected: 'modal:file:edit:rejected',
     },
     Apartment: {
         Open: 'modal:apartment:open',

@@ -11,7 +11,7 @@
     </div>
 </div>
 
-<div id="editable-image-modal" class="fixed inset-0 z-50 hidden">
+<div id="editable-file-modal" class="fixed inset-0 z-50 hidden">
     <div name="background" class="absolute inset-0 bg-black/50"></div>
 
     <div class="flex items-center justify-center min-h-screen p-4">
@@ -51,55 +51,7 @@
 
 {% include 'components/templates/image-view-modal.html' %}
 
-<div id="editable-iframe-modal" class="fixed inset-0 z-50 hidden">
-    <div name="background" class="absolute inset-0 bg-black/50"></div>
-
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="relative w-full max-w-md bg-gray-200 dark:bg-gray-800 rounded-3xl shadow-xl max-h-[90vh] flex flex-col">
-            <div class="p-4 shrink-0">
-                <h2 name="title" class="text-lg font-semibold text-gray-800 dark:text-gray-300"></h2>
-            </div>
-
-            <div class="overflow-y-auto flex-1 p-4">
-                <div class="flex flex-col gap-4">
-                    <div class="flex flex-col w-full p-1">
-                        <div class="flex flex-row justify-between">
-                            <span class="text-sm text-gray-800 dark:text-gray-300">HTML</span>
-                            <button role="tooltip" name="content-tooltip" class="flex items-center justify-center text-gray-400 hover:text-primary-500">
-                                <svg class="h-4 w-4">
-                                    <use href="/static/svg/question.svg#icon"></use>
-                                </svg>
-                            </button>
-                        </div>
-                        <textarea name="content-input" class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 focus:text-gray-800 dark:focus:text-gray-300 placeholder-gray-400 outline-none active:outline-none p-2 rounded-xl min-h-64 resize-none"></textarea>
-                    </div>
-                    <div class="flex flex-col w-full p-1 gap-4">
-                        <button name="preview-button" title="Обновить предпросмотр" class="flex items-center justify-center text-gray-400 hover:text-primary-500">
-                            <svg class="h-4 w-4">
-                                <use href="/static/svg/arrow-bot.svg#icon"></use>
-                            </svg>
-                        </button>
-                    </div>
-                    <div name="content-preview" class="flex flex-col w-full p-1 rounded-3xl">
-
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-4 flex justify-end gap-3">
-                <button name="reject-button" class="bg-gray-300 hover:bg-gray-350  dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-300 rounded-xl p-2 transition-all active:scale-95">
-                    Отменить
-                </button>
-
-                <button name="submit-button" class="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white dark:text-gray-300 dark:hover:text-gray-100 rounded-xl p-2 transition-all active:scale-95">
-                    Подтвердить
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="iframe-view-modal" class="fixed inset-0 z-50 hidden">
+<div id="html-view-modal" class="fixed inset-0 z-50 hidden">
     <div name="background" class="absolute inset-0 bg-black/50"></div>
 
     <div class="flex items-center justify-center min-h-screen p-4">
@@ -111,7 +63,8 @@
                     </svg>
                 </button>
             </div>
-            <div name="iframe-container" class="flex flex-col w-full aspect-video p-4 rounded-3xl">
+            <div class="w-full h-[75vh] p-4">
+                <iframe title="Просмотр файла" class="w-full h-full border-0 rounded-3xl bg-white"></iframe>
             </div>
         </div>
     </div>
@@ -593,31 +546,34 @@
                     <use href="/static/svg/edit.svg#icon"></use>
                 </svg>
             </button>
-            <button name="remove-button" title="Удалить" class="flex items-center justify-center text-gray-400 dark:text-gray-400 hover:text-red-500 active:scale-95">
+            <button name="remove-button" title="Удалить" class="flex items-center justify-center text-gray-400 dark:text-gray-400 hover:text-red-500 active:scale-95 disabled:opacity-50 disabled:pointer-events-none">
                 <svg class="h-3 w-3">
                     <use href="/static/svg/trash.svg#icon"></use>
                 </svg>
             </button>
         </div>
-                        
+
         {% include 'components/dynamic-image.html' %}
     </div>
 </template>
 
-<template id="editable-iframe-template">
+<template id="editable-html-template">
     <div class="flex relative aspect-video h-20">
-        <div class="absolute flex gap-2 p-2 top-2 right-2 bg-gray-700 rounded-3xl z-30">
-            <button name="edit-button" title="Изменить" class="flex items-center justify-center text-gray-400 dark:text-gray-400 hover:text-primary-500 active:scale-95 transition">
+        <div class="absolute flex flex-row gap-2 p-2 top-2 right-2 bg-gray-700 rounded-3xl z-30">
+            <button name="edit-button" title="Изменить" class="flex items-center justify-center text-gray-400 dark:text-gray-400 hover:text-primary-500 active:scale-95">
                 <svg class="h-3 w-3">
                     <use href="/static/svg/edit.svg#icon"></use>
                 </svg>
             </button>
+            <button name="remove-button" title="Удалить" class="flex items-center justify-center text-gray-400 dark:text-gray-400 hover:text-red-500 active:scale-95 disabled:opacity-50 disabled:pointer-events-none">
+                <svg class="h-3 w-3">
+                    <use href="/static/svg/trash.svg#icon"></use>
+                </svg>
+            </button>
         </div>
 
-        <div class="relative w-full h-full overflow-hidden rounded-3xl">
-            <div name="iframe-container" class="w-full h-full"></div>
-            <div class="absolute inset-0 z-10"></div>
-        </div>
+        <iframe name="preview" title="Файл этажа" class="hidden absolute inset-0 w-full h-full border-0 rounded-3xl bg-white pointer-events-none"></iframe>
+        <div name="placeholder" class="absolute inset-0 flex items-center justify-center rounded-3xl bg-gray-200 dark:bg-gray-700 text-xs text-gray-500 dark:text-gray-400">Файл не задан</div>
     </div>
 </template>
 
@@ -670,7 +626,7 @@
 
         <div class="flex flex-row w-full gap-4">
             <div class="flex-shrink-0 bg-gray-300 dark:bg-gray-600 p-2 rounded-3xl">
-                <div class="flex flex-col gap-1 max-h-[350px] overflow-y-auto">
+                <div class="flex flex-col gap-1">
                     <div class="flex flex-col">
                         <span class="w-full text-center text-gray-700 dark:text-gray-300">Превью</span>
                         <div name="preview-image-container" class="flex relative aspect-video h-20">
@@ -682,8 +638,12 @@
                         </div>
                     </div>
                     <div class="flex flex-col">
+                        <span class="w-full text-center text-gray-700 dark:text-gray-300">Этаж</span>
+                        <div name="floor-plan-container" class="flex relative aspect-video h-20"></div>
+                    </div>
+                    <div class="flex flex-col">
                         <span class="w-full text-center text-gray-700 dark:text-gray-300">Карта</span>
-                        <div name="interactive-map-container" class="flex relative aspect-video h-20">    
+                        <div name="interactive-map-container" class="flex relative aspect-video h-20">
                         </div>
                     </div>
                 </div>

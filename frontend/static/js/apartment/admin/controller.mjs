@@ -43,7 +43,7 @@ export class AdminApartmentController {
         });
 
         /* Apartment image events */
-        this.bus.on(ApartmentEvents.Request.Image.Open, (url) => this.bus.emit(ModalEvents.Image.Open, url));
+        this.bus.on(ApartmentEvents.Request.Image.Open, (url) => this.bus.emit(ModalEvents.ImageView.Open, url));
 
         this.bus.on(ApartmentEvents.Request.Image.Create, ({apartmentId}) => {
             this.bus.emit(ModalEvents.ApartmentImage.Open, {
