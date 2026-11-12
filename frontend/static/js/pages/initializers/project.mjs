@@ -53,14 +53,14 @@ function createProject(registry, bus, slug) {
 }
 
 
-function createFilter(registry, bus) {
+function createFilter(registry, bus, containerName, selector) {
     try {
-        registry.register('apartments-filter-container', '#apartments-filter-container');
+        registry.register(containerName, selector);
         registry.register('apartments-filter-template', '#apartments-filter-template');
         registry.register('apartments-filter-type-template', '#apartments-filter-type-template');
 
         return new ApartmentsFilter({
-            container: registry.get('apartments-filter-container'),
+            container: registry.get(containerName),
             registry: registry,
             bus: bus,
         });
@@ -94,7 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const slug = segments[segments.length - 1];
 
     createProject(registry, bus, slug);
-    createFilter(registry, bus);
+    createFilter(registry, bus, 'apartments-filter-container', '#apartments-filter-container');
+    createFilter(registry, bus, 'apartments-filter-bottom-container', '#apartments-filter-bottom-container');
     createGalleryPreview(registry, bus);
 
     let projectId = null;

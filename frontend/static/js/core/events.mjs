@@ -112,6 +112,7 @@ export const ApartmentEvents = {
 
 export const SearchEvents = {
     Request: 'search:request',
+    Changed: 'search:changed',
     Loading: 'search:loading',
     Filters: 'search:filters',
     Result: 'search:result',
