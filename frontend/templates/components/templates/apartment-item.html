@@ -2,7 +2,10 @@
     <a href="" class="flex-1 space-y-2 bg-gray-300 hover:bg-gray-320 dark:bg-gray-760 dark:hover:bg-gray-730 rounded-3xl p-4">
        <div class="flex justify-center">
             <div class="aspect-video w-full max-w-[350px] max-h-[200px]">
-                {% include 'components/covered-dynamic-image.html' %}
+                <div class="relative w-full h-full">
+                    {% include 'components/covered-dynamic-image.html' %}
+                    <span name="sold-out-badge" class="hidden absolute inset-0 flex items-center justify-center rounded-3xl bg-black/40 text-white text-xl font-semibold">Распродано</span>
+                </div>
             </div>
         </div>
 
