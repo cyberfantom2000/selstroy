@@ -8,6 +8,7 @@ function normalizeApartmentImage(data) {
         id: data.id,
         apartmentId: data.apartment_id,
         category: data.category,
+        order: data.order ?? 0,
         imageId: data.image ? data.image.id : '',
         url: data.image ? `${ApiUrls.media}/${data.image.id}` : ''
     };
@@ -42,7 +43,7 @@ function normalizeApartment(data) {
     };
 
     if (data.images)
-        result.images = data.images.map(normalizeApartmentImage);
+        result.images = data.images.map(normalizeApartmentImage).sort((a, b) => a.order - b.order);
 
     if (data.items)
         result.floors = data.items.map(normalizeFloor);
@@ -94,7 +95,7 @@ function denormalizeApartmentFilters(filters = {}) {
 
 
 function denormalizeApartmentImage(data) {
-    const bindings = {id: 'id',  apartmentId: 'apartment_id', category: 'category', imageId: 'image_id'};
+    const bindings = {id: 'id',  apartmentId: 'apartment_id', category: 'category', order: 'order', imageId: 'image_id'};
     return denormalize(data, bindings);
 }
 

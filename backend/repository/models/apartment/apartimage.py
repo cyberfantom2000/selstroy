@@ -19,6 +19,7 @@ class ApartImageImageLink(SQLModel, table=True):
 class ApartImageBase(SQLModel):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     category: str
+    order: int = Field(default=0)
 
 
 class ApartImage(ApartImageBase, table=True):
@@ -43,5 +44,6 @@ class ApartImageCreate(ApartImageBase):
 class ApartImageUpdate(ApartImageBase):
     id: UUID
     category: str | None = None
+    order: int | None = None
     category_icon_id: UUID | None = None
     image_id: UUID | None = None

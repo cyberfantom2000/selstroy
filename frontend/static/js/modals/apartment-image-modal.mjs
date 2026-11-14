@@ -8,6 +8,7 @@ const tooltips = {
     'apartment-id-tooltip': 'Уникальный идентификатор планировки. Присваевается автоматически, неизменяемый. Служебная информация, не отображается на сайте.',
     'image-id-tooltip': 'Уникальный индентификатор медиафайла. Необходим для отображения изображения в элементе.',
     'category-tooltip': 'Категория изображения (тэг). Будет представлен как текст на кнопке для переключения изображения, например "Генплан", "Планировка" и т.д.',
+    'order-tooltip': 'Порядок отображения кнопки-категории. Чем меньше число, тем раньше кнопка.',
 };
 
 
@@ -22,6 +23,7 @@ export class ApartmentImageModal extends ModalWithTwoButtons {
         this.apartmentId = this.element.querySelector('[name="apartment-id"]');
         this.imageId = this.element.querySelector('[name="image-id-input"]');
         this.category = this.element.querySelector('[name="category-input"]');
+        this.order = this.element.querySelector('[name="order-input"]');
 
         for (const button of this.element.querySelectorAll('[role="tooltip"]'))
             button.onclick = () => this.bus.emit(ModalEvents.Tooltip.Open, tooltips[button.name]);
@@ -49,13 +51,15 @@ export class ApartmentImageModal extends ModalWithTwoButtons {
         this.apartmentId.textContent = data.apartmentId ?? '';
         this.imageId.value = data.imageId ?? '';
         this.category.value = data.category ?? '';
+        this.order.value = data.order ?? 0;
     }
 
     data() {
         let result = {
             apartmentId: this.apartmentId.textContent,
             imageId: this.imageId.value,
-            category: this.category.value
+            category: this.category.value,
+            order: Number(this.order.value) || 0
         };
 
         if (!isEmpty(this.id.textContent))
