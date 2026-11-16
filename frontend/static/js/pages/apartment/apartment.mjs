@@ -1,4 +1,6 @@
 import { ApartmentEvents, ProjectEvents, ModelErrorType } from "../../core/events.mjs";
+import { ApartmentType, apartmentTypeLabel } from "../../apartment/type.mjs";
+import { pretifyCost } from "../../utils/utils.mjs";
 
 
 export class Apartment {
@@ -13,6 +15,13 @@ export class Apartment {
         this.loading = registry.get('apartment-loading');
         this.content = registry.get('apartment-content');
         this.error = registry.get('apartment-error');
+
+        this.title = this.content.querySelector('[name="title"]');
+        this.cost = this.content.querySelector('[name="cost"]');
+        this.pdf = this.content.querySelector('[name="pdf"]');
+        this.projectTitle = this.content.querySelector('[name="project-title"]');
+        this.releaseDate = this.content.querySelector('[name="release-date"]');
+        this.floor = this.content.querySelector('[name="floor"]');
 
         this.bus.on(ApartmentEvents.Update, (projectId, apartments) => {
             const apartment = apartments.find(el => el.slug === this.slug);
@@ -44,12 +53,34 @@ export class Apartment {
         if (this.project?.id !== apartment.projectId)
             this.project = null;
 
+        this.updateInfo();
         this.setState(this.project ? 'ready' : 'loading');
     }
 
     updateProject(project) {
         this.project = project;
+        this.updateInfo();
         this.setState('ready');
+    }
+
+    updateInfo() {
+        const apartment = this.apartment;
+        const type = apartmentTypeLabel(apartment.type);
+        const title = type ? (apartment.type === ApartmentType.Studio ? type : `${type} квартира`) : '—';
+        this.title.textContent = `${title} ${apartment.square ?? '—'} м²`;
+
+        const item = apartment.floors?.[0];
+        this.cost.textContent = item ? `${pretifyCost(item.cost)} ₽` : 'Распродано';
+        this.floor.textContent = item?.floor ?? '—';
+
+        this.pdf.classList.toggle('hidden', !apartment.pdfUrl);
+        if (apartment.pdfUrl)
+            this.pdf.setAttribute('href', apartment.pdfUrl);
+        else
+            this.pdf.removeAttribute('href');
+
+        this.projectTitle.textContent = this.project?.title || '—';
+        this.releaseDate.textContent = this.project?.releaseDate || '—';
     }
 
     setState(state) {
