@@ -143,6 +143,35 @@ export class ProjectStore {
         }
     }
 
+    async loadById(id) {
+        const requestId = ++this.requestId;
+        try {
+            const data = await this.api.queryProject({id: id, is_draft: false});
+            if (requestId !== this.requestId) return null;
+
+            if (data.length === 0) {
+                this.bus.emit(ProjectEvents.Error, ModelErrorType.Load, `Project not found for id ${id}`);
+                return null;
+            }
+
+            const projectData = normalizeProject(data[0]);
+
+            const index = this.projects.findIndex(el => projectData.id === el.id);
+            if (index === -1)
+                this.projects = [...this.projects, projectData];
+            else
+                this.projects[index] = projectData;
+
+            this.bus.emit(ProjectEvents.Update, this.projects);
+            return projectData;
+        } catch(err) {
+            if (requestId !== this.requestId) return null;
+            this.bus.emit(ProjectEvents.Error, ModelErrorType.Load, err.toString());
+            console.log(err);
+            return null;
+        }
+    }
+
     async createProject(data) {
         try {
             const reply = normalizeProject(await this.api.createProject(denormalizeProject(data)));
