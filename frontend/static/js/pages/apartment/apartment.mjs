@@ -1,6 +1,7 @@
 import { ApartmentEvents, ProjectEvents, ModelErrorType } from "../../core/events.mjs";
 import { ApartmentType, apartmentTypeLabel } from "../../apartment/type.mjs";
 import { pretifyCost } from "../../utils/utils.mjs";
+import { ApartmentToggledImages } from "./apartment-toggled-images.mjs";
 
 
 export class Apartment {
@@ -15,6 +16,8 @@ export class Apartment {
         this.loading = registry.get('apartment-loading');
         this.content = registry.get('apartment-content');
         this.error = registry.get('apartment-error');
+
+        this.images = new ApartmentToggledImages({container: registry.get('apartment-images'), bus: bus});
 
         this.title = this.content.querySelector('[name="title"]');
         this.cost = this.content.querySelector('[name="cost"]');
@@ -54,12 +57,14 @@ export class Apartment {
             this.project = null;
 
         this.updateInfo();
+        this.images.update(this.apartment, this.project);
         this.setState(this.project ? 'ready' : 'loading');
     }
 
     updateProject(project) {
         this.project = project;
         this.updateInfo();
+        this.images.update(this.apartment, this.project);
         this.setState('ready');
     }
 

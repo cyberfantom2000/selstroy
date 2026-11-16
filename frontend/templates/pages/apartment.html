@@ -41,62 +41,7 @@
             </div>
 
             <div id="apartment-content" class="hidden grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 p-4">
-                <div>
-                    <div class="flex flex-col gap-2 justify-center items-center w-full">
-                        <div class="w-full md:w-auto min-w-0 overflow-x-auto">
-                            <div class="flex lg:grid lg:grid-cols-4 gap-1 w-full">
-                                <label class="flex-shrink-0 cursor-pointer">
-                                    <input type="checkbox" class="peer hidden" disabled />
-                                    <div class="whitespace-nowrap p-1 rounded-xl text-center
-                                                bg-gray-300 dark:bg-gray-600
-                                                hover:bg-primary-500 transition
-                                                peer-checked:bg-primary-500
-                                                text-black dark:text-gray-300
-                                                hover:text-gray-200 peer-checked:text-gray-200">
-                                        Планировка
-                                    </div>
-                                </label>
-                                <label class="flex-shrink-0 cursor-pointer">
-                                    <input type="checkbox" class="peer hidden" disabled />
-                                    <div class="whitespace-nowrap p-1 rounded-xl text-center
-                                                bg-gray-300 dark:bg-gray-600
-                                                hover:bg-primary-500 transition
-                                                peer-checked:bg-primary-500
-                                                text-black dark:text-gray-300
-                                                hover:text-gray-200 peer-checked:text-gray-200">
-                                        Вид из окон
-                                    </div>
-                                </label>
-                                <label class="flex-shrink-0 cursor-pointer">
-                                    <input type="checkbox" class="peer hidden" disabled />
-                                    <div class="whitespace-nowrap p-1 rounded-xl text-center
-                                                bg-gray-300 dark:bg-gray-600
-                                                hover:bg-primary-500 transition
-                                                peer-checked:bg-primary-500
-                                                text-black dark:text-gray-300
-                                                hover:text-gray-200 peer-checked:text-gray-200">
-                                        План этажа
-                                    </div>
-                                </label>
-                                <label class="flex-shrink-0 cursor-pointer">
-                                    <input type="checkbox" class="peer hidden" disabled />
-                                    <div class="whitespace-nowrap p-1 rounded-xl text-center
-                                                bg-gray-300 dark:bg-gray-600
-                                                hover:bg-primary-500 transition
-                                                peer-checked:bg-primary-500
-                                                text-black dark:text-gray-300
-                                                hover:text-gray-200 peer-checked:text-gray-200">
-                                        Генплан
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-center w-full max-w-[500px] aspect-square rounded-3xl bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                            <span>Изображение квартиры</span>
-                        </div>
-                    </div>
-                </div>
+                <div id="apartment-images" class="flex flex-col w-full min-w-0"></div>
 
                 <div class="min-w-0 min-h-0">
                     <div class="flex flex-col rounded-3xl bg-gray-100 dark:bg-gray-600 w-full h-full p-4 gap-4 min-h-0">
@@ -145,6 +90,8 @@
         </div>
     </div>
 
+    {% include 'components/templates/gallery-preview.html' %}
+    {% include 'components/templates/floor-plan-modal.html' %}
 {% endblock %}
 
 {% block include_js %}

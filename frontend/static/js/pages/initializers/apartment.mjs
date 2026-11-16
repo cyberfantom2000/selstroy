@@ -6,6 +6,8 @@ import { ApartmentStore } from "../../store/apartment.mjs";
 import { ProjectApi } from "../../api/project.mjs";
 import { ProjectStore } from "../../store/project.mjs";
 import { Apartment } from "../apartment/apartment.mjs";
+import { GalleryPreview } from "../../components/gallery-preview.mjs";
+import { FloorPlanModal } from "../project/floor-plan-modal.mjs";
 
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -21,8 +23,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     registry.register('apartment-loading', '#apartment-loading');
     registry.register('apartment-content', '#apartment-content');
     registry.register('apartment-error', '#apartment-error');
+    registry.register('apartment-images', '#apartment-images');
+    registry.register('gallery-preview-modal', '#gallery-preview-modal');
+    registry.register('floor-plan-modal', '#floor-plan-modal');
 
     const apartment = new Apartment({registry: registry, bus: bus, slug: slug});
+    const galleryPreview = new GalleryPreview({registry: registry, bus: bus});
+    const floorPlanModal = new FloorPlanModal({registry: registry, bus: bus});
 
     bus.on(ApartmentEvents.Error, (type, err) => {
         if (type !== ModelErrorType.Load)
