@@ -1,5 +1,5 @@
 import { ApiUrls, BaseUrls } from "../api/base-urls.mjs";
-import { ApartmentEvents, SearchEvents, ModelErrorType } from "../core/events.mjs";
+import { ApartmentEvents, SearchEvents, ModelErrorType, NavigationEvents } from "../core/events.mjs";
 import { denormalize } from "./common.mjs";
 
 
@@ -143,6 +143,38 @@ export class ApartmentStore {
 
             this.bus.emit(ApartmentEvents.Error, ModelErrorType.Load, err.toString());
             console.log(err);
+        }
+    }
+
+    async loadBySlug(slug) {
+        const requestId = ++this.requestId;
+        try {
+            const data = await this.api.queryApartments({slug: slug, is_draft: false});
+            if (requestId !== this.requestId) return null;
+
+            if (data.length === 0) {
+                this.bus.emit(NavigationEvents.NotFound, `Apartment not found for slug ${slug}`);
+                return null;
+            }
+
+            const apartment = normalizeApartment(data[0]);
+
+            const projectApartments = [...(this.apartments.get(apartment.projectId) ?? [])];
+            const index = projectApartments.findIndex(el => el.id === apartment.id);
+            if (index === -1)
+                projectApartments.push(apartment);
+            else
+                projectApartments[index] = apartment;
+
+            this.apartments.set(apartment.projectId, projectApartments);
+            this.bus.emit(ApartmentEvents.Update, apartment.projectId, projectApartments);
+            return apartment;
+        } catch(err) {
+            if (requestId !== this.requestId) return null;
+
+            this.bus.emit(ApartmentEvents.Error, ModelErrorType.Load, err.toString());
+            console.log(err);
+            return null;
         }
     }
 

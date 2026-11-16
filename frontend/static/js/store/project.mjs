@@ -117,7 +117,7 @@ export class ProjectStore {
     async loadBySlug(slug) {
         const requestId = ++this.requestId;
         try {
-            const data = await this.api.queryProject({slug: slug});
+            const data = await this.api.queryProject({slug: slug, is_draft: false});
             if (requestId !== this.requestId) return null;
 
             if (data.length === 0) {
@@ -126,11 +126,6 @@ export class ProjectStore {
             }
 
             const projectData = normalizeProject(data[0]);
-
-            if (projectData.isDraft) {
-                this.bus.emit(NavigationEvents.NotFound, `Project ${slug} is a draft`);
-                return null;
-            }
 
             const index = this.projects.findIndex(el => projectData.id === el.id);
             if (index === -1)
