@@ -45,6 +45,8 @@ export class Apartment {
         this.title = this.content.querySelector('[name="title"]');
         this.cost = this.content.querySelector('[name="cost"]');
         this.pdf = this.content.querySelector('[name="pdf"]');
+        this.booking = this.content.querySelector('[name="booking"]');
+        this.bookingUrl = this.booking.getAttribute('href');
         this.projectTitle = this.content.querySelector('[name="project-title"]');
         this.releaseDate = this.content.querySelector('[name="release-date"]');
         this.floor = this.content.querySelector('[name="floor"]');
@@ -120,6 +122,14 @@ export class Apartment {
     }
 
     updateFloors(floors) {
+        const soldOut = floors.length === 0;
+        this.booking.setAttribute('aria-disabled', soldOut ? 'true' : 'false');
+        this.booking.setAttribute('tabindex', soldOut ? '-1' : '0');
+        if (soldOut)
+            this.booking.removeAttribute('href');
+        else
+            this.booking.setAttribute('href', this.bookingUrl);
+
         this.floors.replaceChildren();
         this.floorItems = [];
 
