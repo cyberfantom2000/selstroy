@@ -1,16 +1,24 @@
 
 export class MenuHighlighter {
-    constructor(registry) {
+    constructor(menu) {
         this.paths = {
-            '/': registry.get('menu-home'),
-            '/projects': registry.get('menu-projects'),
-            '/promo': registry.get('menu-promo'),
-            '/gallery': registry.get('menu-gallery'),
-            '/contacts': registry.get('menu-contacts'),
+            '/': menu.querySelector('#menu-home'),
+            '/projects': menu.querySelector('#menu-projects'),
+            '/promo': menu.querySelector('#menu-promo'),
+            '/gallery': menu.querySelector('#menu-gallery'),
+            '/contacts': menu.querySelector('#menu-contacts'),
         };
 
-        const classes = ['text-primary-600', 'dark:text-primary-400'];
+        let path = location.pathname.replace(/\/$/, '') || '/';
+        if (path.startsWith('/projects/') || path.startsWith('/apartments/'))
+            path = '/projects';
 
-        this.paths[location.pathname]?.classList.add(...classes);
+        const activeLink = this.paths[path];
+
+        if (activeLink) {
+            activeLink.classList.remove('text-gray-500', 'dark:text-gray-400');
+            activeLink.classList.add('text-primary-600', 'dark:text-primary-400');
+            activeLink.setAttribute('aria-current', path === location.pathname ? 'page' : 'location');
+        }
     }
 }

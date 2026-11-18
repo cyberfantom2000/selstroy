@@ -36,20 +36,21 @@
     {% endblock %}
 </head>
 <body class="flex flex-col min-h-screen bg-gray-200 dark:bg-gray-800">
-    <header class="sticky w-full top-0 shrink-0 z-50 shadow">
-        <nav class="bg-white border-gray-200 py-2.5 dark:bg-gray-900">
+    <header id="site-header" class="sticky w-full top-0 shrink-0 z-50 shadow">
+        <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 hidden lg:hidden" aria-hidden="true"></div>
+        <nav aria-label="Основная навигация" class="relative bg-white border-gray-200 py-2.5 dark:bg-gray-900">
             <div class="flex items-center px-4 mx-auto">
                 <div class="shrink-0">
-                    <a href="/" class="flex text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
-                        <svg class="h-24 w-24">
+                    <a href="/" aria-label="Новгородсельстрой — главная" class="flex text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                        <svg class="h-16 w-16 lg:h-24 lg:w-24" aria-hidden="true">
                             <use href="/static/svg/logo_color.svg#logo"></use>
                         </svg>
                     </a>
                 </div>
 
                 <div class="flex-1 flex justify-center">
-                    <div class="items-center justify-between hidden w-full lg:flex lg:w-auto lg:order-1" id="mobile-menu-2">
-                        <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
+                    <div class="absolute top-full left-0 hidden w-full max-h-[calc(100dvh-84px)] overflow-y-auto bg-white px-4 pb-4 shadow-lg dark:bg-gray-900 lg:static lg:flex lg:w-auto lg:max-h-none lg:overflow-visible lg:p-0 lg:shadow-none" id="site-navigation">
+                        <ul class="flex flex-col font-medium lg:flex-row lg:space-x-8">
                             <li>
                                 <a id="menu-home" href="/" class="block py-2 pl-3 pr-4 text-gray-500 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-600 lg:p-0 dark:text-gray-400 lg:dark:hover:text-primary-400 dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700 transition-all active:scale-95">Главная</a>
                             </li>
@@ -66,19 +67,29 @@
                                 <a id="menu-contacts" href="/contacts" class="block py-2 pl-3 pr-4 text-gray-500 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-600 lg:p-0 dark:text-gray-400 lg:dark:hover:text-primary-400 dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700 transition-all active:scale-95">Контакты</a>
                             </li>
                         </ul>
+                        <div class="flex flex-col gap-3 px-3 pt-4 text-gray-500 dark:text-gray-400 lg:hidden">
+                            <a href="https://max.ru/u/f9LHodD0cOLmM6jeCsfbJajrusYb9XXeBvMdpPh0z28y_nLKQifuO68rDt4" class="inline-flex items-center gap-2 hover:text-primary-600 dark:hover:text-primary-400">
+                                <svg class="h-6 w-6" aria-hidden="true"><use href="/static/svg/max-messenger-logo-mono.svg#logo"></use></svg>
+                                <span>+7(921)205-72-80</span>
+                            </a>
+                            <a href="tel:+78162774400" class="inline-flex items-center gap-2 hover:text-primary-600 dark:hover:text-primary-400">
+                                <svg class="h-6 w-6" aria-hidden="true"><use href="/static/svg/phone.svg#icon-phone"></use></svg>
+                                <span>+7(8162)77-44-00</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
                 <div class="shrink-0">
                     <div class="flex gap-2 lg:order-2">
                         <div class="flex items-center lg:flex-col gap-2">
-                                <a href="https://max.ru/u/f9LHodD0cOLmM6jeCsfbJajrusYb9XXeBvMdpPh0z28y_nLKQifuO68rDt4" class="inline-flex intems-center space-x-2 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-all active:scale-95">
+                                <a href="https://max.ru/u/f9LHodD0cOLmM6jeCsfbJajrusYb9XXeBvMdpPh0z28y_nLKQifuO68rDt4" aria-label="Написать в MAX: +7(921)205-72-80" class="inline-flex items-center justify-center min-h-11 min-w-11 lg:min-h-0 lg:min-w-0 space-x-2 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-all active:scale-95">
                                     <svg class="h-6 w-6">
                                         <use href="/static/svg/max-messenger-logo-mono.svg#logo"></use>
                                     </svg>
                                     <span class="hidden lg:flex">+7(921)205-72-80</span>
                                 </a>
-                                <a href="tel:+78162774400" class="inline-flex intems-center space-x-2 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-all active:scale-95">
+                                <a href="tel:+78162774400" aria-label="Позвонить: +7(8162)77-44-00" class="inline-flex items-center justify-center min-h-11 min-w-11 lg:min-h-0 lg:min-w-0 space-x-2 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-all active:scale-95">
                                     <svg class="h-6 w-6">
                                         <use href="/static/svg/phone.svg#icon-phone"></use>
                                     </svg>
@@ -86,12 +97,11 @@
                                 </a>
                         </div>
                         <div class="flex items-center lg:hidden">                    
-                            <button data-collapse-toggle="mobile-menu-2" type="button" class="inline-flex items-center text-sm rounded-lg text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 focus:outline-none" aria-controls="mobile-menu-2" aria-expanded="false">
-                                <span class="sr-only">Меню</span>
-                                <svg class="h-7 w-7 transition">
+                            <button id="mobile-menu-toggle" type="button" class="inline-flex items-center justify-center h-11 w-11 text-sm rounded-lg text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600" aria-label="Открыть меню" aria-controls="site-navigation" aria-expanded="false">
+                                <svg name="burger-icon" class="h-7 w-7" aria-hidden="true">
                                     <use href="/static/svg/burger.svg#burger"></use>
                                 </svg>
-                                <svg class="h-6 w-6 hidden transition">
+                                <svg name="close-icon" class="h-7 w-7 hidden" aria-hidden="true">
                                     <use href="/static/svg/x-mark.svg#x"></use>
                                 </svg>
                             </button>
