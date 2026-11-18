@@ -70,13 +70,15 @@
                                 <span>Этаж</span>
                                 <span name="floor">—</span>
                             </div>
+                            <div class="flex justify-between text-gray-700 dark:text-gray-300">
+                                <span>Номер квартиры</span>
+                                <span name="number">—</span>
+                            </div>
                         </div>
 
                         <div class="flex flex-col flex-1 min-h-0 gap-2">
-                            <h3 class="flex-shrink-0 text-gray-700 dark:text-gray-300">Другие квартиры этой планировки</h3>
-                            <div class="flex flex-col flex-1 overflow-y-auto min-h-0 max-h-64 gap-1">
-                                <span class="text-gray-700 dark:text-gray-300">—</span>
-                            </div>
+                            <h3 class="flex-shrink-0 text-gray-700 dark:text-gray-300">Квартиры этой планировки</h3>
+                            <div name="floors" role="group" aria-label="Варианты квартир этой планировки" class="flex flex-col flex-1 overflow-y-auto min-h-0 max-h-64 gap-1"></div>
                         </div>
 
                         <div class="flex justify-center flex-shrink-0">
@@ -89,6 +91,16 @@
             </div>
         </div>
     </div>
+
+    <template id="apartment-floor-template">
+        <button type="button" aria-pressed="false" class="flex justify-between gap-2 shrink-0 rounded-xl px-3 py-2 text-left text-base break-words transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 aria-pressed:bg-primary-600 aria-pressed:text-white aria-[pressed=false]:bg-gray-200 aria-[pressed=false]:text-gray-700 aria-[pressed=false]:hover:bg-gray-300 dark:aria-[pressed=false]:bg-gray-700 dark:aria-[pressed=false]:text-gray-300 dark:aria-[pressed=false]:hover:bg-gray-500">
+            <span name="floor" class="min-w-0"></span>
+            <span name="cost" class="shrink-0 text-right"></span>
+        </button>
+    </template>
+    <template id="apartment-floors-empty-template">
+        <span class="text-sm text-gray-700 dark:text-gray-300">Нет доступных квартир этой планировки</span>
+    </template>
 
     {% include 'components/templates/gallery-preview.html' %}
     {% include 'components/templates/floor-plan-modal.html' %}

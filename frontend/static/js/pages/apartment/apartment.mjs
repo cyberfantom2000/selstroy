@@ -4,6 +4,27 @@ import { pretifyCost } from "../../utils/utils.mjs";
 import { ApartmentToggledImages } from "./apartment-toggled-images.mjs";
 
 
+class FloorItem {
+    constructor(registry) {
+        this.element = registry.getTemplate('apartment-floor-template');
+        this.floor = this.element.querySelector('[name="floor"]');
+        this.cost = this.element.querySelector('[name="cost"]');
+        this.onclick = null;
+        this.element.onclick = () => this.onclick?.(this.id);
+    }
+
+    update(data) {
+        this.id = data.id;
+        this.floor.textContent = `Этаж ${data.floor}`;
+        this.cost.textContent = `${pretifyCost(data.cost)} ₽`;
+    }
+
+    setSelected(selected) {
+        this.element.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    }
+}
+
+
 export class Apartment {
     constructor({bus, registry, slug}) {
         this.bus = bus;
@@ -11,6 +32,8 @@ export class Apartment {
         this.slug = slug;
         this.apartment = null;
         this.project = null;
+        this.selectedItemId = null;
+        this.floorItems = [];
 
         this.element = registry.get('apartment-page');
         this.loading = registry.get('apartment-loading');
@@ -25,6 +48,8 @@ export class Apartment {
         this.projectTitle = this.content.querySelector('[name="project-title"]');
         this.releaseDate = this.content.querySelector('[name="release-date"]');
         this.floor = this.content.querySelector('[name="floor"]');
+        this.number = this.content.querySelector('[name="number"]');
+        this.floors = this.content.querySelector('[name="floors"]');
 
         this.bus.on(ApartmentEvents.Update, (projectId, apartments) => {
             const apartment = apartments.find(el => el.slug === this.slug);
@@ -52,11 +77,21 @@ export class Apartment {
     }
 
     update(apartment) {
+        const items = [...(apartment.floors ?? [])].sort((a, b) => b.floor - a.floor);
+        let selectedItemId = items[0]?.id ?? null;
+        const isSameApartment = this.apartment?.id === apartment.id;
+        const selectedItemExists = items.some(item => item.id === this.selectedItemId);
+
+        if (isSameApartment && selectedItemExists)
+            selectedItemId = this.selectedItemId;
+
         this.apartment = apartment;
         if (this.project?.id !== apartment.projectId)
             this.project = null;
 
+        this.updateFloors(items);
         this.updateInfo();
+        this.selectItem(selectedItemId);
         this.images.update(this.apartment, this.project);
         this.setState(this.project ? 'ready' : 'loading');
     }
@@ -74,10 +109,6 @@ export class Apartment {
         const title = type ? (apartment.type === ApartmentType.Studio ? type : `${type} квартира`) : '—';
         this.title.textContent = `${title} ${apartment.square ?? '—'} м²`;
 
-        const item = apartment.floors?.[0];
-        this.cost.textContent = item ? `${pretifyCost(item.cost)} ₽` : 'Распродано';
-        this.floor.textContent = item?.floor ?? '—';
-
         this.pdf.classList.toggle('hidden', !apartment.pdfUrl);
         if (apartment.pdfUrl)
             this.pdf.setAttribute('href', apartment.pdfUrl);
@@ -86,6 +117,35 @@ export class Apartment {
 
         this.projectTitle.textContent = this.project?.title || '—';
         this.releaseDate.textContent = this.project?.releaseDate || '—';
+    }
+
+    updateFloors(floors) {
+        this.floors.replaceChildren();
+        this.floorItems = [];
+
+        if (floors.length === 0) {
+            this.floors.appendChild(this.registry.getTemplate('apartment-floors-empty-template'));
+            return;
+        }
+
+        for (const floor of floors) {
+            const item = new FloorItem(this.registry);
+            item.onclick = id => this.selectItem(id);
+            item.update(floor);
+            this.floors.appendChild(item.element);
+            this.floorItems.push(item);
+        }
+    }
+
+    selectItem(id) {
+        this.selectedItemId = id;
+        const item = this.apartment.floors?.find(item => item.id === id);
+        this.cost.textContent = item ? `${pretifyCost(item.cost)} ₽` : 'Распродано';
+        this.floor.textContent = item?.floor ?? '—';
+        this.number.textContent = item?.number ?? '—';
+
+        for (const item of this.floorItems)
+            item.setSelected(item.id === id);
     }
 
     setState(state) {

@@ -24,6 +24,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     registry.register('apartment-content', '#apartment-content');
     registry.register('apartment-error', '#apartment-error');
     registry.register('apartment-images', '#apartment-images');
+    registry.register('apartment-floor-template', '#apartment-floor-template');
+    registry.register('apartment-floors-empty-template', '#apartment-floors-empty-template');
     registry.register('gallery-preview-modal', '#gallery-preview-modal');
     registry.register('floor-plan-modal', '#floor-plan-modal');
 
