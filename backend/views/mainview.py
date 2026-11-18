@@ -1,5 +1,7 @@
 from fastapi import Request, APIRouter
-from fastapi.responses import HTMLResponse
+from fastapi.exception_handlers import http_exception_handler
+from fastapi.responses import HTMLResponse, Response
+from starlette.exceptions import HTTPException
 
 from ..repository.managers import ModelManager
 from .templates import templates
@@ -24,7 +26,6 @@ class MainViewRouter:
         self.router.add_api_route('/about', self.about, include_in_schema=False)
         self.router.add_api_route('/renovation', self.renovation, include_in_schema=False)
         self.router.add_api_route('/admin', self.admin, include_in_schema=False)
-        self.router.add_api_route('/{fullpath:path}', self.not_found, include_in_schema=False)
 
     async def index(self, request: Request) -> HTMLResponse:
         return templates.TemplateResponse(
@@ -92,7 +93,11 @@ class MainViewRouter:
             name='pages/admin/admin.html'
         )
 
-    async def not_found(self, request: Request) -> HTMLResponse:
+    async def not_found(self, request: Request, exc: HTTPException | None = None) -> Response:
+        path = request.url.path
+        if exc is not None and (path in ('/api', '/static') or path.startswith(('/api/', '/static/'))):
+            return await http_exception_handler(request, exc)
+
         return templates.TemplateResponse(
             request=request,
             name='pages/404.html',

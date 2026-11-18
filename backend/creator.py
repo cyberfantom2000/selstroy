@@ -147,3 +147,4 @@ def register(app, lifespan) -> None:
     for router in view_routers:
         log.debug(f'register view router: {router}')
         app.include_router(router.router)
+        app.add_exception_handler(404, router.not_found)
