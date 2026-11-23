@@ -38,6 +38,26 @@ export function isJsonContent(resp) {
 }
 
 
+export async function requestModel(url) {
+    const resp = await fetch(url, {
+        method: 'GET',
+        headers: {'accept': 'application/json'}
+    });
+
+    if (!resp.ok) {
+        const error = await extractErrorMessage(resp);
+        throw new Error(error);
+    }
+
+    try {
+        return await resp.json();
+    } catch (err) {
+        console.error('Failed to parse server response:', err);
+        throw new Error('Failed to parse server response');
+    }
+}
+
+
 export async function requestModels(baseUrl, limit=100, offset=0, fields=[]){
     let url = baseUrl + '?limit=' + limit + '&offset=' + offset;
     if(fields.length)

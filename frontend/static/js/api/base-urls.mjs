@@ -9,6 +9,7 @@ export const ApiUrls = {
     apartmentElement: '/api/apartment/element',
     feedback: '/api/feedback',
     gallery: '/api/gallery',
+    settings: '/api/settings',
     searchFilters: '/api/search/apartments/filters',
     searchApartments: '/api/search/apartments'
 };

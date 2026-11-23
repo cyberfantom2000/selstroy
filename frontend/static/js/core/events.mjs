@@ -127,8 +127,15 @@ export const GalleryEvents = {
 };
 
 
+export const SiteSettingsEvents = {
+    Update: 'settings:update',
+    Error: 'settings:error',
+};
+
+
 export const ModelErrorType = {
     Load: 'load',
+    Update: 'update',
     Create: 'create',
     Edit: 'download',
     Remove: 'remove',
