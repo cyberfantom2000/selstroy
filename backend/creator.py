@@ -21,6 +21,7 @@ from .repository.managers import *
 from .repository.models.promotion import *
 from .repository.models.common import *
 from .repository.models.gallery import *
+from .repository.models.settings import SiteSettings
 from .repository.database import AsyncRepository
 from .repository.localstorage import LocalStorage
 from .repository.redis import RedisLocal, RedisRemote, RedisFacade

@@ -15,6 +15,7 @@ from backend.repository.models.promotion import *
 from backend.repository.models.apartment import Apartment, ApartElement, ApartImage
 from backend.repository.models.project import *
 from backend.repository.models.gallery import *
+from backend.repository.models.settings import SiteSettings
 
 
 log = get_logger(settings, 'Migrations', store=False)
