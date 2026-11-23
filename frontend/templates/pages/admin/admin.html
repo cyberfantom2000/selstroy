@@ -43,9 +43,9 @@
                     </a>
                 </div>
 
-                <div class="flex-1 flex justify-center">
-                    <div class="items-center justify-between hidden w-full lg:flex lg:w-auto lg:order-1" id="mobile-menu-2">
-                        <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
+                <div class="flex-1 min-w-0 flex justify-center">
+                    <div class="w-full lg:w-auto" id="mobile-menu-2">
+                        <ul class="flex flex-wrap justify-end lg:justify-center gap-x-4 gap-y-1 font-medium lg:gap-x-8">
                             <li>
                                 <button id="projects-page-button" class="block py-2 pl-3 pr-4 text-gray-500 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-600 lg:p-0 dark:text-gray-400 lg:dark:hover:text-primary-400 dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700 transition-all active:scale-95">
                                     Проекты
@@ -66,6 +66,11 @@
                                     Медиатека
                                 </button>
                             </li>
+                            <li>
+                                <button id="settings-page-button" class="block py-2 pl-3 pr-4 text-gray-500 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-600 lg:p-0 dark:text-gray-400 lg:dark:hover:text-primary-400 dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700 transition-all active:scale-95">
+                                    Настройки
+                                </button>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -80,6 +85,7 @@
                 {% include 'pages/admin/promo-subpage.html' %}
                 {% include 'pages/admin/gallery-subpage.html' %}
                 {% include 'pages/admin/media-subpage.html' %}
+                {% include 'pages/admin/settings-subpage.html' %}
             </div>
         </div>
     </main>

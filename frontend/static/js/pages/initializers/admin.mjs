@@ -40,6 +40,11 @@ import { AdminGalleryController } from "../../gallery/admin/controller.mjs";
 import { AdminGallerySubpage } from "../../gallery/admin/subpage.mjs";
 import { GalleryItemModal } from "../../modals/gallery-item-modal.mjs";
 
+import { SiteSettingsApi } from "../../api/settings.mjs";
+import { SiteSettingsStore } from "../../store/settings.mjs";
+import { AdminSettingsController } from "../../settings/admin/controller.mjs";
+import { AdminSettingsSubpage } from "../../settings/admin/subpage.mjs";
+
 import { SubpageNavigator } from "../subpage-navigator.mjs";
 import { SubpageLoader } from "../subpage-loader.mjs";
 import { SubpageController } from "../subpage-controller.mjs";
@@ -289,12 +294,25 @@ function createGalleryItemModal(bus, registry) {
 }
 
 
+function createSettingsSubpage(bus, registry) {
+    try {
+        registry.register('settings-subpage', '#settings-subpage');
+        return new AdminSettingsSubpage({registry: registry, bus: bus});
+    } catch (err) {
+        bus.emit(PopupEvents.Message.Err.Show, err);
+        console.log(err);
+        return null;
+    }
+}
+
+
 function createSubpageNavigator(bus, registry) {
     try {
         registry.register('projects-subpage-button', '#projects-page-button');
         registry.register('promo-subpage-button', '#promo-page-button');
         registry.register('gallery-subpage-button', '#gallery-page-button');
         registry.register('media-subpage-button', '#media-page-button');
+        registry.register('settings-subpage-button', '#settings-page-button');
         return new SubpageNavigator(bus);
     } catch (err) {
         bus.emit(PopupEvents.Message.Err.Show, err);
@@ -350,16 +368,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const galleryStore = new GalleryStore({api: galleryApi, bus: bus});
     const galleryController = new AdminGalleryController({bus: bus, store: galleryStore});
 
+    const settingsSubpage = createSettingsSubpage(bus, registry);
+    const settingsApi = new SiteSettingsApi();
+    const settingsStore = new SiteSettingsStore({api: settingsApi, bus: bus});
+    const settingsController = new AdminSettingsController({bus: bus, store: settingsStore});
+
     const pageNavigator = createSubpageNavigator(bus, registry);
     pageNavigator.bind(registry.get('projects-subpage-button'), projectsSubpage);
     pageNavigator.bind(registry.get('promo-subpage-button'), promoSubpage);
     pageNavigator.bind(registry.get('gallery-subpage-button'), gallerySubpage);
     pageNavigator.bind(registry.get('media-subpage-button'), mediaSubpage);
+    pageNavigator.bind(registry.get('settings-subpage-button'), settingsSubpage);
 
     const pageLoader = new SubpageLoader(bus);
     pageLoader.bind(promoSubpage, async () => { await promoController.load(); });
     pageLoader.bind(mediaSubpage, async () => { await mediaController.load(); });
     pageLoader.bind(gallerySubpage, async () => { await galleryController.load(); });
+    pageLoader.bind(settingsSubpage, async () => { await settingsController.load(); });
     pageLoader.bind(projectsSubpage, async () => { 
         await projectsController.load();
         await apartmentController.load();

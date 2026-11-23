@@ -11,6 +11,10 @@ import { ProjectsPreviewContainer } from "../index/projects-container.mjs";
 
 import { ImageCarousel } from "../../components/carousel.mjs";
 
+import { SiteSettingsApi } from "../../api/settings.mjs";
+import { SiteSettingsStore } from "../../store/settings.mjs";
+import { IndexSettings } from "../index/site-settings.mjs";
+
 
 function createPromoCarousel(registry, bus) {
     try {
@@ -59,7 +63,23 @@ function createProjectsPreviewContainer(registry, bus) {
 }
 
 
+function createIndexSettings(registry, bus) {
+    try {
+        registry.register('index-settings', '#index-settings');
+        return new IndexSettings({registry: registry, bus: bus});
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
+
+
 document.addEventListener("DOMContentLoaded", () => {
+    const settingsApi = new SiteSettingsApi();
+    const settingsStore = new SiteSettingsStore({api: settingsApi, bus: bus});
+    const settings = createIndexSettings(registry, bus);
+    settingsStore.load();
+
     const promoApi = new PromoApi();
     const promoStore = new PromoStore({api: promoApi, bus: bus});
 

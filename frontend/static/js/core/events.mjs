@@ -128,7 +128,14 @@ export const GalleryEvents = {
 
 
 export const SiteSettingsEvents = {
+    Request: {
+        Load: 'settings:load:request',
+        SaveStatistics: 'settings:statistics:save:request',
+        EditImage: 'settings:image:edit:request',
+        RemoveImage: 'settings:image:remove:request',
+    },
     Update: 'settings:update',
+    State: 'settings:state',
     Error: 'settings:error',
 };
 
