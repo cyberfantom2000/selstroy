@@ -85,6 +85,9 @@ export class AdminSettingsController {
             });
         }
 
+        if (result && operation !== 'load')
+            this.bus.emit(PopupEvents.Message.Inf.Show, 'Изменения сохранены');
+
         return result;
     }
 

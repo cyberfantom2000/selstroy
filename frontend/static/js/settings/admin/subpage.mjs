@@ -17,16 +17,18 @@ export class AdminSettingsSubpage extends Page {
         this.status = this.pageContainer.querySelector('[name="status"]');
         this.error = this.pageContainer.querySelector('[name="error"]');
         this.retryButton = this.pageContainer.querySelector('[name="retry-button"]');
-        this.imagePlaceholder = this.pageContainer.querySelector('[name="image-placeholder"]');
         this.fields = Object.fromEntries(
             [...this.form.querySelectorAll('input')].map(input => [input.name, input])
         );
 
-        this.heroImage = new EditableImage(this.pageContainer.querySelector('[name="hero-image"]'));
+        this.heroImage = new EditableImage(registry.getTemplate('editable-image-template'));
+        this.heroImage.update(null);
+        this.heroImage.image.classList.add('hidden');
         this.heroImage.editClicked = () => this.bus.emit(SiteSettingsEvents.Request.EditImage);
         this.heroImage.removeClicked = () => this.bus.emit(SiteSettingsEvents.Request.RemoveImage);
         this.heroImage.clicked = url => this.bus.emit(ModalEvents.ImageView.Open, url);
-        this.heroImage.image.onerror = () => this.showImageError();
+        this.heroImage.image.onerror = () => this.heroImage.image.classList.add('hidden');
+        this.pageContainer.querySelector('[name="hero-image"]').appendChild(this.heroImage.element);
 
         this.retryButton.onclick = () => this.bus.emit(SiteSettingsEvents.Request.Load);
         this.form.addEventListener('input', () => { this.statisticsDirty = true; });
@@ -49,8 +51,6 @@ export class AdminSettingsSubpage extends Page {
         this.settings = data;
         this.heroImage.update(data.heroImage);
         this.heroImage.image.classList.toggle('hidden', !data.heroImage);
-        this.imagePlaceholder.classList.toggle('hidden', !!data.heroImage);
-        this.imagePlaceholder.textContent = 'Изображение не задано';
 
         if (updateStatistics) {
             for (const [name, input] of Object.entries(this.fields))
@@ -70,11 +70,5 @@ export class AdminSettingsSubpage extends Page {
         this.status.textContent = message;
         this.error.textContent = error ?? '';
         this.error.classList.toggle('hidden', !error);
-    }
-
-    showImageError() {
-        this.heroImage.image.classList.add('hidden');
-        this.imagePlaceholder.classList.remove('hidden');
-        this.imagePlaceholder.textContent = 'Не удалось загрузить изображение';
     }
 }

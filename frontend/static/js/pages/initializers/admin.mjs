@@ -217,7 +217,6 @@ function createProjectsSubpage(bus, registry) {
         registry.register('project-item-admin-template', '#admin-project-item-template');
         registry.register('project-tag-template', '#project-tag-template');
         registry.register('project-detail-admin-template', '#project-detail-admin-template');
-        registry.register('editable-image-template', '#editable-image-template');
         registry.register('editable-html-template', '#editable-html-template');
         registry.register('apartment-item-template', '#apartment-item-template');
         registry.register('apartment-item-admin-template', '#apartment-item-admin-template');
@@ -325,6 +324,7 @@ function createSubpageNavigator(bus, registry) {
 document.addEventListener("DOMContentLoaded", () => {
     const bus = new EventBus();
     const registry = new DomRegistry();
+    registry.register('editable-image-template', '#editable-image-template');
 
     const popupContainer = createPopupContainer(bus, registry);
     const popupController = new PopupController(bus);

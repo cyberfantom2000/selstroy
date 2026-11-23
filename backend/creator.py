@@ -17,7 +17,16 @@ from .auth.secrets import SECRET_KEY
 from .tasks import ClearTokenTask
 from .repository.models.project import *
 from .repository.models.apartment import *
-from .repository.managers import *
+from .repository.managers import (
+    ApartImageManager,
+    ApartmentManager,
+    AuthModelManager,
+    ModelManager,
+    ProjectDetailsManager,
+    ProjectManager,
+    PromotionManager,
+    SiteSettingsManager,
+)
 from .repository.models.promotion import *
 from .repository.models.common import *
 from .repository.models.gallery import *

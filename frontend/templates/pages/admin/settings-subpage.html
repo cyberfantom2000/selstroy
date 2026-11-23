@@ -5,21 +5,12 @@
     <button name="retry-button" type="button" class="hidden mb-4 rounded-xl bg-gray-300 dark:bg-gray-600 px-4 py-2 disabled:opacity-50">Повторить загрузку</button>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <fieldset name="image-controls" disabled class="min-w-0 rounded-3xl bg-white dark:bg-gray-900 p-4 md:p-6">
+        <fieldset name="image-controls" disabled class="min-w-0 rounded-3xl bg-white dark:bg-gray-900">
             <legend class="sr-only">Главное изображение</legend>
-            <h2 class="text-lg font-semibold mb-2">Главное изображение</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Загрузите изображение в медиатеку и скопируйте его ID. Замена и снятие картинки сохраняются сразу.</p>
-            <div name="hero-image" class="flex flex-col gap-3">
-                <div class="flex items-center justify-center h-64 rounded-2xl bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                    <img alt="Главное изображение" class="hidden w-full h-full object-cover cursor-pointer">
-                    <p name="image-placeholder" class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">Изображение не задано</p>
-                </div>
-                <div class="flex flex-wrap gap-3">
-                    <button name="edit-button" type="button" class="rounded-xl bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 disabled:opacity-50">Указать ID изображения</button>
-                    <button name="remove-button" type="button" disabled class="rounded-xl bg-gray-200 dark:bg-gray-700 px-4 py-2 disabled:opacity-50">Снять изображение</button>
-                </div>
+            <div class="flex h-full flex-col">
+                <h2 class="mx-4 mt-4 text-lg font-semibold">Главное изображение</h2>
+                <div name="hero-image" class="relative m-2 grow min-h-64 [&>div]:absolute [&>div]:inset-0 [&>div]:w-full [&>div]:h-full [&_img]:object-cover"></div>
             </div>
-            <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">Снятие изображения не удаляет файл из медиатеки.</p>
         </fieldset>
 
         <form name="statistics-form" class="min-w-0 rounded-3xl bg-white dark:bg-gray-900 p-4 md:p-6">

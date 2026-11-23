@@ -613,8 +613,8 @@
 </template>
 
 <template id="admin-project-item-template">
-    <div class="flex flex-col gap-1 w-full">
-        <div name="item-container" class="flex w-full">
+    <div class="flex flex-col gap-1 w-full min-w-0 [overflow-wrap:anywhere]">
+        <div name="item-container" class="flex w-full [&_[name=title]]:line-clamp-2 [&_[name=title]]:text-3xl md:[&_[name=title]]:text-5xl">
         </div>
 
         <div class="flex flex-row gap-2 justify-end items-center">
@@ -635,7 +635,7 @@
             </button>
         </div>
 
-        <div class="flex flex-row w-full gap-4">
+        <div class="flex flex-wrap w-full gap-4">
             <div class="flex-shrink-0 bg-gray-300 dark:bg-gray-600 p-2 rounded-3xl">
                 <div class="flex flex-col gap-1">
                     <div class="flex flex-col">
@@ -660,33 +660,33 @@
                 </div>
             </div>
 
-            <div class="flex-shrink-0 bg-gray-300 dark:bg-gray-600 p-2 rounded-3xl">
+            <div class="min-w-0 flex-1 basis-64 bg-gray-300 dark:bg-gray-600 p-2 rounded-3xl">
                 <div class="w-full text-center pb-2">
                     <span class="text-gray-700 dark:text-gray-300">Параметры</span>
                 </div>
                 <div name="description-container" class="flex flex-col gap-2">
                     <div class="flex flex-row gap-2">
-                        <span class="text-gray-800 dark:text-gray-300">Заголовок:</span>
+                        <span class="shrink-0 text-gray-800 dark:text-gray-300">Заголовок:</span>
                         <span name="title" class="text-gray-600 dark:text-gray-400"></span>
                     </div>
                     <div class="flex flex-row gap-2">
-                        <span class="text-gray-800 dark:text-gray-300">Плоащдь мин.:</span>
+                        <span class="shrink-0 text-gray-800 dark:text-gray-300">Плоащдь мин.:</span>
                         <span name="square-min" class="text-gray-600 dark:text-gray-400"></span>
                     </div>
                     <div class="flex flex-row gap-2">
-                        <span class="text-gray-800 dark:text-gray-300">Площадь макс.:</span>
+                        <span class="shrink-0 text-gray-800 dark:text-gray-300">Площадь макс.:</span>
                         <span name="square-max" class="text-gray-600 dark:text-gray-400"></span>
                     </div>
                     <div class="flex flex-row gap-2">
-                        <span class="text-gray-800 dark:text-gray-300">Статус:</span>
+                        <span class="shrink-0 text-gray-800 dark:text-gray-300">Статус:</span>
                         <span name="sale-status" class="text-gray-600 dark:text-gray-400"></span>
                     </div>
                     <div class="flex flex-row gap-2">
-                        <span class="text-gray-800 dark:text-gray-300">Слаг:</span>
+                        <span class="shrink-0 text-gray-800 dark:text-gray-300">Слаг:</span>
                         <span name="slug" class="text-gray-600 dark:text-gray-400">-</span>
                     </div>
                     <div class="flex flex-row gap-2">
-                        <span class="text-gray-800 dark:text-gray-300">Тэги:</span>
+                        <span class="shrink-0 text-gray-800 dark:text-gray-300">Тэги:</span>
                         <span name="tags" class="text-gray-600 dark:text-gray-400">-</span>
                     </div>
                     <div class="flex w-full">
@@ -699,7 +699,7 @@
                 </div>
             </div>
 
-            <div name="detail-description-container" class="flex flex-col flex-grow bg-gray-300 dark:bg-gray-600 p-2 gap-2 rounded-3xl">
+            <div name="detail-description-container" class="flex flex-col min-w-0 flex-1 basis-64 bg-gray-300 dark:bg-gray-600 p-2 gap-2 rounded-3xl">
                 <div class="w-full text-center">
                     <span class="text-gray-700 dark:text-gray-300">Описание</span>
                 </div>
@@ -709,7 +709,7 @@
                 </div>
             </div>
 
-            <div name="details-container" class="flex flex-col flex-grow bg-gray-300 dark:bg-gray-600 p-2 gap-2 rounded-3xl">
+            <div name="details-container" class="flex flex-col min-w-0 flex-1 basis-64 bg-gray-300 dark:bg-gray-600 p-2 gap-2 rounded-3xl">
                 <div class="w-full text-center">
                     <span class="text-gray-700 dark:text-gray-300">Доп. описания</span>
                 </div>
