@@ -9,7 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from common import settings, get_logger, DatabaseDSN
 
-from .api import create_model_router, ModelCollection, FileRouter, AuthRouter, FeedbackRouter, SearchRouter
+from .api import create_model_router, ModelCollection, FileRouter, AuthRouter, FeedbackRouter, SearchRouter, SiteSettingsRouter
 from .api.middlewares import HttpExceptionMapper, DatabaseSessionMiddleware, OAuthMiddleware
 from .api.openapi import custom_openapi
 from .auth import AuthSystem, Hasher, TokenManager, AuthSecrets, TokenConfig
@@ -70,6 +70,7 @@ def register(app, lifespan) -> None:
                 ]
 
     routers = [create_model_router(manager, collection, **kwargs) for manager, collection, kwargs in elements]
+    routers.append(SiteSettingsRouter(SiteSettingsManager(repo), prefix='/api/settings', tags=['Site Settings']))
 
     smtp = SmtpClient()
     feedback_router = FeedbackRouter(smtp, prefix='/api/feedback', tags=['Feedback'])

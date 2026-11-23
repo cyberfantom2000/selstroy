@@ -5,3 +5,4 @@ from .project import ProjectManager
 from .projectdetails import ProjectDetailsManager
 from .promotion import PromotionManager
 from .authmanager import AuthModelManager
+from .settings import SiteSettingsManager
