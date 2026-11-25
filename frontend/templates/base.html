@@ -1,41 +1,6 @@
-<!DOCTYPE html>
- <html lang="en">
-<head>
-    <!-- <link rel="canonical" href="https://demo.themesberg.com/landwind/" /> -->
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>СЗ "Новгородсельстрой"</title>
+{% extends 'layout.html' %}
 
-    <!-- Meta SEO -->
-    <meta name="title" content="СЗ &quot;Новгородсельстрой&quot;">
-    <meta name="description" content="Get started with a free and open-source landing page built with Tailwind CSS and the Flowbite component library.">
-    <meta name="robots" content="index, follow">
-    <meta name="language" content="Russia">
-
-    <!-- Social media share -->
-    <meta property="og:title" content="СЗ &quot;Новгородсельстрой&quot;">
-    <meta property="og:site_name" content="СЗ &quot;Новгородсельстрой&quot;">
-    <!-- <meta property="og:url" content="https://demo.themesberg.com/landwind/"> -->
-    <meta property="og:description" content="ООО &quot; Спецзастройщик &quot; Новгородсельстрой&quot; г. Великий Новгород, ул. Стратилатовская, 17">
-    <meta property="og:type" content="website">
-    <!-- <meta property="og:image" content="https://themesberg.s3.us-east-2.amazonaws.com/public/github/landwind/og-image.png"> -->
-
-    <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
-    <link rel="manifest" href="/static/configs/site.webmanifest">
-    <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="theme-color" content="#ffffff">
-
-    <link href="/static/css/output.css" rel="stylesheet">
-
-    {% block include_css %}
-
-    {% endblock %}
-</head>
-<body class="flex flex-col min-h-screen bg-gray-200 dark:bg-gray-800">
+{% block body %}
     <header id="site-header" class="sticky w-full top-0 shrink-0 z-50 shadow">
         <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 hidden lg:hidden" aria-hidden="true"></div>
         <nav aria-label="Основная навигация" class="relative bg-white border-gray-200 py-2.5 dark:bg-gray-900">
@@ -198,7 +163,7 @@
                         </button>
                         
 
-                        <a href="https://vk.com/novgorodselstroy" target="_blank" rel="noopener noreferrer" class="flex justify-between items-center bg-gray-300 hover:bg-gray-320 dark:bg-gray-600 dark:hover:bg-gray-550 cursor-pointer rounded-3xl px-3 group">
+                        <a href="https://vk.com/novgorodselstroy" target="_blank" rel="noopener noreferrer" class="primary-action flex justify-between items-center bg-gray-300 hover:bg-gray-320 dark:bg-gray-600 dark:hover:bg-gray-550 cursor-pointer rounded-3xl px-3 group">
                             <div class="flex flex-col gap-2 p-3 text-left">
                                 <span class="text-gray-800 group-hover:text-black dark:text-gray-200 dark:group-hover:text-gray-100 text-xl">Хотите быть в курсе событий?</span>
                                 <span class="text-gray-600 group-hover:text-gray-700 dark:text-gray-300 dark:group-hover:text-gray-200 text-lg">Наша группа в VK!</span>
@@ -262,5 +227,4 @@
     {% block include_js %}
 
     {% endblock %}
-</body>
-</html>
+{% endblock %}

@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root:not(.dark) button,
+  :root:not(.dark) a.bg-primary-600,
+  :root:not(.dark) .primary-action,
+  :root:not(.dark) #site-header a[href^="tel:"],
+  :root:not(.dark) #site-header a[href^="https://max.ru/"] {
+    --primary-600: #22845f;
+    --primary-700: #146746;
+  }
+}
+
 @media (hover: none) and (pointer: coarse) {
   .touch\:opacity-100 { opacity: 1 !important; }
   .touch\:visible { visibility: visible !important; }
