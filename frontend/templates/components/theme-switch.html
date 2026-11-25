@@ -1,0 +1,20 @@
+<label class="inline-flex shrink-0 cursor-pointer">
+    <span class="relative block h-11 w-12 shrink-0 lg:h-8">
+        <input type="checkbox" role="switch" aria-label="Тёмная тема" name="theme-switch" class="peer sr-only">
+        <span aria-hidden="true" class="absolute inset-x-0 inset-y-2.5 rounded-full bg-sky-50 shadow-inner ring-1 ring-inset ring-black/10 transition-colors duration-300 peer-checked:bg-gray-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-600 motion-reduce:transition-none lg:inset-y-1"></span>
+        <span aria-hidden="true" class="absolute left-0.5 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-sky-300 shadow-sm ring-1 ring-inset ring-white/30 transition-[transform,background-color] duration-300 ease-in-out peer-checked:translate-x-6 peer-checked:bg-gray-600 peer-checked:[&_[name=sun]]:rotate-90 peer-checked:[&_[name=sun]]:scale-50 peer-checked:[&_[name=sun]]:opacity-0 peer-checked:[&_[name=moon]]:rotate-0 peer-checked:[&_[name=moon]]:scale-100 peer-checked:[&_[name=moon]]:opacity-100 motion-reduce:transition-none lg:top-1.5">
+            <svg name="sun" viewBox="0 0 24 24" class="absolute h-4 w-4 text-yellow-100 transition-[transform,opacity] duration-300 ease-in-out motion-reduce:transition-none" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <circle cx="12" cy="12" r="4.5" fill="currentColor" stroke="none"></circle>
+                <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+            </svg>
+            <svg name="moon" viewBox="0 0 24 24" class="absolute h-4 w-4 -rotate-90 scale-50 opacity-0 transition-[transform,opacity] duration-300 ease-in-out motion-reduce:transition-none">
+                <circle cx="12" cy="12" r="9" fill="#e5e7eb"></circle>
+                <g fill="#9ca3af">
+                    <circle cx="9" cy="9" r="2"></circle>
+                    <circle cx="15.5" cy="11" r="1.5"></circle>
+                    <circle cx="11.5" cy="16" r="2.5"></circle>
+                </g>
+            </svg>
+        </span>
+    </span>
+</label>

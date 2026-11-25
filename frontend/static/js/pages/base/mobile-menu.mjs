@@ -75,7 +75,7 @@ export class MobileMenu {
 
         if (event.key !== 'Tab') return;
 
-        const links = [...this.header.querySelectorAll('a, button')].filter((element) => element.getClientRects().length);
+        const links = [...this.header.querySelectorAll('a, button, input')].filter((element) => element.getClientRects().length);
         const first = links[0];
         const last = links[links.length - 1];
 
