@@ -1,6 +1,11 @@
 import { ModalEvents, GalleryEvents } from "../../core/events.mjs";
-import { GalleryItem } from "../../gallery/item.mjs"
-import { Modal } from "../../modals/modal.mjs";
+import { GalleryItem } from "../../gallery/item.mjs";
+
+
+const Direction = {
+    Next: 1,
+    Previous: -1,
+};
 
 
 export class GalleryContainer {
@@ -9,31 +14,34 @@ export class GalleryContainer {
         this.bus = bus;
         this.items = [];
 
-        this.element = this.registry.get('gallery-container');
+        this.element = this.registry.get('gallery');
+        this.itemsContainer = this.element.querySelector('[name="items"]');
+        this.empty = this.element.querySelector('[name="empty"]');
 
         this.bus.on(GalleryEvents.Update, (items) => this.updateGallery(items));
-
-        this.bus.on(ModalEvents.ImageGallery.Next, (payload) => {
-            const index = this.items.findIndex(el => el.id === payload.id);
-            
-            if (index === -1)
-                return;
-
-            const nextIndex = (index + 1) % this.items.length;
-            const item = this.items[nextIndex];
-            this.bus.emit(ModalEvents.ImageGallery.Open, item.url, {id: item.id});
+        this.bus.on(GalleryEvents.Error, () => {
+            this.element.setAttribute('aria-busy', 'false');
         });
 
-        this.bus.on(ModalEvents.ImageGallery.Previous, (payload) => {
-            const index = this.items.findIndex(el => el.id === payload.id);
+        this.bus.on(ModalEvents.ImageGallery.Next, ({id}) => this.switchImage(Direction.Next, id));
+        this.bus.on(ModalEvents.ImageGallery.Previous, ({id}) => this.switchImage(Direction.Previous, id));
+    }
 
-            if (index === -1)
-                return;
-
-            const prevIndex = (index - 1 + this.items.length) % this.items.length;
-            const item = this.items[prevIndex];
-            this.bus.emit(ModalEvents.ImageGallery.Open, item.url, {id: item.id});
+    sendOpenRequest(item) {
+        this.bus.emit(ModalEvents.ImageGallery.Open, item.url, {
+            id: item.id,
+            index: this.items.indexOf(item),
+            total: this.items.length,
+            navigable: this.items.length > 1,
         });
+    }
+
+    switchImage(direction, id) {
+        const index = this.items.findIndex(item => item.id === id);
+        if (index === -1 || this.items.length < 2) return;
+
+        const nextIndex = (index + direction + this.items.length) % this.items.length;
+        this.sendOpenRequest(this.items[nextIndex]);
     }
 
     updateGallery(galleryItems) {
@@ -44,10 +52,13 @@ export class GalleryContainer {
 
         for (const data of galleryItems) {
             const item = new GalleryItem(this.registry);
-            item.clicked = (url) => this.bus.emit(ModalEvents.ImageGallery.Open, url, {id: data.id});
-            this.element.prepend(item.element)
-            this.items = [item, ...this.items];
+            item.clicked = () => this.sendOpenRequest(item);
+            this.itemsContainer.prepend(item.element);
+            this.items.unshift(item);
             item.update(data);
         }
+
+        this.empty.classList.toggle('hidden', this.items.length > 0);
+        this.element.setAttribute('aria-busy', 'false');
     }
 }

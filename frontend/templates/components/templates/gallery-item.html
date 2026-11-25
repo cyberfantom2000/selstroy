@@ -1,5 +1,5 @@
 <template id="gallery-item-template">
-    <div class="flex aspect-square h-[200px] hover:cursor-pointer">
+    <button type="button" aria-label="Открыть фотографию объекта" class="relative block w-full aspect-square rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 [&_img]:max-w-none [&_img]:transition-[width,height,inset] [&_img]:duration-300 [&_img]:ease-out motion-safe:hover:[&_img]:w-[105%] motion-safe:hover:[&_img]:h-[105%] motion-safe:hover:[&_img]:-inset-[2.5%]">
         {% include 'components/covered-dynamic-image.html' %}
-    </div>
+    </button>
 </template>

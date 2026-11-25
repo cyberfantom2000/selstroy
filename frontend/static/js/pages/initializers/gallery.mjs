@@ -11,11 +11,11 @@ import { GalleryPreview } from "../../components/gallery-preview.mjs";
 
 function createGalleryContainer(registry, bus) {
     try {
-        registry.register('gallery-container', '#gallery-container');
+        registry.register('gallery', '#gallery');
         registry.register('gallery-item-template', '#gallery-item-template');
 
-        bus.on(GalleryEvents.Error, (err) => {
-            console.log(err);
+        bus.on(GalleryEvents.Error, (type, error) => {
+            console.log(error);
             bus.emit(PopupEvents.Message.Err.Show, 'Не удалось загрузить галерею. Попробуйте обновить страницу или возвращайтесь позднее');
         });
 
