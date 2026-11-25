@@ -1,8 +1,5 @@
 <section id="settings-subpage" class="hidden w-full p-4 text-gray-800 dark:text-gray-300" aria-labelledby="settings-title">
     <h1 id="settings-title" class="text-2xl font-semibold mb-4">Настройки главной страницы</h1>
-    <p name="status" role="status" aria-live="polite" class="mb-4 text-sm text-gray-600 dark:text-gray-400"></p>
-    <p name="error" role="alert" class="hidden mb-4 text-sm text-red-600 dark:text-red-400 break-words"></p>
-    <button name="retry-button" type="button" class="hidden mb-4 rounded-xl bg-gray-300 dark:bg-gray-600 px-4 py-2 disabled:opacity-50">Повторить загрузку</button>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <fieldset name="image-controls" disabled class="min-w-0 rounded-3xl bg-white dark:bg-gray-900">
@@ -33,7 +30,7 @@
                     <span>Жителей</span>
                     <input name="residentsCount" type="number" required min="0" step="1" max="9007199254740991" class="w-full rounded-xl bg-gray-100 dark:bg-gray-700 px-3 py-2">
                 </label>
-                <button type="submit" class="self-start rounded-xl bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 disabled:opacity-50">Сохранить показатели</button>
+                <button type="submit" disabled class="self-start rounded-xl bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 disabled:opacity-50">Сохранить показатели</button>
             </fieldset>
         </form>
     </div>

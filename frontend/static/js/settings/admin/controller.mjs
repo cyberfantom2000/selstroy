@@ -1,22 +1,13 @@
 import { SiteSettingsEvents, ModalEvents, PopupEvents } from "../../core/events.mjs";
 
 
-const messages = {
-    load: ['Загрузка настроек…', 'Настройки загружены'],
-    image: ['Сохранение изображения…', 'Изображение сохранено'],
-    statistics: ['Сохранение показателей…', 'Показатели сохранены'],
-};
-
-
 export class AdminSettingsController {
     constructor({bus, store}) {
         this.bus = bus;
         this.store = store;
         this.busy = false;
-        this.error = null;
 
         this.bus.on(SiteSettingsEvents.Error, (type, error) => this.onError(error));
-        this.bus.on(SiteSettingsEvents.Request.Load, () => this.load());
         this.bus.on(SiteSettingsEvents.Request.SaveStatistics, data => {
             if (!this.store.current()) return;
 
@@ -65,9 +56,8 @@ export class AdminSettingsController {
         if (this.busy) return null;
 
         this.busy = true;
-        this.error = null;
         this.bus.emit(SiteSettingsEvents.State, {
-            busy: true, operation, message: messages[operation][0], error: null,
+            busy: true, operation,
         });
 
         let result = null;
@@ -80,8 +70,6 @@ export class AdminSettingsController {
             this.bus.emit(SiteSettingsEvents.State, {
                 busy: false,
                 operation: null,
-                message: result ? messages[operation][1] : '',
-                error: result ? null : this.error ?? 'Не удалось выполнить запрос',
             });
         }
 
@@ -92,7 +80,6 @@ export class AdminSettingsController {
     }
 
     onError(error) {
-        this.error = error;
         this.bus.emit(PopupEvents.Message.Err.Show, error);
     }
 }

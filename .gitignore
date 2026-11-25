@@ -215,3 +215,6 @@ package-lock.json
 AGENTS.md
 CLAUDE.md
 .paiw
+
+uploads/
+output.css

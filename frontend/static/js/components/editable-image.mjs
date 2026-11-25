@@ -11,6 +11,10 @@ export class EditableImage extends EditableFile {
         this.image.onclick = () => { if (this.clicked && this.data) this.clicked(this.data.url); };
     }
 
+    hide(hidden = true) {
+        this.image.classList.toggle('hidden', hidden);
+    }
+
     update(data) {
         super.update(data);
 

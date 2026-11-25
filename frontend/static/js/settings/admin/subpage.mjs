@@ -7,30 +7,27 @@ export class AdminSettingsSubpage extends Page {
     constructor({registry, bus}) {
         super({pageContainer: registry.get('settings-subpage')});
         this.bus = bus;
-        this.settings = null;
+        this.loaded = false;
         this.operation = null;
         this.statisticsDirty = false;
 
         this.form = this.pageContainer.querySelector('[name="statistics-form"]');
+        this.submitButton = this.form.querySelector('[type="submit"]');
         this.statisticsControls = this.form.querySelector('fieldset');
         this.imageControls = this.pageContainer.querySelector('[name="image-controls"]');
-        this.status = this.pageContainer.querySelector('[name="status"]');
-        this.error = this.pageContainer.querySelector('[name="error"]');
-        this.retryButton = this.pageContainer.querySelector('[name="retry-button"]');
         this.fields = Object.fromEntries(
             [...this.form.querySelectorAll('input')].map(input => [input.name, input])
         );
 
         this.heroImage = new EditableImage(registry.getTemplate('editable-image-template'));
         this.heroImage.update(null);
-        this.heroImage.image.classList.add('hidden');
+        this.heroImage.hide();
         this.heroImage.editClicked = () => this.bus.emit(SiteSettingsEvents.Request.EditImage);
         this.heroImage.removeClicked = () => this.bus.emit(SiteSettingsEvents.Request.RemoveImage);
         this.heroImage.clicked = url => this.bus.emit(ModalEvents.ImageView.Open, url);
-        this.heroImage.image.onerror = () => this.heroImage.image.classList.add('hidden');
+        this.heroImage.image.onerror = () => this.heroImage.hide();
         this.pageContainer.querySelector('[name="hero-image"]').appendChild(this.heroImage.element);
 
-        this.retryButton.onclick = () => this.bus.emit(SiteSettingsEvents.Request.Load);
         this.form.addEventListener('input', () => { this.statisticsDirty = true; });
         this.form.addEventListener('submit', event => {
             event.preventDefault();
@@ -47,10 +44,10 @@ export class AdminSettingsSubpage extends Page {
     }
 
     update(data) {
-        const updateStatistics = !this.settings || !this.statisticsDirty || this.operation === 'statistics';
-        this.settings = data;
+        const updateStatistics = !this.loaded || !this.statisticsDirty || this.operation === 'statistics';
+        this.loaded = true;
         this.heroImage.update(data.heroImage);
-        this.heroImage.image.classList.toggle('hidden', !data.heroImage);
+        this.heroImage.hide(!data.heroImage);
 
         if (updateStatistics) {
             for (const [name, input] of Object.entries(this.fields))
@@ -60,15 +57,11 @@ export class AdminSettingsSubpage extends Page {
         }
     }
 
-    setState({busy, operation, message, error}) {
+    setState({busy, operation}) {
         this.operation = operation;
         this.pageContainer.setAttribute('aria-busy', String(busy));
-        this.imageControls.disabled = busy || !this.settings;
-        this.statisticsControls.disabled = busy || !this.settings;
-        this.retryButton.disabled = busy;
-        this.retryButton.classList.toggle('hidden', busy || !!this.settings || !error);
-        this.status.textContent = message;
-        this.error.textContent = error ?? '';
-        this.error.classList.toggle('hidden', !error);
+        this.imageControls.disabled = busy || !this.loaded;
+        this.statisticsControls.disabled = busy || !this.loaded;
+        this.submitButton.disabled = busy || !this.loaded;
     }
 }
